@@ -11,7 +11,7 @@ export default function Nav() {
     <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 100 }}>
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '4rem' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-         <img src="/IMG_5432-removebg-preview (1).png" alt="DudeMD" style={{ height: '40px', width: 'auto' }} />
+         <img src="/IMG_5432-removebg-preview%20(1).png" alt="DudeMD" style={{ height: '40px', width: 'auto' }} />
         </Link>
         <nav style={{ display: 'flex', gap: '2rem' }} className="desktop-nav">
           {LINKS.map((item) => (
