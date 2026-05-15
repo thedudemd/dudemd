@@ -9,9 +9,9 @@ export default function Nav() {
 
   return (
     <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 100 }}>
-      <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0' }}>
+      <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', minHeight: '80px' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-       <img src="/dudemd-logo.png" alt="DudeMD" style={{ width: '300px', height: 'auto', display: 'block' }} />
+       <img src="/<img src="/dudemd-logo.png" alt="DudeMD" style={{ width: '300px', height: 'auto', display: 'block', flexShrink: 0 }} />
             <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none' }}>
               {item}
             </Link>
