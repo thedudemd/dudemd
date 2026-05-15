@@ -11,7 +11,7 @@ export default function Nav() {
     <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 100 }}>
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '100px' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-        <img src="/IMG_5432-removebg-preview%20(1).png" alt="DudeMD" style={{ height: 'auto', width: 'auto', objectFit: 'contain' }} />
+        <img src="/IMG_5432-removebg-preview%20(1).png" alt="DudeMD" style={{ height: '160', width: 'auto', objectFit: 'contain' }} />
           {LINKS.map((item) => (
             <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none' }}>
               {item}
