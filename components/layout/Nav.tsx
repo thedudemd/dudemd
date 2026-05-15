@@ -11,7 +11,7 @@ export default function Nav() {
     <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 100 }}>
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-       <img src="/dudemd-logo.png" alt="DudeMD" style={{ width: '200px', height: 'auto', display: 'block' }} />
+       <img src="/dudemd-logo.png" alt="DudeMD" style={{ width: '280px', height: 'auto', display: 'block' }} />
             <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none' }}>
               {item}
             </Link>
