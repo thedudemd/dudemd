@@ -9,15 +9,26 @@ export default function Nav() {
 
   return (
     <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 100 }}>
-      <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0', minHeight: '80px' }}>
+      <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '14px', paddingBottom: '14px' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-       <img src="/<img src="/dudemd-logo.png" alt="DudeMD" style={{ width: '300px', height: 'auto', display: 'block', flexShrink: 0 }} />
-            <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none' }}>
+          <img
+            src="/dudemd-logo.png"
+            alt="DudeMD"
+            style={{
+              width: 'clamp(160px, 20vw, 280px)',
+              height: 'auto',
+              display: 'block',
+            }}
+          />
+        </Link>
+        <nav style={{ display: 'flex', gap: '2rem' }} className="desktop-nav">
+          {LINKS.map((item) => (
+            <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none', letterSpacing: '0.03em' }}>
               {item}
             </Link>
           ))}
         </nav>
-        <button onClick={() => setOpen(!open)} className="mobile-menu-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'none' }} aria-label="Menu">
+        <button onClick={() => setOpen(!open)} className="mobile-menu-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}>
           <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
           <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
           <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
@@ -34,15 +45,6 @@ export default function Nav() {
           </div>
         </div>
       )}
-      <style>{`
-        @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .mobile-menu-btn { display: block !important; }
-        }
-        @media (min-width: 769px) {
-          .mobile-menu-btn { display: none !important; }
-        }
-      `}</style>
     </header>
   )
 }
