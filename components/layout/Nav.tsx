@@ -1,22 +1,53 @@
+i'use client'
 import Link from 'next/link'
+import { useState } from 'react'
+
+const LINKS = ['Health', 'Fitness', 'Recovery', 'Style', 'Gear']
 
 export default function Nav() {
+  const [open, setOpen] = useState(false)
+
   return (
-    <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee' }}>
+    <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 100 }}>
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '4rem' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
           <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.5rem', color: '#0e1a2b', letterSpacing: '-0.02em' }}>
             Dude<span style={{ color: '#c9b28f' }}>MD</span>
           </span>
         </Link>
-        <nav style={{ display: 'flex', gap: '2rem' }}>
-          {['Health','Fitness','Style','Gear'].map((item) => (
-            <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none', letterSpacing: '0.02em' }}>
+        <nav style={{ display: 'flex', gap: '2rem' }} className="desktop-nav">
+          {LINKS.map((item) => (
+            <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none' }}>
               {item}
             </Link>
           ))}
         </nav>
+        <button onClick={() => setOpen(!open)} className="mobile-menu-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'none' }} aria-label="Menu">
+          <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
+          <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
+          <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
+        </button>
       </div>
+      {open && (
+        <div style={{ backgroundColor: '#f7f4ee', borderTop: '1px solid #ede8df', padding: '1rem 0' }}>
+          <div className="container-content">
+            {LINKS.map((item) => (
+              <Link key={item} href={`/category/${item.toLowerCase()}`} onClick={() => setOpen(false)} style={{ display: 'block', padding: '0.75rem 0', fontSize: '15px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', borderBottom: '1px solid #ede8df' }}>
+                {item}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+      <style>{`
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .mobile-menu-btn { display: block !important; }
+        }
+        @media (min-width: 769px) {
+          .mobile-menu-btn { display: none !important; }
+        }
+      `}</style>
     </header>
   )
 }
