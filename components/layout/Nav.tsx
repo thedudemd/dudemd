@@ -4,8 +4,7 @@ import { useState } from 'react'
 
 const NAV_ITEMS = [
   {
-    label: 'Health',
-    href: '/category/health',
+    label: 'Health', href: '/category/health',
     subs: ['Testosterone', 'Heart Health', 'Sleep', 'Gut Health', 'Mental Health'],
     articles: [
       { slug: 'the-testosterone-guide', title: 'The Complete Testosterone Guide for Men Over 30', image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&q=80' },
@@ -13,8 +12,7 @@ const NAV_ITEMS = [
     ]
   },
   {
-    label: 'Fitness',
-    href: '/category/fitness',
+    label: 'Fitness', href: '/category/fitness',
     subs: ['Strength Training', 'Cardio', 'Nutrition', 'Supplements', 'Workout Gear'],
     articles: [
       { slug: 'strength-40s', title: "Strength Training in Your 40s: What Changes and What Doesn't", image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300&q=80' },
@@ -22,8 +20,7 @@ const NAV_ITEMS = [
     ]
   },
   {
-    label: 'Recovery',
-    href: '/category/recovery',
+    label: 'Recovery', href: '/category/recovery',
     subs: ['Sleep', 'Cold Exposure', 'Mobility', 'Stress Management'],
     articles: [
       { slug: 'sleep-recovery', title: 'The 7-Day Sleep Reset That Actually Works', image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=300&q=80' },
@@ -31,8 +28,7 @@ const NAV_ITEMS = [
     ]
   },
   {
-    label: 'Style',
-    href: '/category/style',
+    label: 'Style', href: '/category/style',
     subs: ['Grooming', 'Fashion', 'Watches', 'Shoes', 'Skincare'],
     articles: [
       { slug: 'grooming-routine', title: "A No-Nonsense Grooming Routine for Men Who Don't Have Time", image: 'https://images.unsplash.com/photo-1621607512022-6aecc4fed814?w=300&q=80' },
@@ -40,8 +36,7 @@ const NAV_ITEMS = [
     ]
   },
   {
-    label: 'Gear',
-    href: '/category/gear',
+    label: 'Gear', href: '/category/gear',
     subs: ['Tech', 'Outdoors', 'Home', 'Travel', 'Reviews'],
     articles: [
       { slug: 'gear-essentials', title: 'The 10 Gear Essentials Every Man Should Own in 2025', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&q=80' },
@@ -60,9 +55,7 @@ export default function Nav() {
       <style>{`
         .nav-desktop { display: flex !important; }
         .nav-mobile-btn { display: none !important; }
-        .mega-menu { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 3px solid #c9b28f; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 300; }
-        .nav-item:hover .mega-menu { display: flex; }
-        .nav-link { font-size: 13px; font-weight: 600; color: #f7f4ee; text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem 0; border-bottom: 2px solid transparent; transition: border-color 0.2s; }
+        .nav-link { font-size: 13px; font-weight: 600; color: #f7f4ee; text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; padding-bottom: 2px; border-bottom: 2px solid transparent; }
         .nav-link:hover { border-bottom-color: #c9b28f; }
         .nav-item { position: relative; padding: 1.25rem 1rem; cursor: pointer; }
         @media (max-width: 768px) {
@@ -71,7 +64,6 @@ export default function Nav() {
         }
       `}</style>
 
-      {/* DESKTOP NAV */}
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '4.5rem' }}>
         <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
           <img src="/DudeMD.svg" alt="DudeMD" style={{ height: '44px', width: 'auto', objectFit: 'contain' }} />
@@ -84,40 +76,49 @@ export default function Nav() {
               onMouseLeave={() => setActiveDropdown(null)}>
               <Link href={item.href} className="nav-link">{item.label}</Link>
 
-              {/* MEGA MENU */}
-              <div className="mega-menu" style={{ display: activeDropdown === item.label ? 'flex' : 'none' }}>
-                <div className="container-content" style={{ display: 'flex', gap: '3rem', padding: '2rem 1rem', width: '100%' }}>
-                  {/* Sub-categories */}
-                  <div style={{ minWidth: '160px' }}>
-                    <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Topics</p>
-                    {item.subs.map((sub) => (
-                      <Link key={sub} href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
-                        style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', padding: '0.4rem 0', borderBottom: '1px solid #f0ede8' }}>
-                        {sub}
-                      </Link>
-                    ))}
-                  </div>
-
-                  {/* Latest articles */}
-                  <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Latest in {item.label}</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                      {item.articles.map((a) => (
-                        <Link key={a.slug} href={`/articles/${a.slug}`} style={{ textDecoration: 'none', display: 'flex', gap: '0.75rem', alignItems: 'start' }}>
-                          <img src={a.image} alt={a.title} style={{ width: '80px', height: '60px', objectFit: 'cover', flexShrink: 0 }} />
-                          <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.3 }}>{a.title}</p>
+              {activeDropdown === item.label && (
+                <div style={{
+                  position: 'fixed',
+                  top: '4.5rem',
+                  left: 0,
+                  right: 0,
+                  backgroundColor: '#ffffff',
+                  borderTop: '3px solid #c9b28f',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                  zIndex: 999
+                }}>
+                  <div className="container-content" style={{ display: 'flex', gap: '3rem', padding: '2rem 1rem' }}>
+                    <div style={{ minWidth: '180px' }}>
+                      <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Topics</p>
+                      {item.subs.map((sub) => (
+                        <Link key={sub}
+                          href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
+                          style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', padding: '0.4rem 0', borderBottom: '1px solid #f0ede8' }}>
+                          {sub}
                         </Link>
                       ))}
                     </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Latest in {item.label}</p>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                        {item.articles.map((a) => (
+                          <Link key={a.slug} href={`/articles/${a.slug}`}
+                            style={{ textDecoration: 'none', display: 'flex', gap: '0.75rem', alignItems: 'start' }}>
+                            <img src={a.image} alt={a.title} style={{ width: '80px', height: '60px', objectFit: 'cover', flexShrink: 0 }} />
+                            <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.3, margin: 0 }}>{a.title}</p>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           ))}
         </nav>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} className="nav-desktop">
-          <Link href="/newsletter" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0e1a2b', backgroundColor: '#c9b28f', padding: '0.5rem 1.25rem', textDecoration: 'none' }}>
+        <div className="nav-desktop" style={{ alignItems: 'center' }}>
+          <Link href="/newsletter" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0e1a2b', backgroundColor: '#c9b28f', padding: '0.5rem 1.25rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
             Subscribe
           </Link>
         </div>
@@ -130,21 +131,21 @@ export default function Nav() {
         </button>
       </div>
 
-      {/* MOBILE MENU */}
       {mobileOpen && (
-        <div style={{ backgroundColor: '#0e1a2b', borderTop: '1px solid rgba(255,255,255,0.1)', padding: '0.5rem 0' }}>
+        <div style={{ backgroundColor: '#0e1a2b', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <div className="container-content">
             {NAV_ITEMS.map((item) => (
               <div key={item.label}>
                 <div onClick={() => setMobileExpanded(mobileExpanded === item.label ? null : item.label)}
                   style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 0', borderBottom: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
                   <span style={{ fontSize: '14px', fontWeight: 600, color: '#f7f4ee', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{item.label}</span>
-                  <span style={{ color: '#c9b28f', fontSize: '18px' }}>{mobileExpanded === item.label ? '−' : '+'}</span>
+                  <span style={{ color: '#c9b28f', fontSize: '18px', lineHeight: 1 }}>{mobileExpanded === item.label ? '−' : '+'}</span>
                 </div>
                 {mobileExpanded === item.label && (
                   <div style={{ padding: '0.5rem 0 1rem 1rem' }}>
                     {item.subs.map((sub) => (
-                      <Link key={sub} href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
+                      <Link key={sub}
+                        href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
                         onClick={() => setMobileOpen(false)}
                         style={{ display: 'block', padding: '0.5rem 0', fontSize: '14px', color: '#c9b28f', textDecoration: 'none' }}>
                         {sub}
