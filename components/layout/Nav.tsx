@@ -125,7 +125,7 @@ export default function Nav() {
               About
             </Link>
             {aboutOpen && (
-              <div style={{ position: 'absolute', top: '100%', right: 0, backgroundColor: '#ffffff', borderTop: '3px solid #c9b28f', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', zIndex: 999, minWidth: '180px', padding: '0.5rem 0', marginTop: '0.75rem' }}>
+              <div style={{ position: 'absolute', top: '100%', right: 0, backgroundColor: '#ffffff', borderTop: '3px solid #c9b28f', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', zIndex: 999, minWidth: '180px', padding: '0.5rem 0', marginTop: 0 }}>
                 {['Our Story', 'Editorial Policy', 'Contact', 'Advertise'].map((item) => (
                   <Link key={item} href={`/${item.toLowerCase().replace(/ /g, '-')}`}
                     style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', padding: '0.5rem 1.25rem', borderBottom: '1px solid #f0ede8' }}>
