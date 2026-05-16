@@ -10,7 +10,7 @@ export default function Nav() {
     <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 100 }}>
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '5rem' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-          <img src="/dudemd-logo.png" alt="DudeMD" style={{ height: '64px', width: 'auto', objectFit: 'contain' }} />
+          <img src="/Untitled_design.png" alt="DudeMD" style={{ height: '56px', width: 'auto', objectFit: 'contain' }} />
         </Link>
         <nav style={{ display: 'flex', gap: '2rem' }} className="desktop-nav">
           {LINKS.map((item) => (
@@ -19,7 +19,7 @@ export default function Nav() {
             </Link>
           ))}
         </nav>
-        <button onClick={() => setOpen(!open)} className="mobile-menu-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'none' }}>
+        <button onClick={() => setOpen(!open)} className="mobile-menu-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}>
           <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
           <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
           <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
