@@ -8,11 +8,19 @@ export default function Nav() {
   const [open, setOpen] = useState(false)
   return (
     <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 100 }}>
+      <style>{`
+        .desktop-nav { display: flex !important; }
+        .mobile-menu-btn { display: none !important; }
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .mobile-menu-btn { display: block !important; }
+        }
+      `}</style>
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '5rem' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-          <img src="/Untitled_design.png" alt="DudeMD" style={{ height: '56px', width: 'auto', objectFit: 'contain' }} />
+          <img src="/DudeMD.svg" alt="DudeMD" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
         </Link>
-        <nav style={{ display: 'flex', gap: '2rem' }} className="desktop-nav">
+        <nav style={{ gap: '2rem' }} className="desktop-nav">
           {LINKS.map((item) => (
             <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
               {item}
