@@ -13,21 +13,25 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const { slug } = await params
   return (
     <main>
+      <style>{`
+        .article-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+        .article-sidebar { order: -1; }
+        @media (min-width: 900px) {
+          .article-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 4rem; }
+          .article-sidebar { order: 0; position: sticky; top: 6rem; }
+        }
+      `}</style>
+
       {/* HERO */}
-      <div style={{ width: '100%', aspectRatio: '21/9', overflow: 'hidden', maxHeight: '520px' }}>
-        <img
-          src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1600&q=80"
-          alt="Article hero"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-        />
+      <div style={{ width: '100%', overflow: 'hidden', maxHeight: '520px' }}>
+        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1600&q=80" alt="Article hero" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
       </div>
 
-      <div className="container-content" style={{ paddingTop: '3rem', paddingBottom: '4rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: '4rem', alignItems: 'start' }}>
+      <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
+        <div className="article-grid" style={{ alignItems: 'start' }}>
 
           {/* MAIN CONTENT */}
           <article>
-            {/* Breadcrumb */}
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.5rem' }}>
               <Link href="/" style={{ fontSize: '12px', color: '#9a9085', textDecoration: 'none' }}>Home</Link>
               <span style={{ fontSize: '12px', color: '#9a9085' }}>›</span>
@@ -36,23 +40,19 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <span style={{ fontSize: '12px', color: '#4A5563' }}>Testosterone Guide</span>
             </div>
 
-            {/* Category + read time */}
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
               <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f' }}>Health</span>
               <span style={{ fontSize: '12px', color: '#9a9085' }}>9 min read</span>
             </div>
 
-            {/* Headline */}
             <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', lineHeight: 1.15, color: '#0e1a2b', marginBottom: '1.25rem' }}>
               The Complete Testosterone Guide for Men Over 30
             </h1>
 
-            {/* Excerpt */}
             <p style={{ fontSize: '18px', color: '#4A5563', lineHeight: 1.65, marginBottom: '1.5rem', fontStyle: 'italic', borderLeft: '3px solid #c9b28f', paddingLeft: '1rem' }}>
               What the numbers actually mean, what moves the needle, and what your doctor probably won&apos;t tell you.
             </p>
 
-            {/* Author + date */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid #ede8df', marginBottom: '2rem' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <span style={{ fontSize: '14px', fontWeight: 700, color: '#c9b28f' }}>JM</span>
@@ -63,38 +63,25 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
 
-            {/* Article body */}
             <div style={{ fontSize: '16px', color: '#1B1D21', lineHeight: 1.8 }}>
-              <p style={{ marginBottom: '1.5rem' }}>
-                Testosterone is the most talked-about hormone in men&apos;s health — and also the most misunderstood. Most men only hear about it when something goes wrong. But understanding how testosterone actually works, what affects it, and what you can do about it is one of the highest-leverage things you can do for your long-term health.
-              </p>
+              <p style={{ marginBottom: '1.5rem' }}>Testosterone is the most talked-about hormone in men&apos;s health — and also the most misunderstood. Most men only hear about it when something goes wrong. But understanding how testosterone actually works, what affects it, and what you can do about it is one of the highest-leverage things you can do for your long-term health.</p>
               <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', marginTop: '2.5rem' }}>What is a "normal" testosterone level?</h2>
-              <p style={{ marginBottom: '1.5rem' }}>
-                The standard lab reference range is roughly 300–1000 ng/dL. But that range is so wide it&apos;s nearly useless. A 35-year-old man at 310 ng/dL is technically "normal" but will likely feel terrible. Context matters more than the number alone.
-              </p>
+              <p style={{ marginBottom: '1.5rem' }}>The standard lab reference range is roughly 300–1000 ng/dL. But that range is so wide it&apos;s nearly useless. A 35-year-old man at 310 ng/dL is technically "normal" but will likely feel terrible. Context matters more than the number alone.</p>
               <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', marginTop: '2.5rem' }}>What actually moves the needle</h2>
-              <p style={{ marginBottom: '1.5rem' }}>
-                Before you consider any medical intervention, there are four lifestyle factors that have strong evidence behind them: sleep quality, resistance training, body composition, and stress management. Most men who optimize these four things see meaningful improvements in how they feel — and often in their labs.
-              </p>
+              <p style={{ marginBottom: '1.5rem' }}>Before you consider any medical intervention, there are four lifestyle factors that have strong evidence behind them: sleep quality, resistance training, body composition, and stress management. Most men who optimize these four things see meaningful improvements in how they feel — and often in their labs.</p>
               <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', marginTop: '2.5rem' }}>When to talk to your doctor</h2>
-              <p style={{ marginBottom: '1.5rem' }}>
-                If you&apos;ve dialed in your sleep, training, and nutrition and still feel off — fatigue, low libido, brain fog, mood changes — it&apos;s worth getting a full hormone panel, not just total testosterone. Ask for free testosterone, SHBG, LH, FSH, and estradiol at minimum.
-              </p>
+              <p style={{ marginBottom: '1.5rem' }}>If you&apos;ve dialed in your sleep, training, and nutrition and still feel off — fatigue, low libido, brain fog, mood changes — it&apos;s worth getting a full hormone panel, not just total testosterone. Ask for free testosterone, SHBG, LH, FSH, and estradiol at minimum.</p>
             </div>
 
-            {/* Author bio */}
             <div style={{ marginTop: '3rem', padding: '1.5rem', backgroundColor: '#f7f4ee', borderLeft: '3px solid #c9b28f' }}>
               <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.5rem' }}>About the Author</p>
               <p style={{ fontSize: '15px', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.25rem' }}>Dr. James Mercer</p>
-              <p style={{ fontSize: '14px', color: '#4A5563', lineHeight: 1.6, margin: 0 }}>
-                Board-certified internist with 15 years of experience in men&apos;s health and preventive medicine. Dr. Mercer writes for DudeMD to bring evidence-based medicine to everyday men.
-              </p>
+              <p style={{ fontSize: '14px', color: '#4A5563', lineHeight: 1.6, margin: 0 }}>Board-certified internist with 15 years of experience in men&apos;s health and preventive medicine.</p>
             </div>
           </article>
 
           {/* SIDEBAR */}
-          <aside style={{ position: 'sticky', top: '6rem' }}>
-            {/* Newsletter */}
+          <aside className="article-sidebar">
             <div style={{ backgroundColor: '#0e1a2b', padding: '1.5rem', marginBottom: '2rem' }}>
               <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '0.5rem' }}>Free Newsletter</p>
               <p style={{ fontSize: '16px', fontWeight: 700, color: '#f7f4ee', lineHeight: 1.3, marginBottom: '1rem' }}>Men&apos;s health that doesn&apos;t waste your time.</p>
@@ -102,7 +89,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <button style={{ width: '100%', padding: '0.75rem', backgroundColor: '#c9b28f', color: '#0e1a2b', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>Join Free</button>
             </div>
 
-            {/* Related articles */}
             <div>
               <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', borderBottom: '1px solid #ede8df', paddingBottom: '0.5rem', marginBottom: '1.25rem' }}>Related Articles</p>
               {RELATED.map((a) => (
