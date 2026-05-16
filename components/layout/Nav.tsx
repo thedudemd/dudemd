@@ -43,12 +43,19 @@ const NAV_ITEMS = [
       { slug: 'gut-health', title: "Your Gut Is Running Your Brain. Here's How to Fix It", image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=300&q=80' },
     ]
   },
+  {
+    label: 'About', href: '/about',
+    subs: ['Our Story', 'Editorial Policy', 'Contact', 'Advertise'],
+    articles: []
+  },
 ]
 
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   return (
     <header style={{ backgroundColor: '#0e1a2b', position: 'sticky', top: 0, zIndex: 200 }}>
@@ -58,8 +65,6 @@ export default function Nav() {
         .nav-link { font-size: 13px; font-weight: 600; color: #f7f4ee; text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; padding-bottom: 2px; border-bottom: 2px solid transparent; }
         .nav-link:hover { border-bottom-color: #c9b28f; }
         .nav-item { position: relative; padding: 1.25rem 1rem; cursor: pointer; }
-        .about-link { font-size: 13px; font-weight: 600; color: #f7f4ee; text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; padding-bottom: 2px; border-bottom: 2px solid transparent; }
-        .about-link:hover { border-bottom-color: #c9b28f; }
         @media (max-width: 768px) {
           .nav-desktop { display: none !important; }
           .nav-mobile-btn { display: block !important; }
@@ -83,34 +88,39 @@ export default function Nav() {
                     <div style={{ minWidth: '180px' }}>
                       <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Topics</p>
                       {item.subs.map((sub) => (
-                        <Link key={sub} href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
+                        <Link key={sub}
+                          href={item.label === 'About' ? `/${sub.toLowerCase().replace(/ /g, '-')}` : `/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
                           style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', padding: '0.4rem 0', borderBottom: '1px solid #f0ede8' }}>
                           {sub}
                         </Link>
                       ))}
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Latest in {item.label}</p>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                        {item.articles.map((a) => (
-                          <Link key={a.slug} href={`/articles/${a.slug}`} style={{ textDecoration: 'none', display: 'flex', gap: '0.75rem', alignItems: 'start' }}>
-                            <img src={a.image} alt={a.title} style={{ width: '80px', height: '60px', objectFit: 'cover', flexShrink: 0 }} />
-                            <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.3, margin: 0 }}>{a.title}</p>
-                          </Link>
-                        ))}
+                    {item.articles.length > 0 && (
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Latest in {item.label}</p>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                          {item.articles.map((a) => (
+                            <Link key={a.slug} href={`/articles/${a.slug}`} style={{ textDecoration: 'none', display: 'flex', gap: '0.75rem', alignItems: 'start' }}>
+                              <img src={a.image} alt={a.title} style={{ width: '80px', height: '60px', objectFit: 'cover', flexShrink: 0 }} />
+                              <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.3, margin: 0 }}>{a.title}</p>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               )}
             </div>
           ))}
-          <div style={{ padding: '1.25rem 1rem' }}>
-            <Link href="/about" className="about-link">About</Link>
-          </div>
         </nav>
 
-        <div className="nav-desktop" style={{ alignItems: 'center' }}>
+        <div className="nav-desktop" style={{ alignItems: 'center', gap: '1rem' }}>
+          <button onClick={() => setSearchOpen(!searchOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.25rem', color: '#f7f4ee', display: 'flex', alignItems: 'center' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </button>
           <Link href="/newsletter" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0e1a2b', backgroundColor: '#c9b28f', padding: '0.5rem 1.25rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
             Subscribe
           </Link>
@@ -123,6 +133,18 @@ export default function Nav() {
           <div style={{ width: '22px', height: '2px', backgroundColor: '#f7f4ee', margin: '4px 0' }} />
         </button>
       </div>
+
+      {searchOpen && (
+        <div style={{ backgroundColor: '#0e1a2b', borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1rem 0' }}>
+          <div className="container-content">
+            <div style={{ display: 'flex', gap: '0', maxWidth: '40rem', margin: '0 auto' }}>
+              <input autoFocus type="text" placeholder="Search DudeMD..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                style={{ flex: 1, padding: '0.85rem 1rem', backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', borderRight: 'none', color: '#f7f4ee', outline: 'none', fontSize: '15px' }} />
+              <button style={{ padding: '0.85rem 1.5rem', backgroundColor: '#c9b28f', color: '#0e1a2b', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>Search</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {mobileOpen && (
         <div style={{ backgroundColor: '#0e1a2b', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
@@ -137,7 +159,8 @@ export default function Nav() {
                 {mobileExpanded === item.label && (
                   <div style={{ padding: '0.5rem 0 1rem 1rem' }}>
                     {item.subs.map((sub) => (
-                      <Link key={sub} href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
+                      <Link key={sub}
+                        href={item.label === 'About' ? `/${sub.toLowerCase().replace(/ /g, '-')}` : `/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
                         onClick={() => setMobileOpen(false)}
                         style={{ display: 'block', padding: '0.5rem 0', fontSize: '14px', color: '#c9b28f', textDecoration: 'none' }}>
                         {sub}
@@ -147,10 +170,6 @@ export default function Nav() {
                 )}
               </div>
             ))}
-            <Link href="/about" onClick={() => setMobileOpen(false)}
-              style={{ display: 'block', padding: '0.875rem 0', fontSize: '14px', fontWeight: 600, color: '#f7f4ee', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              About
-            </Link>
             <Link href="/newsletter" onClick={() => setMobileOpen(false)}
               style={{ display: 'block', margin: '1rem 0', padding: '0.875rem', backgroundColor: '#c9b28f', color: '#0e1a2b', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>
               Subscribe
