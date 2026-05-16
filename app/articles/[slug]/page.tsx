@@ -15,7 +15,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     <main>
       <style>{`
         .article-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        .article-sidebar { order: -1; }
+       
         @media (min-width: 900px) {
           .article-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 4rem; }
           .article-sidebar { order: 0; position: sticky; top: 6rem; }
