@@ -9,7 +9,8 @@ const RELATED = [
   { slug: 'stress-cortisol', category: 'Health', title: 'Chronic Stress Is Wrecking Your Hormones', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80' },
 ]
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   return (
     <main>
       {/* HERO */}
