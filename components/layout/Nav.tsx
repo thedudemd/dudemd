@@ -2,45 +2,162 @@
 import Link from 'next/link'
 import { useState } from 'react'
 
-const LINKS = ['Health', 'Fitness', 'Recovery', 'Style', 'Gear']
+const NAV_ITEMS = [
+  {
+    label: 'Health',
+    href: '/category/health',
+    subs: ['Testosterone', 'Heart Health', 'Sleep', 'Gut Health', 'Mental Health'],
+    articles: [
+      { slug: 'the-testosterone-guide', title: 'The Complete Testosterone Guide for Men Over 30', image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&q=80' },
+      { slug: 'stress-cortisol', title: 'Chronic Stress Is Wrecking Your Hormones', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=300&q=80' },
+    ]
+  },
+  {
+    label: 'Fitness',
+    href: '/category/fitness',
+    subs: ['Strength Training', 'Cardio', 'Nutrition', 'Supplements', 'Workout Gear'],
+    articles: [
+      { slug: 'strength-40s', title: "Strength Training in Your 40s: What Changes and What Doesn't", image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300&q=80' },
+      { slug: 'protein-guide', title: 'How Much Protein Do You Actually Need?', image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=300&q=80' },
+    ]
+  },
+  {
+    label: 'Recovery',
+    href: '/category/recovery',
+    subs: ['Sleep', 'Cold Exposure', 'Mobility', 'Stress Management'],
+    articles: [
+      { slug: 'sleep-recovery', title: 'The 7-Day Sleep Reset That Actually Works', image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=300&q=80' },
+      { slug: 'cold-exposure', title: 'Cold Exposure: Separating the Hype From the Science', image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=300&q=80' },
+    ]
+  },
+  {
+    label: 'Style',
+    href: '/category/style',
+    subs: ['Grooming', 'Fashion', 'Watches', 'Shoes', 'Skincare'],
+    articles: [
+      { slug: 'grooming-routine', title: "A No-Nonsense Grooming Routine for Men Who Don't Have Time", image: 'https://images.unsplash.com/photo-1621607512022-6aecc4fed814?w=300&q=80' },
+      { slug: 'gear-essentials', title: 'The 10 Gear Essentials Every Man Should Own', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&q=80' },
+    ]
+  },
+  {
+    label: 'Gear',
+    href: '/category/gear',
+    subs: ['Tech', 'Outdoors', 'Home', 'Travel', 'Reviews'],
+    articles: [
+      { slug: 'gear-essentials', title: 'The 10 Gear Essentials Every Man Should Own in 2025', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&q=80' },
+      { slug: 'gut-health', title: "Your Gut Is Running Your Brain. Here's How to Fix It", image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=300&q=80' },
+    ]
+  },
+]
 
 export default function Nav() {
-  const [open, setOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null)
+
   return (
-    <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 100 }}>
+    <header style={{ backgroundColor: '#0e1a2b', position: 'sticky', top: 0, zIndex: 200 }}>
       <style>{`
-        .desktop-nav { display: flex !important; }
-        .mobile-menu-btn { display: none !important; }
+        .nav-desktop { display: flex !important; }
+        .nav-mobile-btn { display: none !important; }
+        .mega-menu { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 3px solid #c9b28f; box-shadow: 0 8px 32px rgba(0,0,0,0.12); z-index: 300; }
+        .nav-item:hover .mega-menu { display: flex; }
+        .nav-link { font-size: 13px; font-weight: 600; color: #f7f4ee; text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem 0; border-bottom: 2px solid transparent; transition: border-color 0.2s; }
+        .nav-link:hover { border-bottom-color: #c9b28f; }
+        .nav-item { position: relative; padding: 1.25rem 1rem; cursor: pointer; }
         @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .mobile-menu-btn { display: block !important; }
+          .nav-desktop { display: none !important; }
+          .nav-mobile-btn { display: block !important; }
         }
       `}</style>
-      <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '5rem' }}>
-        <Link href="/" style={{ textDecoration: 'none' }}>
-          <img src="/DudeMD.svg" alt="DudeMD" style={{ height: '150px', width: 'auto', objectFit: 'contain' }} />
+
+      {/* DESKTOP NAV */}
+      <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '4.5rem' }}>
+        <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
+          <img src="/DudeMD.svg" alt="DudeMD" style={{ height: '44px', width: 'auto', objectFit: 'contain' }} />
         </Link>
-        <nav style={{ gap: '2rem' }} className="desktop-nav">
-          {LINKS.map((item) => (
-            <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-              {item}
-            </Link>
+
+        <nav className="nav-desktop" style={{ gap: '0', alignItems: 'center' }}>
+          {NAV_ITEMS.map((item) => (
+            <div key={item.label} className="nav-item"
+              onMouseEnter={() => setActiveDropdown(item.label)}
+              onMouseLeave={() => setActiveDropdown(null)}>
+              <Link href={item.href} className="nav-link">{item.label}</Link>
+
+              {/* MEGA MENU */}
+              <div className="mega-menu" style={{ display: activeDropdown === item.label ? 'flex' : 'none' }}>
+                <div className="container-content" style={{ display: 'flex', gap: '3rem', padding: '2rem 1rem', width: '100%' }}>
+                  {/* Sub-categories */}
+                  <div style={{ minWidth: '160px' }}>
+                    <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Topics</p>
+                    {item.subs.map((sub) => (
+                      <Link key={sub} href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
+                        style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', padding: '0.4rem 0', borderBottom: '1px solid #f0ede8' }}>
+                        {sub}
+                      </Link>
+                    ))}
+                  </div>
+
+                  {/* Latest articles */}
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Latest in {item.label}</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                      {item.articles.map((a) => (
+                        <Link key={a.slug} href={`/articles/${a.slug}`} style={{ textDecoration: 'none', display: 'flex', gap: '0.75rem', alignItems: 'start' }}>
+                          <img src={a.image} alt={a.title} style={{ width: '80px', height: '60px', objectFit: 'cover', flexShrink: 0 }} />
+                          <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.3 }}>{a.title}</p>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           ))}
         </nav>
-        <button onClick={() => setOpen(!open)} className="mobile-menu-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}>
-          <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
-          <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
-          <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} className="nav-desktop">
+          <Link href="/newsletter" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0e1a2b', backgroundColor: '#c9b28f', padding: '0.5rem 1.25rem', textDecoration: 'none' }}>
+            Subscribe
+          </Link>
+        </div>
+
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="nav-mobile-btn"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}>
+          <div style={{ width: '22px', height: '2px', backgroundColor: '#f7f4ee', margin: '4px 0' }} />
+          <div style={{ width: '22px', height: '2px', backgroundColor: '#f7f4ee', margin: '4px 0' }} />
+          <div style={{ width: '22px', height: '2px', backgroundColor: '#f7f4ee', margin: '4px 0' }} />
         </button>
       </div>
-      {open && (
-        <div style={{ backgroundColor: '#f7f4ee', borderTop: '1px solid #ede8df', padding: '1rem 0' }}>
+
+      {/* MOBILE MENU */}
+      {mobileOpen && (
+        <div style={{ backgroundColor: '#0e1a2b', borderTop: '1px solid rgba(255,255,255,0.1)', padding: '0.5rem 0' }}>
           <div className="container-content">
-            {LINKS.map((item) => (
-              <Link key={item} href={`/category/${item.toLowerCase()}`} onClick={() => setOpen(false)} style={{ display: 'block', padding: '0.75rem 0', fontSize: '15px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', borderBottom: '1px solid #ede8df' }}>
-                {item}
-              </Link>
+            {NAV_ITEMS.map((item) => (
+              <div key={item.label}>
+                <div onClick={() => setMobileExpanded(mobileExpanded === item.label ? null : item.label)}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 0', borderBottom: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#f7f4ee', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{item.label}</span>
+                  <span style={{ color: '#c9b28f', fontSize: '18px' }}>{mobileExpanded === item.label ? '−' : '+'}</span>
+                </div>
+                {mobileExpanded === item.label && (
+                  <div style={{ padding: '0.5rem 0 1rem 1rem' }}>
+                    {item.subs.map((sub) => (
+                      <Link key={sub} href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
+                        onClick={() => setMobileOpen(false)}
+                        style={{ display: 'block', padding: '0.5rem 0', fontSize: '14px', color: '#c9b28f', textDecoration: 'none' }}>
+                        {sub}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
+            <Link href="/newsletter" onClick={() => setMobileOpen(false)}
+              style={{ display: 'block', margin: '1rem 0', padding: '0.875rem', backgroundColor: '#c9b28f', color: '#0e1a2b', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>
+              Subscribe
+            </Link>
           </div>
         </div>
       )}
