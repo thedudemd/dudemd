@@ -58,6 +58,8 @@ export default function Nav() {
         .nav-link { font-size: 13px; font-weight: 600; color: #f7f4ee; text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; padding-bottom: 2px; border-bottom: 2px solid transparent; }
         .nav-link:hover { border-bottom-color: #c9b28f; }
         .nav-item { position: relative; padding: 1.25rem 1rem; cursor: pointer; }
+        .about-link { font-size: 13px; font-weight: 600; color: #f7f4ee; text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; padding-bottom: 2px; border-bottom: 2px solid transparent; }
+        .about-link:hover { border-bottom-color: #c9b28f; }
         @media (max-width: 768px) {
           .nav-desktop { display: none !important; }
           .nav-mobile-btn { display: block !important; }
@@ -75,24 +77,13 @@ export default function Nav() {
               onMouseEnter={() => setActiveDropdown(item.label)}
               onMouseLeave={() => setActiveDropdown(null)}>
               <Link href={item.href} className="nav-link">{item.label}</Link>
-
               {activeDropdown === item.label && (
-                <div style={{
-                  position: 'fixed',
-                  top: '4.5rem',
-                  left: 0,
-                  right: 0,
-                  backgroundColor: '#ffffff',
-                  borderTop: '3px solid #c9b28f',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-                  zIndex: 999
-                }}>
+                <div style={{ position: 'fixed', top: '4.5rem', left: 0, right: 0, backgroundColor: '#ffffff', borderTop: '3px solid #c9b28f', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', zIndex: 999 }}>
                   <div className="container-content" style={{ display: 'flex', gap: '3rem', padding: '2rem 1rem' }}>
                     <div style={{ minWidth: '180px' }}>
                       <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Topics</p>
                       {item.subs.map((sub) => (
-                        <Link key={sub}
-                          href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
+                        <Link key={sub} href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
                           style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', padding: '0.4rem 0', borderBottom: '1px solid #f0ede8' }}>
                           {sub}
                         </Link>
@@ -102,8 +93,7 @@ export default function Nav() {
                       <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Latest in {item.label}</p>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                         {item.articles.map((a) => (
-                          <Link key={a.slug} href={`/articles/${a.slug}`}
-                            style={{ textDecoration: 'none', display: 'flex', gap: '0.75rem', alignItems: 'start' }}>
+                          <Link key={a.slug} href={`/articles/${a.slug}`} style={{ textDecoration: 'none', display: 'flex', gap: '0.75rem', alignItems: 'start' }}>
                             <img src={a.image} alt={a.title} style={{ width: '80px', height: '60px', objectFit: 'cover', flexShrink: 0 }} />
                             <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.3, margin: 0 }}>{a.title}</p>
                           </Link>
@@ -115,6 +105,9 @@ export default function Nav() {
               )}
             </div>
           ))}
+          <div style={{ padding: '1.25rem 1rem' }}>
+            <Link href="/about" className="about-link">About</Link>
+          </div>
         </nav>
 
         <div className="nav-desktop" style={{ alignItems: 'center' }}>
@@ -144,8 +137,7 @@ export default function Nav() {
                 {mobileExpanded === item.label && (
                   <div style={{ padding: '0.5rem 0 1rem 1rem' }}>
                     {item.subs.map((sub) => (
-                      <Link key={sub}
-                        href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
+                      <Link key={sub} href={`/category/${item.label.toLowerCase()}/${sub.toLowerCase().replace(/ /g, '-')}`}
                         onClick={() => setMobileOpen(false)}
                         style={{ display: 'block', padding: '0.5rem 0', fontSize: '14px', color: '#c9b28f', textDecoration: 'none' }}>
                         {sub}
@@ -155,6 +147,10 @@ export default function Nav() {
                 )}
               </div>
             ))}
+            <Link href="/about" onClick={() => setMobileOpen(false)}
+              style={{ display: 'block', padding: '0.875rem 0', fontSize: '14px', fontWeight: 600, color: '#f7f4ee', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              About
+            </Link>
             <Link href="/newsletter" onClick={() => setMobileOpen(false)}
               style={{ display: 'block', margin: '1rem 0', padding: '0.875rem', backgroundColor: '#c9b28f', color: '#0e1a2b', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>
               Subscribe
