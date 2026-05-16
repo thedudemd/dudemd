@@ -18,7 +18,7 @@ export default function Nav() {
       `}</style>
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '5rem' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-          <img src="/DudeMD.svg" alt="DudeMD" style={{ height: '48px', width: 'auto', objectFit: 'contain' }} />
+          <img src="/DudeMD.svg" alt="DudeMD" style={{ height: '150px', width: 'auto', objectFit: 'contain' }} />
         </Link>
         <nav style={{ gap: '2rem' }} className="desktop-nav">
           {LINKS.map((item) => (
