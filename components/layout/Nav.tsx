@@ -6,21 +6,20 @@ const LINKS = ['Health', 'Fitness', 'Recovery', 'Style', 'Gear']
 
 export default function Nav() {
   const [open, setOpen] = useState(false)
-
   return (
     <header style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 100 }}>
-      <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '4rem' }}>
+      <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '5rem' }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-          <img src="/IMG_5432-removebg-preview%20(1).png" alt="DudeMD" style={{ height: 'auto', width: 'auto', maxHeight: '50px', maxWidth: '160px', objectFit: 'contain' }} />
+          <img src="/dudemd-logo.png" alt="DudeMD" style={{ height: '64px', width: 'auto', objectFit: 'contain' }} />
         </Link>
         <nav style={{ display: 'flex', gap: '2rem' }} className="desktop-nav">
           {LINKS.map((item) => (
-            <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none' }}>
+            <Link key={item} href={`/category/${item.toLowerCase()}`} style={{ fontSize: '13px', fontWeight: 500, color: '#4A5563', textDecoration: 'none', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
               {item}
             </Link>
           ))}
         </nav>
-        <button onClick={() => setOpen(!open)} className="mobile-menu-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}>
+        <button onClick={() => setOpen(!open)} className="mobile-menu-btn" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'none' }}>
           <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
           <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
           <div style={{ width: '22px', height: '2px', backgroundColor: '#0e1a2b', margin: '4px 0' }} />
