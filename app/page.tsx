@@ -18,13 +18,13 @@ const LATEST = [
   { slug: 'strength-40s', category: 'Fitness', title: "Strength Training in Your 40s: What Changes and What Doesn't", excerpt: 'The science of muscle after 40.', author: 'Coach T. Williams', readTime: '8 min read', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80' },
   { slug: 'stress-cortisol', category: 'Health', title: 'Chronic Stress Is Wrecking Your Hormones', excerpt: 'Cortisol, testosterone, and the feedback loop most men never hear about.', author: 'Dr. Sarah Okonkwo', readTime: '7 min read', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80' },
   { slug: 'grooming-routine', category: 'Style', title: "A No-Nonsense Grooming Routine for Men Who Don't Have Time", excerpt: 'Four products, ten minutes, done.', author: 'DudeMD Staff', readTime: '4 min read', image: 'https://images.unsplash.com/photo-1621607512022-6aecc4fed814?w=600&q=80' },
-  { slug: 'gut-health', category: 'Health', title: 'Your Gut Is Running Your Brain. Here\'s How to Fix It', excerpt: 'The microbiome research every man should know.', author: 'Dr. James Mercer', readTime: '6 min read', image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80' },
-  { slug: 'cold-exposure', category: 'Recovery', title: 'Cold Exposure: Separating the Hype From the Science', excerpt: 'What cold plunges actually do — and don\'t do — for your body.', author: 'Marcus Reid', readTime: '5 min read', image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80' },
+  { slug: 'gut-health', category: 'Health', title: "Your Gut Is Running Your Brain. Here's How to Fix It", excerpt: 'The microbiome research every man should know.', author: 'Dr. James Mercer', readTime: '6 min read', image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80' },
+  { slug: 'cold-exposure', category: 'Recovery', title: 'Cold Exposure: Separating the Hype From the Science', excerpt: "What cold plunges actually do — and don't do — for your body.", author: 'Marcus Reid', readTime: '5 min read', image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80' },
 ]
 
 const EDITORS_PICKS = [
   { slug: 'protein-guide', category: 'Fitness', title: 'How Much Protein Do You Actually Need?', image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=600&q=80' },
-  { slug: 'mental-health-men', category: 'Mental Health', title: 'Why Men Don\'t Talk About Mental Health — And What It\'s Costing Them', image: 'https://images.unsplash.com/photo-1474631245212-32dc3c8310c6?w=600&q=80' },
+  { slug: 'mental-health-men', category: 'Mental Health', title: "Why Men Don't Talk About Mental Health — And What It's Costing Them", image: 'https://images.unsplash.com/photo-1474631245212-32dc3c8310c6?w=600&q=80' },
   { slug: 'gear-essentials', category: 'Gear', title: 'The 10 Gear Essentials Every Man Should Own in 2025', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80' },
 ]
 
@@ -33,7 +33,6 @@ const CATS = ['Health', 'Fitness', 'Recovery', 'Mental Health', 'Style', 'Gear']
 export default function HomePage() {
   return (
     <>
-      {/* HERO */}
       <section style={{ borderBottom: '1px solid #ede8df' }}>
         <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', alignItems: 'start' }}>
@@ -53,12 +52,11 @@ export default function HomePage() {
                 <p style={{ fontSize: '15px', color: '#4A5563', lineHeight: 1.65 }}>{FEATURED.excerpt}</p>
               </div>
             </div>
-
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', borderBottom: '1px solid #ede8df', paddingBottom: '0.5rem' }}>Editor&apos;s Picks</p>
               {EDITORS_PICKS.map((a) => (
                 <Link key={a.slug} href={`/articles/${a.slug}`} style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '1rem', textDecoration: 'none', alignItems: 'start' }}>
-                  <img src={a.image} alt={a.title} style={{ width: '80px', height: '60px', objectFit: 'cover', display: 'block', flexShrink: 0 }} />
+                  <img src={a.image} alt={a.title} style={{ width: '80px', height: '60px', objectFit: 'cover', display: 'block' }} />
                   <div>
                     <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '0.3rem' }}>{a.category}</p>
                     <p style={{ fontSize: '14px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.3 }}>{a.title}</p>
@@ -70,7 +68,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CATEGORY RIBBON */}
       <section style={{ borderBottom: '1px solid #ede8df', padding: '1rem 0', backgroundColor: '#f7f4ee' }}>
         <div className="container-content">
           <div style={{ display: 'flex', gap: '2rem', overflowX: 'auto', alignItems: 'center', paddingBottom: '2px' }}>
@@ -85,7 +82,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* LATEST ARTICLES */}
       <section style={{ padding: '3rem 0', borderBottom: '1px solid #ede8df' }}>
         <div className="container-content">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
@@ -97,9 +93,7 @@ export default function HomePage() {
               <article key={a.slug}>
                 <Link href={`/articles/${a.slug}`}>
                   <div style={{ width: '100%', aspectRatio: '16/10', overflow: 'hidden', marginBottom: '1rem' }}>
-                    <img src={a.image} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.3s ease' }}
-                      onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.03)')}
-                      onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')} />
+                    <img src={a.image} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </div>
                 </Link>
                 <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -117,7 +111,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* NEWSLETTER */}
       <section style={{ backgroundColor: '#0e1a2b', color: '#f7f4ee', padding: '4rem 0' }}>
         <div className="container-content">
           <div style={{ maxWidth: '30rem', margin: '0 auto', textAlign: 'center' }}>
