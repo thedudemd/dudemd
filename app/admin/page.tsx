@@ -35,7 +35,7 @@ export default function AdminDashboard() {
         <div className="container-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <img src="/dude md.svg" alt="DudeMD" style={{ height: '32px', width: 'auto', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
-            <span style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f' }}>Editorial Dashboard</span>
+            <span style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f' }}>Editorial Studio</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
             <span style={{ fontSize: '12px', color: 'rgba(247,244,238,0.6)' }}>{user?.email}</span>
