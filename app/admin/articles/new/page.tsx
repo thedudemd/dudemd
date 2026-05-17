@@ -102,19 +102,7 @@ export default function NewArticle() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee' }}>
-      <style>{\`
-        .ProseMirror { outline: none; min-height: 400px; padding: 1rem; font-size: 16px; line-height: 1.8; color: #1B1D21; }
-        .ProseMirror p { margin-bottom: 1rem; }
-        .ProseMirror h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; font-family: Georgia, serif; }
-        .ProseMirror h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; font-family: Georgia, serif; }
-        .ProseMirror h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; font-family: Georgia, serif; }
-        .ProseMirror ul, .ProseMirror ol { padding-left: 1.5rem; margin-bottom: 1rem; }
-        .ProseMirror blockquote { border-left: 3px solid #c9b28f; padding-left: 1rem; color: #4A5563; font-style: italic; margin: 1rem 0; }
-        .ProseMirror p.is-editor-empty:first-child::before { content: attr(data-placeholder); color: #9a9085; pointer-events: none; float: left; height: 0; }
-        .tb { padding: 0.4rem 0.6rem; border: 1px solid #ede8df; background: #fff; cursor: pointer; font-size: 13px; color: #0e1a2b; }
-        .tb:hover { background: #f7f4ee; }
-        .tb.on { background: #0e1a2b; color: #fff; }
-      \`}</style>
+      
       <header style={{ backgroundColor: '#0e1a2b', padding: '1rem 0' }}>
         <div className="container-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
