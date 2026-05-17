@@ -71,7 +71,7 @@ export default function Nav() {
 
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '4.5rem' }}>
         <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <img src="/DudeMD.svg" alt="DudeMD" style={{ height: '44px', width: 'auto', objectFit: 'contain' }} />
+          <img src="/dude_md.svg" alt="DudeMD" style={{ height: '44px', width: 'auto', objectFit: 'contain' }} />
         </Link>
 
         {/* MAIN CATEGORY NAV */}
