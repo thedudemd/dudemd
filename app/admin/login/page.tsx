@@ -23,7 +23,7 @@ export default function AdminLogin() {
   }
 
   return (
-    <main style={{ minHeight: '100vh', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ backgroundColor: '#f7f4ee', padding: '3rem', width: '100%', maxWidth: '400px' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <img src="/DudeMD.svg" alt="DudeMD" style={{ height: '40px', width: 'auto', marginBottom: '1rem' }} />
@@ -52,6 +52,6 @@ export default function AdminLogin() {
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </div>
-    </main>
+    </div>
   )
 }
