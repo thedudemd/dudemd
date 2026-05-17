@@ -12,4 +12,14 @@ export const metadata: Metadata = {
   description: "Evidence-based health, fitness, mental wellness and real life advice for men. DudeMD — Modern Wellness for Real Life.",
 }
 
-export default function RootLayout({ children }:
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+      <body style={{ backgroundColor: '#f7f4ee', color: '#0e1a2b' }}>
+        <Nav />
+        <main className="min-h-screen">{children}</main>
+        <Footer />
+      </body>
+    </html>
+  )
+}
