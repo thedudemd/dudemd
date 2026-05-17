@@ -1,27 +1,43 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase/client'
+import { notFound } from 'next/navigation'
 
-export const metadata: Metadata = { title: 'Category — DudeMD' }
+export const revalidate = 60
 
-const ARTICLES = [
-  { slug: 'the-testosterone-guide', category: 'Health', title: 'The Complete Testosterone Guide for Men Over 30', excerpt: "What the numbers actually mean, what moves the needle, and what your doctor probably won't tell you.", author: 'Dr. James Mercer', readTime: '9 min read', image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&q=80' },
-  { slug: 'sleep-recovery', category: 'Recovery', title: 'The 7-Day Sleep Reset That Actually Works', excerpt: 'Evidence-backed habits that recalibrate your sleep in one week.', author: 'Marcus Reid', readTime: '6 min read', image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=600&q=80' },
-  { slug: 'strength-40s', category: 'Fitness', title: "Strength Training in Your 40s: What Changes and What Doesn't", excerpt: 'The science of muscle after 40.', author: 'Coach T. Williams', readTime: '8 min read', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80' },
-  { slug: 'stress-cortisol', category: 'Health', title: 'Chronic Stress Is Wrecking Your Hormones', excerpt: 'Cortisol, testosterone, and the feedback loop most men never hear about.', author: 'Dr. Sarah Okonkwo', readTime: '7 min read', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80' },
-  { slug: 'grooming-routine', category: 'Style', title: "A No-Nonsense Grooming Routine for Men Who Don't Have Time", excerpt: 'Four products, ten minutes, done.', author: 'DudeMD Staff', readTime: '4 min read', image: 'https://images.unsplash.com/photo-1621607512022-6aecc4fed814?w=600&q=80' },
-  { slug: 'gut-health', category: 'Health', title: "Your Gut Is Running Your Brain. Here's How to Fix It", excerpt: 'The microbiome research every man should know.', author: 'Dr. James Mercer', readTime: '6 min read', image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&q=80' },
-  { slug: 'cold-exposure', category: 'Recovery', title: 'Cold Exposure: Separating the Hype From the Science', excerpt: "What cold plunges actually do — and don't do — for your body.", author: 'Marcus Reid', readTime: '5 min read', image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80' },
-  { slug: 'protein-guide', category: 'Fitness', title: 'How Much Protein Do You Actually Need?', excerpt: 'The actual science behind protein intake for men.', author: 'Coach T. Williams', readTime: '5 min read', image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=600&q=80' },
-  { slug: 'gear-essentials', category: 'Gear', title: 'The 10 Gear Essentials Every Man Should Own in 2025', excerpt: 'Tested, proven, worth every dollar.', author: 'DudeMD Staff', readTime: '7 min read', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80' },
-]
+async function getCategory(slug: string) {
+  const { data } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('slug', slug)
+    .single()
+  return data
+}
 
-const CATS = ['Health', 'Fitness', 'Recovery', 'Mental Health', 'Style', 'Gear']
+async function getArticlesByCategory(categoryId: string) {
+  const { data } = await supabase
+    .from('articles')
+    .select('*, authors(name), categories(name, slug)')
+    .eq('category_id', categoryId)
+    .eq('published', true)
+    .order('published_at', { ascending: false })
+  return data || []
+}
+
+async function getAllCategories() {
+  const { data } = await supabase
+    .from('categories')
+    .select('*')
+    .order('name')
+  return data || []
+}
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const label = slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' ')
-  const filtered = ARTICLES.filter(a => a.category.toLowerCase() === slug.toLowerCase())
-  const articles = filtered.length > 0 ? filtered : ARTICLES
+  const category = await getCategory(slug)
+  if (!category) notFound()
+  const articles = await getArticlesByCategory(category.id)
+  const allCategories = await getAllCategories()
 
   return (
     <main>
@@ -31,9 +47,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
             <Link href="/" style={{ fontSize: '12px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none' }}>Home</Link>
             <span style={{ fontSize: '12px', color: 'rgba(247,244,238,0.4)' }}>›</span>
-            <span style={{ fontSize: '12px', color: '#c9b28f' }}>{label}</span>
+            <span style={{ fontSize: '12px', color: '#c9b28f' }}>{category.name}</span>
           </div>
-          <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(2rem, 5vw, 3rem)', color: '#f7f4ee', marginBottom: '0.75rem' }}>{label}</h1>
+          <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(2rem, 5vw, 3rem)', color: '#f7f4ee', marginBottom: '0.75rem' }}>{category.name}</h1>
           <p style={{ fontSize: '15px', color: 'rgba(247,244,238,0.6)', margin: 0 }}>Evidence-based articles for real men.</p>
         </div>
       </div>
@@ -42,10 +58,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       <div style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', padding: '1rem 0' }}>
         <div className="container-content">
           <div style={{ display: 'flex', gap: '2rem', overflowX: 'auto', paddingBottom: '2px' }}>
-            {CATS.map((cat) => (
-              <Link key={cat} href={`/category/${cat.toLowerCase().replace(' ', '-')}`}
-                style={{ flexShrink: 0, fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', whiteSpace: 'nowrap', paddingBottom: '4px', color: cat.toLowerCase() === slug ? '#0e1a2b' : '#9a9085', borderBottom: cat.toLowerCase() === slug ? '2px solid #c9b28f' : '2px solid transparent' }}>
-                {cat}
+            {allCategories.map((cat) => (
+              <Link key={cat.slug} href={`/category/${cat.slug}`}
+                style={{ flexShrink: 0, fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', whiteSpace: 'nowrap', paddingBottom: '4px', color: cat.slug === slug ? '#0e1a2b' : '#9a9085', borderBottom: cat.slug === slug ? '2px solid #c9b28f' : '2px solid transparent' }}>
+                {cat.name}
               </Link>
             ))}
           </div>
@@ -63,18 +79,18 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                 <article key={a.slug}>
                   <Link href={`/articles/${a.slug}`}>
                     <div style={{ width: '100%', aspectRatio: '16/10', overflow: 'hidden', marginBottom: '1rem' }}>
-                      <img src={a.image} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      <img src={a.cover_image_url} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </div>
                   </Link>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c9b28f' }}>{a.category}</span>
-                    <span style={{ fontSize: '11px', color: '#9a9085' }}>{a.readTime}</span>
+                    <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c9b28f' }}>{a.categories?.name}</span>
+                    <span style={{ fontSize: '11px', color: '#9a9085' }}>{a.read_time}</span>
                   </div>
                   <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', lineHeight: 1.3, color: '#0e1a2b', marginBottom: '0.5rem' }}>
                     <Link href={`/articles/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
                   </h2>
                   <p style={{ fontSize: '13px', color: '#4A5563', lineHeight: 1.55, marginBottom: '0.5rem' }}>{a.excerpt}</p>
-                  <p style={{ fontSize: '12px', color: '#9a9085' }}>{a.author}</p>
+                  <p style={{ fontSize: '12px', color: '#9a9085' }}>{a.authors?.name}</p>
                 </article>
               ))}
             </div>
