@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-body', display: 'swa
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display', display: 'swap', style: ['normal', 'italic'] })
 
 export const metadata: Metadata = {
-  title: { default: "DudeMD — Men's Wellness For Real Life", template: '%s | DudeMD' },
+  title: { default: "DudeMD — Modern Wellness for Real Life", template: '%s | DudeMD' },
   description: "DudeMD covers health, fitness, recovery, style, gear, and performance for real men.",
 }
 
