@@ -8,7 +8,7 @@ export default function Footer() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <img src="/dude md.svg" alt="DudeMD" style={{ height: '36px', width: 'auto', marginBottom: '1rem' }} />
+              <img src="/md_transparent.svg" alt="DudeMD" style={{ height: '36px', width: 'auto', marginBottom: '1rem' }} />
               <p style={{ fontSize: '13px', color: 'rgba(247,244,238,0.5)', marginBottom: '1.5rem', maxWidth: '22rem', lineHeight: 1.6 }}>
                 Media for Men. Built Different. Evidence-based health, fitness, recovery, style and gear for real men.
               </p>
