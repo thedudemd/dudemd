@@ -28,4 +28,62 @@ export default function Footer() {
             </div>
 
             <div>
-              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', co
+              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '1rem' }}>Categories</p>
+              {['Health','Fitness','Recovery','Mental Health','Style','Gear'].map((item) => (
+                <Link key={item} href={`/category/${item.toLowerCase().replace(' ','-')}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>
+                  {item}
+                </Link>
+              ))}
+            </div>
+
+            <div>
+              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '1rem' }}>Company</p>
+              {['Our Story','Editorial Policy','Contact','Advertise','Newsletter'].map((item) => (
+                <Link key={item} href={`/${item.toLowerCase().replace(' ','-')}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>
+                  {item}
+                </Link>
+              ))}
+            </div>
+
+            <div>
+              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '1rem' }}>Legal</p>
+              {['Privacy Policy','Terms of Use','Cookie Policy','Sitemap'].map((item) => (
+                <Link key={item} href={`/${item.toLowerCase().replace(/ /g,'-')}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>
+                  {item}
+                </Link>
+              ))}
+            </div>
+
+          </div>
+
+          {/* SEATTLE */}
+          <div style={{ textAlign: 'center', padding: '2rem 0', borderTop: '1px solid rgba(247,244,238,0.1)', borderBottom: '1px solid rgba(247,244,238,0.1)', marginBottom: '1.5rem' }}>
+            <p style={{ margin: '0 0 0.4rem 0', fontSize: '11px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(247,244,238,0.35)' }}>
+              FOUNDED IN <span style={{ fontFamily: 'Georgia, serif', fontSize: '18px', fontWeight: 400, textTransform: 'none', letterSpacing: '0.02em', color: 'rgba(247,244,238,0.65)', fontStyle: 'normal' }}>Seattle</span>
+            </p>
+            <p style={{ margin: 0, fontSize: '12px', color: 'rgba(247,244,238,0.3)', letterSpacing: '0.08em' }}>
+              — <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: 'rgba(247,244,238,0.4)' }}>with love</span> <span style={{ color: '#c0392b' }}>♥</span> —
+            </p>
+          </div>
+
+          {/* BOTTOM BAR */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(247,244,238,0.3)', margin: 0 }}>
+              © {new Date().getFullYear()} DudeMD. All rights reserved.
+            </p>
+
+            {/* RISE MEDIA NETWORK — built in code */}
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ margin: '0 0 2px 0', fontSize: '11px', color: 'rgba(247,244,238,0.25)', letterSpacing: '0.08em' }}>A publication of</p>
+              <div style={{ display: 'inline-block' }}>
+                <p style={{ margin: 0, fontSize: '18px', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(247,244,238,0.55)', lineHeight: 1, fontFamily: 'system-ui, sans-serif' }}>RISE</p>
+                <p style={{ margin: 0, fontSize: '7px', fontWeight: 600, letterSpacing: '0.35em', textTransform: 'uppercase', color: 'rgba(247,244,238,0.3)', lineHeight: 1.4 }}>MEDIA &nbsp; NETWORK</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </footer>
+  )
+}
