@@ -57,11 +57,11 @@ export default function Footer() {
           </div>
 
           <div style={{ textAlign: 'center', padding: '2rem 0', borderTop: '1px solid rgba(247,244,238,0.1)', borderBottom: '1px solid rgba(247,244,238,0.1)', marginBottom: '1.5rem' }}>
-            <p style={{ margin: '0 0 0.4rem 0', fontSize: '11px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(247,244,238,0.35)' }}>
-              FOUNDED IN{' '}<span style={{ fontFamily: 'Georgia, serif', fontSize: '18px', fontWeight: 400, textTransform: 'none', letterSpacing: '0.02em', color: 'rgba(247,244,238,0.65)', fontStyle: 'normal' }}>Seattle</span>
-            </p>
-            <p style={{ margin: 0, fontSize: '12px', color: 'rgba(247,244,238,0.3)', letterSpacing: '0.08em' }}>
-              — <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: 'rgba(247,244,238,0.4)' }}>with love</span> <span style={{ color: '#c0392b' }}>♥</span> —
+            <p style={{ margin: 0, fontSize: '16px', color: '#f7f4ee' }}>
+              <span style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', fontSize: '13px' }}>FOUNDED IN </span>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: 400, fontStyle: 'italic' }}>Seattle, </span>
+              <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '20px' }}>with love </span>
+              <span style={{ color: '#c0392b', fontSize: '22px' }}>♥</span>
             </p>
           </div>
 
