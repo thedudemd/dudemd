@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 
-export const metadata: Metadata = { title: "DudeMD — Men's Wellness For Real Life" }
+export const metadata: Metadata = { title: "DudeMD — Modern Wellness for Real Life" }
 
 export const revalidate = 60
 
