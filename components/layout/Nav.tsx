@@ -47,8 +47,6 @@ const NAV_ITEMS = [
 ]
 
 export default function Nav() {
-  const pathname = usePathname()
-  if (pathname?.startsWith('/admin')) return null
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null)
