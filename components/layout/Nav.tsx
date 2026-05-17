@@ -74,7 +74,7 @@ export default function Nav() {
 
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '4.5rem' }}>
         <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <img src="/ude md.svg" alt="DudeMD" style={{ height: "60px", width: "auto", objectFit: "contain", filter: "brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)" }} />
+          <img src="/dude md.svg" alt="DudeMD" style={{ height: "60px", width: "auto", objectFit: "contain", filter: "brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)" }} />
         </Link>
 
         {/* MAIN CATEGORY NAV */}
