@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 const NAV_ITEMS = [
   {
@@ -52,6 +53,8 @@ export default function Nav() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [aboutOpen, setAboutOpen] = useState(false)
+  const pathname = usePathname()
+  if (pathname?.startsWith('/admin')) return null
 
   return (
     <header style={{ backgroundColor: '#0e1a2b', position: 'sticky', top: 0, zIndex: 200 }}>
