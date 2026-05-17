@@ -21,7 +21,7 @@ export default function AdminLogin() {
   return (
     <main style={{ minHeight: '100vh', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ backgroundColor: '#f7f4ee', padding: '3rem', width: '100%', maxWidth: '400px', margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <img src="/dude md.svg" alt="DudeMD" style={{ height: '50px', width: 'auto', marginBottom: '1rem', filter: 'brightness(0) saturate(100%) invert(14%) sepia(45%) saturate(800%) hue-rotate(190deg) brightness(60%) contrast(90%)' }} />
           <p style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085' }}>Editorial Studio</p>
         </div>
