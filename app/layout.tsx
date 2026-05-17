@@ -16,6 +16,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body style={{ backgroundColor: '#f7f4ee', color: '#0e1a2b' }}>
+        <style>{`
+          body:has(#admin-page) nav,
+          body:has(#admin-page) header:first-of-type,
+          body:has(#admin-page) footer {
+            display: none !important;
+          }
+        `}</style>
         <Nav />
         <main className="min-h-screen">{children}</main>
         <Footer />
