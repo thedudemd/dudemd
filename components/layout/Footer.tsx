@@ -8,7 +8,7 @@ export default function Footer() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
 
             <div style={{ gridColumn: 'span 2' }}>
-              <img src="/md-transparent.svg" alt="DudeMD" style={{ height: '80px', width: 'auto', marginBottom: '1rem' }} />
+              <img src="/md-transparent.svg" alt="DudeMD" style={{ height: '120px', width: 'auto', marginBottom: '1rem', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
               <p style={{ fontSize: '13px', color: 'rgba(247,244,238,0.5)', marginBottom: '1.5rem', maxWidth: '22rem', lineHeight: 1.6 }}>
                 Media for Men. Built Different. Evidence-based health, fitness, recovery, style and gear for real men.
               </p>
@@ -56,7 +56,6 @@ export default function Footer() {
 
           </div>
 
-          {/* SEATTLE */}
           <div style={{ textAlign: 'center', padding: '2rem 0', borderTop: '1px solid rgba(247,244,238,0.1)', borderBottom: '1px solid rgba(247,244,238,0.1)', marginBottom: '1.5rem' }}>
             <p style={{ margin: '0 0 0.4rem 0', fontSize: '11px', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(247,244,238,0.35)' }}>
               FOUNDED IN{' '}<span style={{ fontFamily: 'Georgia, serif', fontSize: '18px', fontWeight: 400, textTransform: 'none', letterSpacing: '0.02em', color: 'rgba(247,244,238,0.65)', fontStyle: 'normal' }}>Seattle</span>
@@ -66,7 +65,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* BOTTOM BAR */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <p style={{ fontSize: '11px', color: 'rgba(247,244,238,0.3)', margin: 0 }}>
               © {new Date().getFullYear()} DudeMD. All rights reserved.
