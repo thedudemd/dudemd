@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -13,7 +13,7 @@ import CharacterCount from '@tiptap/extension-character-count'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
 
-export default function NewArticle() {
+function NewArticleInner() {
   const router = useRouter()
   const [categories, setCategories] = useState<any[]>([])
   const [authors, setAuthors] = useState<any[]>([])
@@ -188,4 +188,8 @@ export default function NewArticle() {
       </div>
     </div>
   )
+}
+
+export default function NewArticle() {
+  return <Suspense><NewArticleInner /></Suspense>
 }
