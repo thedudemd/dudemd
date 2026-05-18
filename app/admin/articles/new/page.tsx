@@ -132,7 +132,7 @@ function NewArticleInner() {
   function scoreColor(s: number) { return s >= 80 ? '#2d7a3a' : s >= 50 ? '#d4820a' : '#c0392b' }
   function scoreBg(s: number) { return s >= 80 ? '#e8f5ea' : s >= 50 ? '#fef3e2' : '#fdecea' }
 
-  async function handleSave(publish: boolean) {
+  async function handleSave(status: string) {
     setSaving(true)
     const { error } = await supabase.from('articles').insert({ ...form, content: editor?.getHTML() || '', read_time: getReadTime(), published: publish, published_at: publish ? new Date().toISOString() : null })
     if (error) { alert('Error: ' + error.message); setSaving(false) }
