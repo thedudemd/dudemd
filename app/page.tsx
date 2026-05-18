@@ -51,7 +51,7 @@ export default async function HomePage() {
       {/* HERO — FEATURED + TWO SECONDARY */}
       <section style={{ padding: '2.5rem 0 0', borderBottom: '1px solid #ede8df' }}>
         <div className="container-content">
-          <div style={{ className: 'hero-grid' }}>
+          <div className="hero-grid">
 
             {/* MAIN FEATURED */}
             {featured && (
