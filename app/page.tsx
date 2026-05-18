@@ -51,11 +51,11 @@ export default async function HomePage() {
       {/* HERO — FEATURED + TWO SECONDARY */}
       <section style={{ padding: '2.5rem 0 0', borderBottom: '1px solid #ede8df' }}>
         <div className="container-content">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '0', alignItems: 'stretch' }}>
+          <div style={{ className: 'hero-grid' }}>
 
             {/* MAIN FEATURED */}
             {featured && (
-              <div style={{ paddingRight: '0' }}>
+              <div className="hero-featured">
                 <Link href={`/articles/${featured.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '1.25rem' }}>
                     <img
@@ -81,7 +81,7 @@ export default async function HomePage() {
             )}
 
             {/* SECONDARY TWO STACK */}
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', gap: '0' }}>
+            <div className="hero-picks">
               <p style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#9a9085', paddingBottom: '0.75rem', borderBottom: '2px solid #0e1a2b', marginBottom: '1.25rem' }}>Editor&apos;s Picks</p>
               {secondary.map((a, i) => (
                 <div key={a.slug} style={{ paddingBottom: '1.5rem', marginBottom: '1.5rem', borderBottom: i < secondary.length - 1 ? '1px solid #ede8df' : 'none' }}>

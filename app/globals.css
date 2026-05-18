@@ -39,3 +39,12 @@ html { overflow-x: hidden; overscroll-behavior-y: none; } body { overflow-x: hid
 .tb { padding: 0.4rem 0.6rem; border: 1px solid #ede8df; background: #fff; cursor: pointer; font-size: 13px; color: #0e1a2b; }
 .tb:hover { background: #f7f4ee; }
 .tb.on { background: #0e1a2b; color: #fff; }
+
+.hero-grid { display: grid; grid-template-columns: 1fr 340px; gap: 0; align-items: stretch; }
+.hero-featured { border-right: 1px solid #ede8df; padding-right: 2rem; }
+.hero-picks { padding-left: 2rem; }
+@media (max-width: 768px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .hero-featured { border-right: none; padding-right: 0; }
+  .hero-picks { padding-left: 0; }
+}
