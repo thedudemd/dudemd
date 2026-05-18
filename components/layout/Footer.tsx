@@ -65,7 +65,7 @@ export default function Footer() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
             <p style={{ fontSize: '11px', color: 'rgba(247,244,238,0.3)', margin: 0 }}>
               © {new Date().getFullYear()} DudeMD. All rights reserved.
             </p>
