@@ -55,7 +55,7 @@ export default async function HomePage() {
 
             {/* MAIN FEATURED */}
             {featured && (
-              <div style={{ borderRight: '1px solid #ede8df', paddingRight: '2rem' }}>
+              <div style={{ paddingRight: '0' }}>
                 <Link href={`/articles/${featured.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '1.25rem' }}>
                     <img
