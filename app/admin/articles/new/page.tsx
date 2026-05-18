@@ -108,7 +108,7 @@ function NewArticleInner() {
       const saved = localStorage.getItem(draftKey)
       if (saved) {
         const d = JSON.parse(saved)
-        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'' })
+        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'', status: d.status||'draft' })
         if (editor && d.content) editor.commands.setContent(d.content)
         setAutoSaved('Draft restored')
       }
