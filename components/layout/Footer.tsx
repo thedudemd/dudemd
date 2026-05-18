@@ -69,7 +69,7 @@ export default function Footer() {
             <p style={{ fontSize: '11px', color: 'rgba(247,244,238,0.3)', margin: 0 }}>
               © {new Date().getFullYear()} DudeMD. All rights reserved.
             </p>
-            <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0px", marginTop: "0", paddingTop: "0" }}><p style={{ margin: 0, fontSize: "9px", fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(247,244,238,0.25)", lineHeight: 1 }}>A publication of</p><img src="/rise-media.svg" alt="Rise Media Network" style={{ height: "120px", width: "auto", opacity: 0.4, filter: "brightness(0) invert(1)" }} /></div>
+            <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0px", marginTop: "0", paddingTop: "0" }}><p style={{ margin: 0, fontSize: "9px", fontWeight: 400, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(247,244,238,0.25)", lineHeight: 1 }}>A publication of</p><img src="/rise-media.svg" alt="Rise Media Network" style={{ height: "120px", width: "auto", opacity: 0.4, marginTop: "-8px", filter: "brightness(0) invert(1)" }} /></div>
           </div>
 
         </div>
