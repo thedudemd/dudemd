@@ -134,9 +134,11 @@ function NewArticleInner() {
 
   async function handleSave(status: string) {
     setSaving(true)
-    const { error } = await supabase.from('articles').insert({ ...form, content: editor?.getHTML() || '', read_time: getReadTime(), published: publish, published_at: publish ? new Date().toISOString() : null })
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { router.push('/admin/login'); return }
+    const { error } = await supabase.from('articles').insert({ ...form, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null })
     if (error) { alert('Error: ' + error.message); setSaving(false) }
-    else { router.push('/admin') }
+    else { localStorage.removeItem('draft_' + session.user.id); router.push('/admin') }
   }
 
   const inp: any = { width: '100%', padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit' }
