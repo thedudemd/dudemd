@@ -1,4 +1,4 @@
-html, body { overflow-x: hidden; overscroll-behavior: none; }
+html { overflow-x: hidden; overscroll-behavior-y: none; } body { overflow-x: hidden; }
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
