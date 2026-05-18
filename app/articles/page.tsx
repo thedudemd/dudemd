@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { supabase } from '@/lib/supabase/client'
 
 export const metadata: Metadata = { title: 'Articles — DudeMD' }
 
 export const revalidate = 60
 
 export default async function ArticlesPage() {
-  const supabase = await createClient()
+
   const { data: articles } = await supabase
     .from('articles')
     .select('*, authors(name), categories(name, slug)')
