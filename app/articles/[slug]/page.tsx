@@ -83,9 +83,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
 
-            <div style={{ fontSize: '16px', color: '#1B1D21', lineHeight: 1.8 }}>
-              {article.content}
-            </div>
+            <div style={{ fontSize: '16px', color: '#1B1D21', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: article.content || '' }} />
 
             <div style={{ marginTop: '3rem', padding: '1.5rem', backgroundColor: '#f7f4ee', borderLeft: '3px solid #c9b28f' }}>
               <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.5rem' }}>About the Author</p>
@@ -121,7 +119,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </div>
       </div>
 
-      {/* BOTTOM RELATED */}
       {related.length > 0 && (
         <section style={{ borderTop: '1px solid #ede8df', padding: '3rem 0', backgroundColor: '#f7f4ee' }}>
           <div className="container-content">
