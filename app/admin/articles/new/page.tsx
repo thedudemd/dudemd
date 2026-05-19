@@ -25,9 +25,10 @@ function NewArticleInner() {
   const [seoScore, setSeoScore] = useState(0)
   const [aeoScore, setAeoScore] = useState(0)
   const [readabilityScore, setReadabilityScore] = useState(0)
-  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft' })
+  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', tags: [] as string[] })
   const [canvaDesigns, setCanvaDesigns] = useState<any[]>([])
   const [showCanvaPicker, setShowCanvaPicker] = useState(false)
+  const [tagInput, setTagInput] = useState('')
   const searchParams = useSearchParams()
 
   const editor = useEditor({
@@ -110,7 +111,7 @@ function NewArticleInner() {
       const saved = localStorage.getItem(draftKey)
       if (saved) {
         const d = JSON.parse(saved)
-        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'', status: d.status||'draft' })
+        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'', status: d.status||'draft', tags: d.tags||[] })
         if (editor && d.content) editor.commands.setContent(d.content)
         setAutoSaved('Draft restored')
       }
@@ -138,6 +139,18 @@ function NewArticleInner() {
     const title = e.target.value
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
     setForm(f => ({ ...f, title, slug, meta_title: title }))
+  }
+
+  function addTag(val: string) {
+    const tag = val.trim().toLowerCase()
+    if (tag && !form.tags.includes(tag)) {
+      setForm(f => ({ ...f, tags: [...f.tags, tag] }))
+    }
+    setTagInput('')
+  }
+
+  function removeTag(tag: string) {
+    setForm(f => ({ ...f, tags: f.tags.filter((t: string) => t !== tag) }))
   }
 
   function getWordCount() { return editor ? editor.getText().split(/\s+/).filter(Boolean).length : 0 }
@@ -249,6 +262,18 @@ function NewArticleInner() {
 
             <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
               <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Settings</p>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={lbl}>Tags</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.5rem' }}>
+                  {form.tags.map((t: string) => (
+                    <span key={t} style={{ fontSize: '11px', backgroundColor: '#0e1a2b', color: '#f7f4ee', padding: '0.2rem 0.5rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      {t}
+                      <button onClick={() => removeTag(t)} style={{ background: 'none', border: 'none', color: '#c9b28f', cursor: 'pointer', fontSize: '13px', padding: 0, lineHeight: 1 }}>×</button>
+                    </span>
+                  ))}
+                </div>
+                <input value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag(tagInput) } }} placeholder="Type tag + Enter" style={{ ...inp, fontSize: '13px' }} />
+              </div>
               <div style={{ marginBottom: '1rem' }}><label style={lbl}>Category</label><select name="category_id" value={form.category_id} onChange={handleChange} style={inp}><option value="">Select...</option>{categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
               <div style={{ marginBottom: '1rem' }}><label style={lbl}>Author</label><select name="author_id" value={form.author_id} onChange={handleChange} style={inp}><option value="">Select...</option>{authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}</select></div>
               <div>
