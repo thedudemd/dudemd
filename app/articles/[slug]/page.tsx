@@ -43,7 +43,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       `}</style>
 
       {/* HERO */}
-      <div style={{ width: '100%', overflow: 'hidden', maxHeight: '520px' }}>
+      <div style={{ width: '100%', overflow: 'hidden', maxHeight: "380px" }}>
         <img src={article.cover_image_url} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
       </div>
 
