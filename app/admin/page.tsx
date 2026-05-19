@@ -64,7 +64,7 @@ export default function AdminDashboard() {
             <span style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f' }}>Editorial Studio</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <span style={{ fontSize: '11px', color: 'rgba(247,244,238,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{role}</span>
+            <span style={{ fontSize: '11px', color: 'rgba(247,244,238,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{role.replace(/_/g, ' ')}</span>
             <span style={{ fontSize: '12px', color: 'rgba(247,244,238,0.6)' }}>{user?.email}</span>
             <Link href="/admin/articles/new" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0e1a2b', backgroundColor: '#c9b28f', padding: '0.5rem 1rem', textDecoration: 'none' }}>+ New Article</Link>
             <Link href="/admin/media" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(247,244,238,0.6)', textDecoration: 'none' }}>Media</Link>
