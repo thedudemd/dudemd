@@ -66,7 +66,7 @@ export default function AdminDashboard() {
               </div>
               <span style={{ fontSize: '13px', color: '#4A5563' }}>{a.categories?.name}</span>
               <span style={{ fontSize: '13px', color: '#4A5563' }}>{a.authors?.name}</span>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: a.published ? '#2d7a3a' : '#9a9085', backgroundColor: a.published ? '#e8f5ea' : '#f0ede8', padding: '0.25rem 0.5rem', display: 'inline-block' }}>{a.published ? 'Published' : 'Draft'}</span>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: a.status === 'published' ? '#2d7a3a' : a.status === 'review' ? '#d4820a' : '#9a9085', backgroundColor: a.status === 'published' ? '#e8f5ea' : a.status === 'review' ? '#fef3e2' : '#f0ede8', padding: '0.25rem 0.5rem', display: 'inline-block' }}>{a.status === 'published' ? 'Published' : a.status === 'review' ? 'In Review' : 'Draft'}</span>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <Link href={`/admin/articles/${a.slug}`} style={{ fontSize: '12px', fontWeight: 600, color: '#0e1a2b', textDecoration: 'none' }}>Edit</Link>
                 <Link href={`/articles/${a.slug}`} target="_blank" style={{ fontSize: '12px', fontWeight: 600, color: '#c9b28f', textDecoration: 'none' }}>View</Link>
