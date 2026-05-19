@@ -20,7 +20,7 @@ export default function AdminDashboard() {
       const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single()
       setRole(profile?.role || 'writer')
       const query = supabase.from('articles').select('*, authors(name), categories(name)').order('created_at', { ascending: false })
-      const { data } = profile?.role === 'writer'
+      const { data } = profile?.role === 'writer' || profile?.role === 'contributor'
         ? await query.eq('author_id', session.user.id)
         : await query
       setArticles(data || [])
@@ -50,7 +50,8 @@ export default function AdminDashboard() {
     setArticles(articles.filter(a => a.id !== id))
   }
 
-  const isEditor = role === 'editor' || role === 'super_admin'
+  const isAdmin = role === 'super_admin' || role === 'editorial_chief_admin'
+  const isEditor = role === 'editor' || isAdmin
   const filtered = filter === 'all' ? articles : articles.filter(a => a.status === filter)
 
   if (loading) return <div style={{ minHeight: '100vh', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={{ color: '#f7f4ee' }}>Loading...</p></div>
@@ -112,7 +113,7 @@ export default function AdminDashboard() {
                 {isEditor && a.status === 'review' && (
                   <button onClick={() => handleReject(a.id)} style={{ fontSize: '12px', fontWeight: 600, color: '#c0392b', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Reject</button>
                 )}
-                {role === 'super_admin' && (
+                {isAdmin && (
                   <button onClick={() => handleDelete(a.id)} style={{ fontSize: '12px', fontWeight: 600, color: '#c0392b', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Delete</button>
                 )}
               </div>
