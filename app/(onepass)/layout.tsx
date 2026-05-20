@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import '../globals.css'
 
 export const metadata: Metadata = {
   title: 'Sign In — DudeMD OnePass',
@@ -6,11 +7,5 @@ export const metadata: Metadata = {
 }
 
 export default function OnePassLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body style={{ margin: 0, padding: 0 }}>
-        {children}
-      </body>
-    </html>
-  )
+  return children
 }
