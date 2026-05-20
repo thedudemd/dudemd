@@ -202,7 +202,7 @@ export default function SignInPage() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover object-center"
         >
-          <source src="https://res.cloudinary.com/dligiz9tp/video/upload/v1779318295/Modern_Wellness_For_Real_Life_2_un1rsw.mov" type="video/mp4" />
+          <source src="https://res.cloudinary.com/dligiz9tp/video/upload/f_mp4,vc_h264/v1779318295/Modern_Wellness_For_Real_Life_2_un1rsw.mov" type="video/mp4" />
         </video>
         <div
           className="absolute inset-0"
