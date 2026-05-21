@@ -79,7 +79,7 @@ export default function SignInPage() {
         .signin-right { width:55%; position:relative; overflow:hidden; background:#0e1a2b; min-height:calc(100vh - 120px); }
         @media (max-width:768px) {
           .signin-wrapper { flex-direction:column; }
-          .signin-left { width:100%; padding:40px 24px; min-height:100vh; }
+          .signin-left { width:100%; padding:40px 24px; min-height:unset; }
           .signin-right { display:none; }
         }
       `}</style>
