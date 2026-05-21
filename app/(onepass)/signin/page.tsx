@@ -79,7 +79,7 @@ export default function SignInPage() {
         .signin-right { width:55%; position:relative; overflow:hidden; background:#0e1a2b; min-height:calc(100vh - 120px); }
         @media (max-width:768px) {
           .signin-wrapper { flex-direction:column; }
-          .signin-left { width:100%; padding:40px 24px; min-height:unset; }
+          .signin-left { width:100%; padding:40px 24px; }
           .signin-right { display:none; }
         }
       `}</style>
@@ -87,8 +87,8 @@ export default function SignInPage() {
         <div className="signin-left">
           <div style={{display:'flex',flexDirection:'column',gap:18,maxWidth:'320px',width:'100%',margin:'0 auto'}}>
             <h1 style={{fontSize:26,fontWeight:700,color:'#0e1a2b',margin:0,textAlign:'center'}}>Sign in</h1>
-            <div style={{display:'flex',justifyContent:'center'}}>
-              <Image src="/images/authly-logo.png" alt="Authly" width={160} height={48} style={{objectFit:'contain'}} priority />
+            <div style={{display:'flex',justifyContent:'center',backgroundColor:'#f7f4ee',padding:'4px 0'}}>
+              <Image src="/images/authly-logo.png" alt="Authly" width={160} height={48} style={{objectFit:'contain',mixBlendMode:'multiply'}} priority />
             </div>
             <div style={{height:1,background:'#d1cfc9'}}/>
             {error && <div style={{background:'#fdecea',color:'#a32d2d',border:'1px solid #f09595',borderRadius:8,padding:'10px 14px',fontSize:13}}>{error}</div>}
