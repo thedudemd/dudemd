@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { signInWithGoogle, signInWithApple, signInWithFacebook, signInWithMagicLink } from '@/lib/auth/supabase-auth'
 
@@ -36,6 +36,14 @@ export default function SignInPage() {
   const [magicLinkSent, setMagicLinkSent] = useState(false)
   const [loading, setLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    v.load()
+    v.play().catch(() => {})
+  }, [])
 
   async function handleGoogle() {
     try { setLoading('google'); setError(null); await signInWithGoogle() }
@@ -120,7 +128,7 @@ export default function SignInPage() {
           </div>
         </div>
         <div className="signin-right">
-          <video autoPlay muted loop playsInline style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'40% center'}}>
+          <video ref={videoRef} autoPlay muted loop playsInline preload="auto" style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'40% center'}}>
             <source src="https://res.cloudinary.com/dligiz9tp/video/upload/v1779323453/Modern_Wellness_For_Real_Life_3_yrsn3z.mp4" type="video/mp4"/>
           </video>
           <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(14,26,43,0.5) 0%,rgba(14,26,43,0.05) 40%,transparent 100%)'}}/>
