@@ -9,7 +9,6 @@ import StarterKit from '@tiptap/starter-kit'
 import TiptapImage from '@tiptap/extension-image'
 import LinkExtension from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
-
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
 
@@ -36,7 +35,6 @@ function NewArticleInner() {
       StarterKit, Underline, TiptapImage,
       LinkExtension.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: 'Write your article here...' }),
-
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
     ],
     content: '',
@@ -190,7 +188,6 @@ function NewArticleInner() {
 
       <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem', alignItems: 'start' }}>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div><label style={lbl}>Title</label><input name="title" value={form.title} onChange={handleTitleChange} placeholder="Article title..." style={{ ...inp, fontSize: '20px', fontWeight: 600 }} /></div>
             <div><label style={lbl}>Slug</label><input name="slug" value={form.slug} onChange={handleChange} style={inp} /></div>
@@ -303,7 +300,6 @@ function NewArticleInner() {
               <button onClick={() => handleSave("published")} disabled={saving} style={{ width: '100%', padding: '0.875rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>{saving ? 'Publishing...' : 'Publish Article'}</button>
             </div>
           </div>
-
         </div>
       </div>
     </div>
