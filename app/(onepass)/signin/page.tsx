@@ -1,4 +1,3 @@
-cat > app/\(onepass\)/signin/page.tsx << 'ENDOFFILE'
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
