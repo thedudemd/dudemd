@@ -73,7 +73,7 @@ export default function SignInPage() {
           <h1 style={{fontSize:26,fontWeight:700,color:'#0e1a2b',margin:0,textAlign:'center'}}>Sign in</h1>
 
           <div style={{display:'flex',justifyContent:'center'}}>
-            <Image src="/images/onepass-logo.png" alt="OnePass" width={170} height={52} style={{objectFit:'contain'}} priority />
+            <Image src="/images/onepass-logo.svg" alt="OnePass" width={170} height={52} style={{objectFit:'contain'}} priority />
           </div>
 
           <div style={{height:1,background:'#d1cfc9'}}/>
