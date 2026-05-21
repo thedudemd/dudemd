@@ -8,7 +8,7 @@ import StarterKit from '@tiptap/starter-kit'
 import TiptapImage from '@tiptap/extension-image'
 import LinkExtension from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
-import CharacterCount from '@tiptap/extension-character-count'
+
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
 
@@ -27,7 +27,7 @@ function EditArticleInner({ slug }: { slug: string }) {
       StarterKit, Underline, TiptapImage,
       LinkExtension.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: 'Write your article here...' }),
-      CharacterCount,
+
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
     ],
     content: '',
