@@ -200,7 +200,7 @@ export default function SignInPage() {
           muted
           loop
           playsInline
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:"50% 50%"}}
         >
           <source src="https://res.cloudinary.com/dligiz9tp/video/upload/v1779320683/Modern_Wellness_For_Real_Life_3_dyoo0u.mp4" type="video/mp4" />
         </video>
