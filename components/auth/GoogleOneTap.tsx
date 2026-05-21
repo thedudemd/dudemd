@@ -12,12 +12,14 @@ declare global {
 export default function GoogleOneTap() {
   useEffect(() => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+    if (clientId === undefined) return
 
     const script = document.createElement('script')
     script.src = 'https://accounts.google.com/gsi/client'
     script.async = true
     script.defer = true
     script.onload = () => {
+      if (window.google === undefined) return
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: async (response: any) => {
@@ -26,6 +28,7 @@ export default function GoogleOneTap() {
             provider: 'google',
             token: response.credential,
           })
+          if (error === null) window.location.reload()
         },
         auto_select: false,
         cancel_on_tap_outside: true,
