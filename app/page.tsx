@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import GoogleOneTap from "@/components/auth/GoogleOneTap"
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 
@@ -32,6 +33,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <GoogleOneTap />
       {/* BREAKING TICKER */}
       <div style={{ backgroundColor: '#c9b28f', padding: '0.4rem 0', overflow: 'hidden' }}>
         <div className="container-content">
