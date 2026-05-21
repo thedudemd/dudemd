@@ -64,70 +64,68 @@ export default function SignInPage() {
   const btn: React.CSSProperties = {display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'12px 16px',borderRadius:8,fontSize:13,fontWeight:500,cursor:'pointer',border:'none',width:'100%'}
 
   return (
-    <div style={{display:'flex',width:'100%',minHeight:'calc(100vh - 120px)',fontFamily:"system-ui,sans-serif"}}>
-
-      {/* LEFT */}
-      <div style={{width:'45%',backgroundColor:'#f7f4ee',display:'flex',flexDirection:'column',justifyContent:'center',padding:'40px 48px',boxSizing:'border-box'}}>
-        <div style={{display:'flex',flexDirection:'column',gap:18,maxWidth:'320px',width:'100%',margin:'0 auto'}}>
-
-          <h1 style={{fontSize:26,fontWeight:700,color:'#0e1a2b',margin:0,textAlign:'center'}}>Sign in</h1>
-
-          <div style={{display:'flex',justifyContent:'center'}}>
-            <Image src="/images/onepass-logo.svg" alt="OnePass" width={170} height={52} style={{objectFit:'contain'}} priority />
-          </div>
-
-          <div style={{height:1,background:'#d1cfc9'}}/>
-
-          {error && <div style={{background:'#fdecea',color:'#a32d2d',border:'1px solid #f09595',borderRadius:8,padding:'10px 14px',fontSize:13}}>{error}</div>}
-
-          <div style={{display:'flex',flexDirection:'column',gap:9}}>
-            <button onClick={handleGoogle} disabled={loading!==null} style={{...btn,background:'#fff',border:'1px solid #d1cfc9',color:'#1B1D21'}}>
-              <GoogleIcon/>{loading==='google'?'Connecting…':'Continue with Google'}
-            </button>
-            <button onClick={handleApple} disabled={loading!==null} style={{...btn,background:'#1B1D21',color:'#f7f4ee'}}>
-              <AppleIcon/>{loading==='apple'?'Connecting…':'Continue with Apple'}
-            </button>
-            <button onClick={handleFacebook} disabled={loading!==null} style={{...btn,background:'#1877F2',color:'#fff'}}>
-              <FacebookIcon/>{loading==='facebook'?'Connecting…':'Continue with Facebook'}
-            </button>
-          </div>
-
-          <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <div style={{flex:1,height:1,background:'#d1cfc9'}}/>
-            <span style={{fontSize:11,color:'#4A5563'}}>or</span>
-            <div style={{flex:1,height:1,background:'#d1cfc9'}}/>
-          </div>
-
-          {magicLinkSent ? (
-            <div style={{background:'#eef7ee',color:'#2d6a2d',border:'1px solid #b6ddb6',borderRadius:8,padding:14,fontSize:13,textAlign:'center'}}>
-              ✓ Magic link sent to <strong>{email}</strong>
+    <>
+      <style>{`
+        .signin-wrapper { display:flex; width:100%; min-height:calc(100vh - 120px); font-family:system-ui,sans-serif; }
+        .signin-left { width:45%; background-color:#f7f4ee; display:flex; flex-direction:column; justify-content:center; padding:40px 48px; box-sizing:border-box; }
+        .signin-right { width:55%; position:relative; overflow:hidden; background:#0e1a2b; min-height:calc(100vh - 120px); }
+        @media (max-width:768px) {
+          .signin-wrapper { flex-direction:column; }
+          .signin-left { width:100%; padding:40px 24px; min-height:100vh; }
+          .signin-right { display:none; }
+        }
+      `}</style>
+      <div className="signin-wrapper">
+        <div className="signin-left">
+          <div style={{display:'flex',flexDirection:'column',gap:18,maxWidth:'320px',width:'100%',margin:'0 auto'}}>
+            <h1 style={{fontSize:26,fontWeight:700,color:'#0e1a2b',margin:0,textAlign:'center'}}>Sign in</h1>
+            <div style={{display:'flex',justifyContent:'center'}}>
+              <Image src="/images/onepass-logo.svg" alt="OnePass" width={170} height={52} style={{objectFit:'contain'}} priority />
             </div>
-          ) : (
-            <div style={{display:'flex',flexDirection:'column',gap:8}}>
-              <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'#4A5563'}}>Email address</label>
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'#0e1a2b',outline:'none',width:'100%',boxSizing:'border-box'}}/>
-              <button onClick={handleMagicLink} disabled={loading!==null||!email} style={{...btn,background:'#0e1a2b',color:'#f7f4ee',fontWeight:600,opacity:(!email||loading!==null)?0.5:1}}>
-                {loading==='magic'?'Sending…':'Sign in with Email'}
+            <div style={{height:1,background:'#d1cfc9'}}/>
+            {error && <div style={{background:'#fdecea',color:'#a32d2d',border:'1px solid #f09595',borderRadius:8,padding:'10px 14px',fontSize:13}}>{error}</div>}
+            <div style={{display:'flex',flexDirection:'column',gap:9}}>
+              <button onClick={handleGoogle} disabled={loading!==null} style={{...btn,background:'#fff',border:'1px solid #d1cfc9',color:'#1B1D21'}}>
+                <GoogleIcon/>{loading==='google'?'Connecting…':'Continue with Google'}
+              </button>
+              <button onClick={handleApple} disabled={loading!==null} style={{...btn,background:'#1B1D21',color:'#f7f4ee'}}>
+                <AppleIcon/>{loading==='apple'?'Connecting…':'Continue with Apple'}
+              </button>
+              <button onClick={handleFacebook} disabled={loading!==null} style={{...btn,background:'#1877F2',color:'#fff'}}>
+                <FacebookIcon/>{loading==='facebook'?'Connecting…':'Continue with Facebook'}
               </button>
             </div>
-          )}
-
-          <p style={{fontSize:11,color:'#4A5563',textAlign:'center',margin:0,lineHeight:1.6}}>
-            By signing in you agree to our <a href="/terms" style={{color:'#0e1a2b'}}>Terms</a> and <a href="/privacy" style={{color:'#0e1a2b'}}>Privacy Policy</a>.
-          </p>
-
-          <p style={{fontSize:10,color:'#4A5563',textAlign:'center',margin:0}}>© {new Date().getFullYear()} DudeMD. A Rise Media Network publication.</p>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <div style={{flex:1,height:1,background:'#d1cfc9'}}/>
+              <span style={{fontSize:11,color:'#4A5563'}}>or</span>
+              <div style={{flex:1,height:1,background:'#d1cfc9'}}/>
+            </div>
+            {magicLinkSent ? (
+              <div style={{background:'#eef7ee',color:'#2d6a2d',border:'1px solid #b6ddb6',borderRadius:8,padding:14,fontSize:13,textAlign:'center'}}>
+                ✓ Magic link sent to <strong>{email}</strong>
+              </div>
+            ) : (
+              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+                <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'#4A5563'}}>Email address</label>
+                <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'#0e1a2b',outline:'none',width:'100%',boxSizing:'border-box'}}/>
+                <button onClick={handleMagicLink} disabled={loading!==null||!email} style={{...btn,background:'#0e1a2b',color:'#f7f4ee',fontWeight:600,opacity:(!email||loading!==null)?0.5:1}}>
+                  {loading==='magic'?'Sending…':'Sign in with Email'}
+                </button>
+              </div>
+            )}
+            <p style={{fontSize:11,color:'#4A5563',textAlign:'center',margin:0,lineHeight:1.6}}>
+              By signing in you agree to our <a href="/terms" style={{color:'#0e1a2b'}}>Terms</a> and <a href="/privacy" style={{color:'#0e1a2b'}}>Privacy Policy</a>.
+            </p>
+            <p style={{fontSize:10,color:'#4A5563',textAlign:'center',margin:0}}>© {new Date().getFullYear()} DudeMD. A Rise Media Network publication.</p>
+          </div>
+        </div>
+        <div className="signin-right">
+          <video autoPlay muted loop playsInline style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'40% center'}}>
+            <source src="https://res.cloudinary.com/dligiz9tp/video/upload/v1779323453/Modern_Wellness_For_Real_Life_3_yrsn3z.mp4" type="video/mp4"/>
+          </video>
+          <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(14,26,43,0.5) 0%,rgba(14,26,43,0.05) 40%,transparent 100%)'}}/>
         </div>
       </div>
-
-      {/* RIGHT */}
-      <div style={{width:'55%',position:'relative',overflow:'hidden',background:'#0e1a2b',minHeight:'calc(100vh - 120px)'}}>
-        <video autoPlay muted loop playsInline style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'40% center'}}>
-          <source src="https://res.cloudinary.com/dligiz9tp/video/upload/v1779320683/Modern_Wellness_For_Real_Life_3_dyoo0u.mp4" type="video/mp4"/>
-        </video>
-        <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(14,26,43,0.5) 0%,rgba(14,26,43,0.05) 40%,transparent 100%)'}}/>
-      </div>
-
-    </div>
+    </>
   )
 }
