@@ -39,7 +39,7 @@ export default function SignInPage() {
 
   async function handleGoogle() {
     try { setLoading('google'); setError(null); await signInWithGoogle() }
-    catch { setError('Google sign-in failed.'); setLoading(null) }
+    catch (err) { console.error("Google auth error:", err); setError('Google sign-in failed.'); setLoading(null) }
   }
   async function handleApple() {
     try { setLoading('apple'); setError(null); await signInWithApple() }
