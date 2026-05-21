@@ -122,7 +122,7 @@ export default function SignInPage() {
 
       {/* RIGHT */}
       <div style={{width:'55%',position:'relative',overflow:'hidden',background:'#0e1a2b',minHeight:'calc(100vh - 120px)'}}>
-        <video autoPlay muted loop playsInline style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'70% center'}}>
+        <video autoPlay muted loop playsInline style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'60% center'}}>
           <source src="https://res.cloudinary.com/dligiz9tp/video/upload/v1779320683/Modern_Wellness_For_Real_Life_3_dyoo0u.mp4" type="video/mp4"/>
         </video>
         <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(14,26,43,0.5) 0%,rgba(14,26,43,0.05) 40%,transparent 100%)'}}/>
