@@ -88,7 +88,7 @@ export default function SignInPage() {
           <div style={{display:'flex',flexDirection:'column',gap:18,maxWidth:'320px',width:'100%',margin:'0 auto'}}>
             <h1 style={{fontSize:26,fontWeight:700,color:'#0e1a2b',margin:0,textAlign:'center'}}>Sign in</h1>
             <div style={{display:'flex',justifyContent:'center'}}>
-              <Image src="/images/onepass-logo.svg" alt="OnePass" width={170} height={52} style={{objectFit:'contain'}} priority />
+              <Image src="/images/authly-logo.png" alt="Authly" width={160} height={48} style={{objectFit:'contain'}} priority />
             </div>
             <div style={{height:1,background:'#d1cfc9'}}/>
             {error && <div style={{background:'#fdecea',color:'#a32d2d',border:'1px solid #f09595',borderRadius:8,padding:'10px 14px',fontSize:13}}>{error}</div>}
