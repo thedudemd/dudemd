@@ -88,6 +88,7 @@ export default function SignInPage() {
           <div style={{display:'flex',flexDirection:'column',gap:18,maxWidth:'320px',width:'100%',margin:'0 auto'}}>
             <p style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.15em',color:'#4A5563',textAlign:'center',margin:0}}>Powered by</p>
             <h1 style={{fontSize:26,fontWeight:700,color:'#0e1a2b',margin:0,textAlign:'center'}}>Sign in</h1>
+            <div <div style={{textAlign:'center',fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.15em',color:'#4A5563',marginBottom:4}}>Powered by</div>
             <div style={{display:'flex',justifyContent:'center',backgroundColor:'#f7f4ee',padding:'4px 0'}}>
               <Image src="/images/authly-logo.png" alt="Authly" width={160} height={48} style={{objectFit:'contain',mixBlendMode:'multiply'}} priority />
             </div>
