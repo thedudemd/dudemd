@@ -107,7 +107,7 @@ export default function SignInPage() {
               <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'#4A5563'}}>Email address</label>
               <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'#0e1a2b',outline:'none',width:'100%',boxSizing:'border-box'}}/>
               <button onClick={handleMagicLink} disabled={loading!==null||!email} style={{...btn,background:'#0e1a2b',color:'#f7f4ee',fontWeight:600,opacity:(!email||loading!==null)?0.5:1}}>
-                {loading==='magic'?'Sending…':'Send magic link'}
+                {loading==='magic'?'Sending…':'Sign in with Email'}
               </button>
             </div>
           )}
