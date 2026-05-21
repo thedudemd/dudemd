@@ -194,7 +194,7 @@ export default function SignInPage() {
       </div>
 
       {/* RIGHT PANEL */}
-      <div className="hidden lg:flex lg:w-[55%]" style={{position:"relative",overflow:"hidden",minHeight:"100vh",backgroundColor:"#0e1a2b"}}>
+      <div style={{width:"55%",position:"relative",overflow:"hidden",minHeight:"calc(100vh - 120px)",backgroundColor:"#0e1a2b"}}>
         <video
           autoPlay
           muted
