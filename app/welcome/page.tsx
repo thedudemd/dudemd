@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { createClient } from '@/lib/auth/supabase-auth'
 
 export default function WelcomePage() {
@@ -30,17 +29,25 @@ export default function WelcomePage() {
     check()
   }, [])
 
+  useEffect(() => {
+    if (step === 3) {
+      const t = setTimeout(() => router.push('/'), 3000)
+      return () => clearTimeout(t)
+    }
+  }, [step])
+
   async function handleComplete() {
     setLoading(true)
     const supabase = createClient()
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) { router.push('/signin'); return }
-    await supabase.from('profiles').update({
+    const { error } = await supabase.from('profiles').update({
       full_name: firstName,
       newsletter_subscribed: newsletter,
       onboarding_complete: true,
     }).eq('id', session.user.id)
-    router.push('/')
+    if (!error) setStep(3)
+    else { alert('Something went wrong. Please try again.'); setLoading(false) }
   }
 
   if (checking) return (
@@ -56,19 +63,14 @@ export default function WelcomePage() {
     <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem 1.5rem', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ width: '100%', maxWidth: '420px' }}>
 
-        {/* LOGO */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <Image src="/dude md.svg" alt="DudeMD" width={140} height={48} style={{ objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(8%) sepia(24%) saturate(1200%) hue-rotate(185deg) brightness(90%) contrast(95%)' }} priority />
-        </div>
+        {step !== 3 && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '2rem' }}>
+            {[1, 2].map(s => (
+              <div key={s} style={{ width: s === step ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: s === step ? '#0e1a2b' : s < step ? '#c9b28f' : '#d1cfc9', transition: 'all 0.3s' }} />
+            ))}
+          </div>
+        )}
 
-        {/* STEP INDICATORS */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '2rem' }}>
-          {[1, 2].map(s => (
-            <div key={s} style={{ width: s === step ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: s === step ? '#0e1a2b' : s < step ? '#c9b28f' : '#d1cfc9', transition: 'all 0.3s' }} />
-          ))}
-        </div>
-
-        {/* STEP 1 — FIRST NAME */}
         {step === 1 && (
           <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid #ede8df' }}>
             <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.5rem', textAlign: 'center' }}>What should we call you?</h1>
@@ -78,6 +80,7 @@ export default function WelcomePage() {
               type="text"
               value={firstName}
               onChange={e => setFirstName(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && firstName.trim() && setStep(2)}
               placeholder="Enter your first name"
               autoFocus
               style={{ width: '100%', padding: '0.875rem', border: '1px solid #ede8df', fontSize: '15px', color: '#0e1a2b', outline: 'none', boxSizing: 'border-box', backgroundColor: '#f7f4ee' }}
@@ -88,12 +91,10 @@ export default function WelcomePage() {
           </div>
         )}
 
-        {/* STEP 2 — PREFERENCES */}
         {step === 2 && (
           <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid #ede8df' }}>
             <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.5rem', textAlign: 'center' }}>Set your preferences</h1>
             <p style={{ fontSize: '14px', color: '#4A5563', textAlign: 'center', margin: '0 0 1.5rem' }}>You can update your selections at any time.</p>
-
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
               <label style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start', cursor: 'pointer' }}>
                 <div onClick={() => setNewsletter(!newsletter)}
@@ -104,7 +105,6 @@ export default function WelcomePage() {
                   Subscribe to the DudeMD newsletter. Get the best in men's wellness, style, and gear delivered weekly.
                 </span>
               </label>
-
               <label style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start', cursor: 'pointer' }}>
                 <div onClick={() => setWeeklyTips(!weeklyTips)}
                   style={{ width: '22px', height: '22px', flexShrink: 0, border: `2px solid ${weeklyTips ? '#0e1a2b' : '#d1cfc9'}`, backgroundColor: weeklyTips ? '#0e1a2b' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1px', cursor: 'pointer' }}>
@@ -115,18 +115,29 @@ export default function WelcomePage() {
                 </span>
               </label>
             </div>
-
             <p style={{ fontSize: '11px', color: '#4A5563', lineHeight: 1.6, margin: '0 0 0.5rem' }}>
               By creating an account, you agree to our <a href="/terms-of-use" style={{ color: '#c9b28f' }}>Terms of Use</a> and acknowledge our <a href="/privacy-policy" style={{ color: '#c9b28f' }}>Privacy Policy</a>. You agree to receive marketing and account-related emails from DudeMD.
             </p>
-
             <button onClick={handleComplete} disabled={loading} style={{ ...btn, opacity: loading ? 0.7 : 1 }}>
               {loading ? 'Setting up your account...' : 'Create Account'}
             </button>
-
             <button onClick={() => setStep(1)} style={{ width: '100%', padding: '0.5rem', background: 'none', border: 'none', fontSize: '12px', color: '#4A5563', cursor: 'pointer', marginTop: '0.75rem', textDecoration: 'underline' }}>
               Back
             </button>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div style={{ backgroundColor: '#fff', padding: '3rem 2rem', border: '1px solid #ede8df', textAlign: 'center' }}>
+            <div style={{ width: '64px', height: '64px', backgroundColor: '#0e1a2b', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9b28f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+            </div>
+            <h1 style={{ fontSize: '26px', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.75rem' }}>Welcome to The Dude Community{firstName ? `, ${firstName}` : ''}!</h1>
+            <p style={{ fontSize: '14px', color: '#4A5563', lineHeight: 1.6, margin: '0 0 1.5rem' }}>You're now part of a community built for real men living real lives. We're glad you're here.</p>
+            <p style={{ fontSize: '12px', color: '#9a9085' }}>Taking you home in a moment...</p>
+            <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
           </div>
         )}
 
