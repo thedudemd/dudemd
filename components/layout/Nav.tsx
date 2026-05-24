@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
-import { useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { useState, useEffect, useRef } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/auth/supabase-auth'
 
 const NAV_ITEMS = [
   {
@@ -53,8 +54,55 @@ export default function Nav() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [aboutOpen, setAboutOpen] = useState(false)
+  const [userOpen, setUserOpen] = useState(false)
+  const [profile, setProfile] = useState<{full_name?: string, avatar_url?: string} | null>(null)
+  const [session, setSession] = useState<any>(null)
+  const userRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+  const router = useRouter()
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      setSession(session)
+      if (session) {
+        const { data } = await supabase.from('profiles').select('full_name, avatar_url').eq('id', session.user.id).single()
+        setProfile(data)
+      }
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session)
+      if (session) {
+        const supabase2 = createClient()
+        const { data } = await supabase2.from('profiles').select('full_name, avatar_url').eq('id', session.user.id).single()
+        setProfile(data)
+      } else {
+        setProfile(null)
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    setSession(null)
+    setProfile(null)
+    setUserOpen(false)
+    router.push('/')
+  }
+
   if (pathname?.startsWith('/admin')) return null
+
+  const firstName = profile?.full_name?.split(' ')[0] || ''
 
   return (
     <>
@@ -83,12 +131,10 @@ export default function Nav() {
       <header style={{ backgroundColor: '#0e1a2b', position: 'sticky', top: 0, zIndex: 200 }}>
         <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '4.5rem' }}>
 
-          {/* LOGO */}
           <Link href="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
             <img src="/dude%20md.svg" alt="DudeMD" style={{ height: '60px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
           </Link>
 
-          {/* DESKTOP NAV */}
           <nav className="nav-desktop" style={{ gap: 0, alignItems: 'center' }}>
             {NAV_ITEMS.map((item) => (
               <div key={item.label} className="nav-item"
@@ -125,7 +171,6 @@ export default function Nav() {
             ))}
           </nav>
 
-          {/* DESKTOP RIGHT */}
           <div className="nav-desktop" style={{ alignItems: 'center', gap: '1.25rem' }}>
             <Link href="/newsletter" style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#0e1a2b', backgroundColor: '#c9b28f', padding: '0.5rem 1.25rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
               Subscribe
@@ -147,11 +192,41 @@ export default function Nav() {
                 </div>
               )}
             </div>
-            <Link href="/signin" className="icon-btn" title="Sign In">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-              </svg>
-            </Link>
+
+            {/* USER MENU */}
+            <div ref={userRef} style={{ position: 'relative' }}>
+              {session ? (
+                <button onClick={() => setUserOpen(!userOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', color: '#f7f4ee', padding: '0.25rem' }}>
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt={firstName} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f' }} />
+                  ) : (
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#c9b28f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#0e1a2b' }}>
+                      {firstName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  {firstName && <span style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.04em' }}>{firstName}</span>}
+                </button>
+              ) : (
+                <Link href="/signin" className="icon-btn" title="Sign In">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </Link>
+              )}
+              {userOpen && session && (
+                <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, backgroundColor: '#ffffff', borderTop: '3px solid #c9b28f', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', zIndex: 999, minWidth: '180px', padding: '0.5rem 0' }}>
+                  <Link href="/account" onClick={() => setUserOpen(false)}
+                    style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', padding: '0.6rem 1.25rem', borderBottom: '1px solid #f0ede8' }}>
+                    My Account
+                  </Link>
+                  <button onClick={handleSignOut}
+                    style={{ display: 'block', width: '100%', textAlign: 'left', fontSize: '14px', fontWeight: 500, color: '#a32d2d', background: 'none', border: 'none', padding: '0.6rem 1.25rem', cursor: 'pointer' }}>
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+
             <button className="icon-btn" onClick={() => setSearchOpen(!searchOpen)}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -167,8 +242,24 @@ export default function Nav() {
             </button>
           </div>
 
-          {/* MOBILE RIGHT */}
           <div className="nav-mobile-only" style={{ alignItems: 'center', gap: '1rem' }}>
+            {session ? (
+              <button onClick={() => setUserOpen(!userOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt={firstName} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f' }} />
+                ) : (
+                  <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#c9b28f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: '#0e1a2b' }}>
+                    {firstName.charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </button>
+            ) : (
+              <Link href="/signin" className="icon-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+              </Link>
+            )}
             <button className="icon-btn" onClick={() => setSearchOpen(!searchOpen)}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -185,7 +276,6 @@ export default function Nav() {
           </div>
         </div>
 
-        {/* SEARCH BAR */}
         {searchOpen && (
           <div style={{ backgroundColor: '#0e1a2b', borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1rem 0' }}>
             <div className="container-content">
@@ -199,12 +289,9 @@ export default function Nav() {
         )}
       </header>
 
-      {/* DRAWER OVERLAY */}
       {drawerOpen && <div className="drawer-overlay" onClick={() => setDrawerOpen(false)} />}
 
-      {/* DRAWER */}
       <div className={`drawer${drawerOpen ? ' open' : ''}`}>
-        {/* DRAWER HEADER */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <Link href="/" onClick={() => setDrawerOpen(false)} style={{ textDecoration: 'none' }}>
             <img src="/dude%20md.svg" alt="DudeMD" style={{ height: '44px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
@@ -212,7 +299,6 @@ export default function Nav() {
           <button onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#f7f4ee', fontSize: '24px', lineHeight: 1, padding: '0.25rem' }}>×</button>
         </div>
 
-        {/* DRAWER CATEGORIES */}
         <div style={{ padding: '0.5rem 0' }}>
           {NAV_ITEMS.map((item) => (
             <div key={item.label} className="drawer-item">
@@ -239,7 +325,6 @@ export default function Nav() {
           ))}
         </div>
 
-        {/* DRAWER FOOTER LINKS */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1rem 0' }}>
           {['Our Story', 'Editorial Policy', 'Advertise', 'Contact'].map((it) => (
             <Link key={it} href={`/${it.toLowerCase().replace(/ /g, '-')}`}
@@ -250,17 +335,28 @@ export default function Nav() {
           ))}
         </div>
 
-        {/* DRAWER BOTTOM */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <Link href="/signin" onClick={() => setDrawerOpen(false)}
-            style={{ display: 'block', padding: '0.75rem', textAlign: 'center', border: '1px solid rgba(247,244,238,0.3)', color: '#f7f4ee', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
-            Sign In
-          </Link>
+          {session ? (
+            <>
+              <Link href="/account" onClick={() => setDrawerOpen(false)}
+                style={{ display: 'block', padding: '0.75rem', textAlign: 'center', border: '1px solid rgba(247,244,238,0.3)', color: '#f7f4ee', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
+                My Account
+              </Link>
+              <button onClick={() => { handleSignOut(); setDrawerOpen(false) }}
+                style={{ display: 'block', width: '100%', padding: '0.75rem', textAlign: 'center', backgroundColor: 'transparent', border: '1px solid rgba(163,45,45,0.5)', color: '#f09595', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <Link href="/signin" onClick={() => setDrawerOpen(false)}
+              style={{ display: 'block', padding: '0.75rem', textAlign: 'center', border: '1px solid rgba(247,244,238,0.3)', color: '#f7f4ee', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
+              Sign In
+            </Link>
+          )}
           <Link href="/newsletter" onClick={() => setDrawerOpen(false)}
             style={{ display: 'block', padding: '0.75rem', textAlign: 'center', backgroundColor: '#c9b28f', color: '#0e1a2b', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
             Subscribe
           </Link>
-          {/* SOCIAL */}
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', paddingTop: '0.5rem' }}>
             {[
               { href: 'https://instagram.com/thedudemd_', label: 'Instagram', d: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z' },
