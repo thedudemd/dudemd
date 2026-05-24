@@ -6,7 +6,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 export function createClient() {
   return createBrowserClient(supabaseUrl, supabaseAnonKey, {
     cookieOptions: {
-      domain: '.dudemd.com',
+      
       path: '/',
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
