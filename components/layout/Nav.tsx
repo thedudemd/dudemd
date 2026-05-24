@@ -66,19 +66,18 @@ export default function Nav() {
   useEffect(() => {
     function getTokenAndUser() {
       try {
-        const cookies = document.cookie.split(';')
-        for (const cookie of cookies) {
-          const eqIdx = cookie.indexOf('=')
-          const name = cookie.substring(0, eqIdx).trim()
-          const value = cookie.substring(eqIdx + 1).trim()
-          if (name === 'sb-bicljoujevywrkzjeaoy-auth-token.0') {
-            const decoded = atob(value.replace('base64-', ''))
-            const parsed = JSON.parse(decoded)
-            const token = parsed.access_token
-            const uid = parsed.user?.id
-            if (token && uid) return { token, uid }
-          }
-        }
+        const jar: Record<string, string> = {}
+        document.cookie.split(';').forEach(c => {
+          const eq = c.indexOf('=')
+          jar[c.substring(0, eq).trim()] = c.substring(eq + 1).trim()
+        })
+        const part0 = jar['sb-bicljoujevywrkzjeaoy-auth-token.0'] || ''
+        const part1 = jar['sb-bicljoujevywrkzjeaoy-auth-token.1'] || ''
+        const raw = part0.replace('base64-', '') + decodeURIComponent(part1)
+        const parsed = JSON.parse(atob(raw))
+        const token = parsed.access_token
+        const uid = parsed.user?.id
+        if (token && uid) return { token, uid }
       } catch {}
       return null
     }
@@ -123,7 +122,6 @@ export default function Nav() {
 
   const firstName = profile?.full_name?.split(' ')[0] || ''
 
-  // User icon component — undefined = loading, null = logged out, object = logged in
   function UserSection() {
     if (session === undefined) return <div style={{width: 32, height: 32}} />
     if (session === null) return (
