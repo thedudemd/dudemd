@@ -17,8 +17,13 @@ export async function GET(request: NextRequest) {
         cookies: {
           getAll() { return cookieStore.getAll() },
           setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options as Parameters<typeof cookieStore.set>[2])
+            cookiesToSet.forEach(({ name, value }) =>
+              cookieStore.set(name, value, {
+                path: '/',
+                sameSite: 'lax',
+                secure: true,
+                maxAge: 60 * 60 * 24 * 365,
+              })
             )
           },
         },
