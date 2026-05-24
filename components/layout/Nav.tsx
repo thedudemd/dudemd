@@ -58,7 +58,7 @@ export default function Nav() {
   const [aboutOpen, setAboutOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
   const [profile, setProfile] = useState<{full_name?: string, avatar_url?: string} | null>(null)
-  const [session, setSession] = useState<any>(null)
+  const [session, setSession] = useState<any>(undefined)
   const userRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const router = useRouter()
@@ -94,6 +94,8 @@ export default function Nav() {
       }).then(r => r.json()).then(profiles => {
         if (profiles?.[0]) setProfile(profiles[0])
       }).catch(() => {})
+    } else {
+      setSession(null)
     }
   }, [])
 
@@ -120,6 +122,52 @@ export default function Nav() {
   if (pathname?.startsWith('/admin')) return null
 
   const firstName = profile?.full_name?.split(' ')[0] || ''
+
+  // User icon component — undefined = loading, null = logged out, object = logged in
+  function UserSection() {
+    if (session === undefined) return <div style={{width: 32, height: 32}} />
+    if (session === null) return (
+      <Link href="/signin" className="icon-btn" title="Sign In">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+      </Link>
+    )
+    return (
+      <button onClick={() => setUserOpen(!userOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', color: '#f7f4ee', padding: '0.25rem' }}>
+        {profile?.avatar_url ? (
+          <img src={profile.avatar_url} alt={firstName} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f' }} />
+        ) : (
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#c9b28f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#0e1a2b' }}>
+            {firstName ? firstName.charAt(0).toUpperCase() : '?'}
+          </div>
+        )}
+        {firstName && <span style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.04em' }}>{firstName} ▾</span>}
+      </button>
+    )
+  }
+
+  function MobileUserSection() {
+    if (session === undefined) return <div style={{width: 30, height: 30}} />
+    if (session === null) return (
+      <Link href="/signin" className="icon-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+      </Link>
+    )
+    return (
+      <button onClick={() => setUserOpen(!userOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+        {profile?.avatar_url ? (
+          <img src={profile.avatar_url} alt={firstName} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f' }} />
+        ) : (
+          <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#c9b28f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: '#0e1a2b' }}>
+            {firstName ? firstName.charAt(0).toUpperCase() : '?'}
+          </div>
+        )}
+      </button>
+    )
+  }
 
   return (
     <>
@@ -211,24 +259,7 @@ export default function Nav() {
             </div>
 
             <div ref={userRef} style={{ position: 'relative' }}>
-              {session ? (
-                <button onClick={() => setUserOpen(!userOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', color: '#f7f4ee', padding: '0.25rem' }}>
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt={firstName} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f' }} />
-                  ) : (
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#c9b28f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#0e1a2b' }}>
-                      {firstName ? firstName.charAt(0).toUpperCase() : '?'}
-                    </div>
-                  )}
-                  {firstName && <span style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.04em' }}>{firstName} ▾</span>}
-                </button>
-              ) : (
-                <Link href="/signin" className="icon-btn" title="Sign In">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                  </svg>
-                </Link>
-              )}
+              <UserSection />
               {userOpen && session && (
                 <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, backgroundColor: '#ffffff', borderTop: '3px solid #c9b28f', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', zIndex: 999, minWidth: '180px', padding: '0.5rem 0' }}>
                   <Link href="/account" onClick={() => setUserOpen(false)}
@@ -260,23 +291,7 @@ export default function Nav() {
 
           <div className="nav-mobile-only" style={{ alignItems: 'center', gap: '1rem' }}>
             <div ref={userRef} style={{ position: 'relative' }}>
-              {session ? (
-                <button onClick={() => setUserOpen(!userOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt={firstName} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f' }} />
-                  ) : (
-                    <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#c9b28f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: '#0e1a2b' }}>
-                      {firstName ? firstName.charAt(0).toUpperCase() : '?'}
-                    </div>
-                  )}
-                </button>
-              ) : (
-                <Link href="/signin" className="icon-btn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                  </svg>
-                </Link>
-              )}
+              <MobileUserSection />
               {userOpen && session && (
                 <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, backgroundColor: '#ffffff', borderTop: '3px solid #c9b28f', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', zIndex: 999, minWidth: '180px', padding: '0.5rem 0' }}>
                   <Link href="/account" onClick={() => setUserOpen(false)}
@@ -366,7 +381,12 @@ export default function Nav() {
         </div>
 
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          {session ? (
+          {session === undefined ? null : session === null ? (
+            <Link href="/signin" onClick={() => setDrawerOpen(false)}
+              style={{ display: 'block', padding: '0.75rem', textAlign: 'center', border: '1px solid rgba(247,244,238,0.3)', color: '#f7f4ee', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
+              Sign In
+            </Link>
+          ) : (
             <>
               <Link href="/account" onClick={() => setDrawerOpen(false)}
                 style={{ display: 'block', padding: '0.75rem', textAlign: 'center', border: '1px solid rgba(247,244,238,0.3)', color: '#f7f4ee', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
@@ -377,11 +397,6 @@ export default function Nav() {
                 Sign Out
               </button>
             </>
-          ) : (
-            <Link href="/signin" onClick={() => setDrawerOpen(false)}
-              style={{ display: 'block', padding: '0.75rem', textAlign: 'center', border: '1px solid rgba(247,244,238,0.3)', color: '#f7f4ee', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
-              Sign In
-            </Link>
           )}
           <Link href="/newsletter" onClick={() => setDrawerOpen(false)}
             style={{ display: 'block', padding: '0.75rem', textAlign: 'center', backgroundColor: '#c9b28f', color: '#0e1a2b', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
