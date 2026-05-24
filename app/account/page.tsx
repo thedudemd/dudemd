@@ -1,158 +1,101 @@
 'use client'
+import { useEffect, useState } from 'react'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/auth/supabase-auth'
+const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
 
-export default function WelcomePage() {
-  const router = useRouter()
-  const [step, setStep] = useState(1)
-  const [firstName, setFirstName] = useState('')
-  const [newsletter, setNewsletter] = useState(true)
-  const [weeklyTips, setWeeklyTips] = useState(true)
-  const [loading, setLoading] = useState(false)
-  const [checking, setChecking] = useState(true)
+function getTokenAndUser() {
+  try {
+    const jar: Record<string, string> = {}
+    document.cookie.split(';').forEach(c => {
+      const eq = c.indexOf('=')
+      jar[c.substring(0, eq).trim()] = c.substring(eq + 1).trim()
+    })
+    const part0 = jar['sb-bicljoujevywrkzjeaoy-auth-token.0'] || ''
+    const part1 = jar['sb-bicljoujevywrkzjeaoy-auth-token.1'] || ''
+    const raw = part0.replace('base64-', '') + decodeURIComponent(part1)
+    const parsed = JSON.parse(atob(raw))
+    return { token: parsed.access_token, uid: parsed.user?.id }
+  } catch {}
+  return null
+}
+
+export default function AccountPage() {
+  const [profile, setProfile] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    async function check() {
-      try {
-        const supabase = createClient()
-        const timeout = new Promise<null>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-        const authCall = supabase.auth.getUser()
-        const result = await Promise.race([authCall, timeout]) as any
-        const user = result?.data?.user
-        if (!user) { router.push('/signin'); return }
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        if (profile?.onboarding_complete) { router.push('/'); return }
-        if (profile?.full_name) {
-          const parts = profile.full_name.split(' ')
-          setFirstName(parts[0] || '')
-        }
-        setChecking(false)
-      } catch (e) {
-        router.push('/signin')
-      }
-    }
-    check()
+    const auth = getTokenAndUser()
+    if (!auth?.uid) { window.location.href = '/signin'; return }
+    fetch(`${SUPABASE_URL}/rest/v1/profiles?select=*&id=eq.${auth.uid}&limit=1`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+    }).then(r => r.json()).then(data => {
+      if (data?.[0]) setProfile(data[0])
+      else setError('Profile not found')
+      setLoading(false)
+    }).catch(() => { setError('Failed to load profile'); setLoading(false) })
   }, [])
 
-  useEffect(() => {
-    if (step === 3) {
-      const t = setTimeout(() => router.push('/'), 3000)
-      return () => clearTimeout(t)
-    }
-  }, [step])
-
-  async function handleComplete() {
-    setLoading(true)
-    try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/signin'); return }
-      const { error } = await supabase.from('profiles').update({
-        full_name: firstName,
-        newsletter_subscribed: newsletter,
-        onboarding_complete: true,
-      }).eq('id', user.id)
-      if (!error) setStep(3)
-      else { alert('Something went wrong. Please try again.'); setLoading(false) }
-    } catch {
-      alert('Something went wrong. Please try again.')
-      setLoading(false)
-    }
-  }
-
-  if (checking) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+  if (loading) return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f7f4ee' }}>
       <div style={{ width: 32, height: 32, border: '3px solid #c9b28f', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
     </div>
   )
 
-  const btn: React.CSSProperties = { width: '100%', padding: '0.875rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontWeight: 700, fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', marginTop: '1.5rem' }
+  if (error) return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f7f4ee' }}>
+      <p style={{ color: '#a32d2d' }}>{error}</p>
+    </div>
+  )
+
+  const firstName = profile?.full_name?.split(' ')[0] || 'Member'
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem 1.5rem', fontFamily: 'system-ui, sans-serif' }}>
-      <div style={{ width: '100%', maxWidth: '420px' }}>
-
-        {step !== 3 && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '2rem' }}>
-            {[1, 2].map(s => (
-              <div key={s} style={{ width: s === step ? '24px' : '8px', height: '8px', borderRadius: '4px', backgroundColor: s === step ? '#0e1a2b' : s < step ? '#c9b28f' : '#d1cfc9', transition: 'all 0.3s' }} />
-            ))}
-          </div>
-        )}
-
-        {step === 1 && (
-          <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid #ede8df' }}>
-            <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.5rem', textAlign: 'center' }}>What should we call you?</h1>
-            <p style={{ fontSize: '14px', color: '#4A5563', textAlign: 'center', margin: '0 0 1.5rem' }}>You can update this at any time in your profile.</p>
-            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#4A5563', marginBottom: '0.5rem' }}>First Name</label>
-            <input
-              type="text"
-              value={firstName}
-              onChange={e => setFirstName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && firstName.trim() && setStep(2)}
-              placeholder="Enter your first name"
-              autoFocus
-              style={{ width: '100%', padding: '0.875rem', border: '1px solid #ede8df', fontSize: '15px', color: '#0e1a2b', outline: 'none', boxSizing: 'border-box', backgroundColor: '#f7f4ee' }}
-            />
-            <button onClick={() => firstName.trim() && setStep(2)} disabled={!firstName.trim()} style={{ ...btn, opacity: firstName.trim() ? 1 : 0.5 }}>
-              Continue
-            </button>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid #ede8df' }}>
-            <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.5rem', textAlign: 'center' }}>Set your preferences</h1>
-            <p style={{ fontSize: '14px', color: '#4A5563', textAlign: 'center', margin: '0 0 1.5rem' }}>You can update your selections at any time.</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
-              <label style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start', cursor: 'pointer' }}>
-                <div onClick={() => setNewsletter(!newsletter)}
-                  style={{ width: '22px', height: '22px', flexShrink: 0, border: `2px solid ${newsletter ? '#0e1a2b' : '#d1cfc9'}`, backgroundColor: newsletter ? '#0e1a2b' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1px', cursor: 'pointer' }}>
-                  {newsletter && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#f7f4ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                </div>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  Subscribe to the DudeMD newsletter. Get the best in men's wellness, style, and gear delivered weekly.
-                </span>
-              </label>
-              <label style={{ display: 'flex', gap: '0.875rem', alignItems: 'flex-start', cursor: 'pointer' }}>
-                <div onClick={() => setWeeklyTips(!weeklyTips)}
-                  style={{ width: '22px', height: '22px', flexShrink: 0, border: `2px solid ${weeklyTips ? '#0e1a2b' : '#d1cfc9'}`, backgroundColor: weeklyTips ? '#0e1a2b' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '1px', cursor: 'pointer' }}>
-                  {weeklyTips && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#f7f4ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                </div>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.5, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                  Sign up to receive DudeMD's weekly wellness tips and personalized content.
-                </span>
-              </label>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee', fontFamily: 'system-ui, sans-serif' }}>
+      <div style={{ maxWidth: '640px', margin: '0 auto', padding: '3rem 1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid #ede8df' }}>
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt={firstName} style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #c9b28f' }} />
+          ) : (
+            <div style={{ width: '72px', height: '72px', borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: 700, color: '#c9b28f', flexShrink: 0 }}>
+              {firstName.charAt(0).toUpperCase()}
             </div>
-            <p style={{ fontSize: '11px', color: '#4A5563', lineHeight: 1.6, margin: '0 0 0.5rem' }}>
-              By creating an account, you agree to our <a href="/terms-of-use" style={{ color: '#c9b28f' }}>Terms of Use</a> and acknowledge our <a href="/privacy-policy" style={{ color: '#c9b28f' }}>Privacy Policy</a>. You agree to receive marketing and account-related emails from DudeMD.
-            </p>
-            <button onClick={handleComplete} disabled={loading} style={{ ...btn, opacity: loading ? 0.7 : 1 }}>
-              {loading ? 'Setting up your account...' : 'Create Account'}
-            </button>
-            <button onClick={() => setStep(1)} style={{ width: '100%', padding: '0.5rem', background: 'none', border: 'none', fontSize: '12px', color: '#4A5563', cursor: 'pointer', marginTop: '0.75rem', textDecoration: 'underline' }}>
-              Back
-            </button>
+          )}
+          <div>
+            <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.25rem' }}>{profile?.full_name || firstName}</h1>
+            <p style={{ fontSize: '13px', color: '#4A5563', margin: 0 }}>{profile?.email}</p>
+            <p style={{ fontSize: '11px', color: '#9a9085', margin: '0.25rem 0 0', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Member since {new Date(profile?.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
           </div>
-        )}
+        </div>
 
-        {step === 3 && (
-          <div style={{ backgroundColor: '#fff', padding: '3rem 2rem', border: '1px solid #ede8df', textAlign: 'center' }}>
-            <div style={{ width: '64px', height: '64px', backgroundColor: '#0e1a2b', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9b28f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 6L9 17l-5-5"/>
-              </svg>
+        <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem', marginBottom: '1.5rem' }}>
+          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Account Details</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', paddingBottom: '0.75rem', borderBottom: '1px solid #f0ede8' }}>
+              <span style={{ color: '#4A5563' }}>Full Name</span>
+              <span style={{ color: '#0e1a2b', fontWeight: 500 }}>{profile?.full_name || '—'}</span>
             </div>
-            <h1 style={{ fontSize: '26px', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.75rem' }}>Welcome to The Dude Community{firstName ? `, ${firstName}` : ''}!</h1>
-            <p style={{ fontSize: '14px', color: '#4A5563', lineHeight: 1.6, margin: '0 0 1.5rem' }}>You're now part of a community built for real men living real lives. We're glad you're here.</p>
-            <p style={{ fontSize: '12px', color: '#9a9085' }}>Taking you home in a moment...</p>
-            <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', paddingBottom: '0.75rem', borderBottom: '1px solid #f0ede8' }}>
+              <span style={{ color: '#4A5563' }}>Email</span>
+              <span style={{ color: '#0e1a2b', fontWeight: 500 }}>{profile?.email || '—'}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', paddingBottom: '0.75rem', borderBottom: '1px solid #f0ede8' }}>
+              <span style={{ color: '#4A5563' }}>Sign in method</span>
+              <span style={{ color: '#0e1a2b', fontWeight: 500, textTransform: 'capitalize' }}>{profile?.provider || '—'}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+              <span style={{ color: '#4A5563' }}>Newsletter</span>
+              <span style={{ color: profile?.newsletter_subscribed ? '#2d7a3a' : '#9a9085', fontWeight: 500 }}>{profile?.newsletter_subscribed ? 'Subscribed' : 'Not subscribed'}</span>
+            </div>
           </div>
-        )}
+        </div>
 
+        <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
+          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.5rem' }}>Coming Soon</p>
+          <p style={{ fontSize: '13px', color: '#4A5563', margin: 0, lineHeight: 1.6 }}>Saved articles, personalized feed, membership perks, and more — coming soon to The Dude Community.</p>
+        </div>
       </div>
     </div>
   )

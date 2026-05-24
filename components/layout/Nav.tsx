@@ -115,7 +115,7 @@ export default function Nav() {
     setSession(null)
     setProfile(null)
     setUserOpen(false)
-    router.push('/signin')
+    window.location.href = '/signin'
   }
 
   if (pathname?.startsWith('/admin')) return null
