@@ -1,81 +1,72 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
-
-async function dbQuery(path: string, options?: RequestInit) {
-  return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    ...options,
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json',
-      ...(options?.headers || {}),
-    },
-  })
-}
 
 function getTokenFromCookie(): string | null {
   try {
     const cookies = document.cookie.split(';')
     for (const cookie of cookies) {
-      const [name, value] = cookie.trim().split('=')
-      if (name.trim() === 'sb-bicljoujevywrkzjeaoy-auth-token.0') {
-        const decoded = atob(value.replace('base64-', ''))
+      const eqIdx = cookie.indexOf('=')
+      const name = cookie.substring(0, eqIdx).trim()
+      const value = cookie.substring(eqIdx + 1).trim()
+      if (name === 'sb-bicljoujevywrkzjeaoy-auth-token.0') {
+        const clean = value.replace('base64-', '')
+        const decoded = atob(clean)
         const parsed = JSON.parse(decoded)
         return parsed.access_token || null
       }
     }
-  } catch {}
+  } catch (e) {
+    console.error('Cookie parse error:', e)
+  }
   return null
 }
 
-function getUserIdFromToken(token: string): string | null {
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    return payload.sub || null
-  } catch {}
-  return null
-}
-
-export default function WelcomePage() {
+function WelcomeInner() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const uid = searchParams.get('uid')
   const [step, setStep] = useState(1)
   const [firstName, setFirstName] = useState('')
   const [newsletter, setNewsletter] = useState(true)
   const [weeklyTips, setWeeklyTips] = useState(true)
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)
-  const [userId, setUserId] = useState<string | null>(null)
-  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [token, setToken] = useState<string | null>(null)
 
   useEffect(() => {
-    async function check() {
-      try {
-        const token = getTokenFromCookie()
-        if (!token) { router.push('/signin'); return }
-        const uid = getUserIdFromToken(token)
-        if (!uid) { router.push('/signin'); return }
-        setUserId(uid)
-        setAccessToken(token)
-        const res = await dbQuery(`profiles?select=*&id=eq.${uid}&limit=1`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        const profiles = await res.json()
-        const profile = profiles?.[0]
-        if (profile?.onboarding_complete) { router.push('/'); return }
-        if (profile?.full_name) {
-          setFirstName(profile.full_name.split(' ')[0] || '')
-        }
+    if (!uid) { router.push('/signin'); return }
+    
+    // Try to get token with retries since cookie may not be set yet
+    let attempts = 0
+    const tryGetToken = () => {
+      const t = getTokenFromCookie()
+      if (t) {
+        setToken(t)
+        // Load existing profile data
+        fetch(`${SUPABASE_URL}/rest/v1/profiles?select=full_name,onboarding_complete&id=eq.${uid}&limit=1`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${t}` }
+        }).then(r => r.json()).then(profiles => {
+          const profile = profiles?.[0]
+          if (profile?.onboarding_complete) { router.push('/'); return }
+          if (profile?.full_name) setFirstName(profile.full_name.split(' ')[0] || '')
+          setChecking(false)
+        }).catch(() => setChecking(false))
+      } else if (attempts < 10) {
+        attempts++
+        setTimeout(tryGetToken, 300)
+      } else {
+        // No token after 3 seconds — just show the form anyway
         setChecking(false)
-      } catch {
-        router.push('/signin')
       }
     }
-    check()
-  }, [])
+    tryGetToken()
+  }, [uid])
 
   useEffect(() => {
     if (step === 3) {
@@ -85,15 +76,20 @@ export default function WelcomePage() {
   }, [step])
 
   async function handleComplete() {
-    if (!userId || !accessToken) return
+    if (!uid) return
     setLoading(true)
     try {
-      const res = await dbQuery(`profiles?id=eq.${userId}`, {
+      const t = token || getTokenFromCookie()
+      const headers: Record<string, string> = { 
+        apikey: SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal'
+      }
+      if (t) headers.Authorization = `Bearer ${t}`
+      
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${uid}`, {
         method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          Prefer: 'return=minimal',
-        },
+        headers,
         body: JSON.stringify({
           full_name: firstName,
           newsletter_subscribed: newsletter,
@@ -176,4 +172,8 @@ export default function WelcomePage() {
       </div>
     </div>
   )
+}
+
+export default function WelcomePage() {
+  return <Suspense><WelcomeInner /></Suspense>
 }
