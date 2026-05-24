@@ -16,9 +16,9 @@ export default function WelcomePage() {
   useEffect(() => {
     async function check() {
       const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) { router.push('/signin'); return }
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/signin'); return }
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
       if (profile?.onboarding_complete) { router.push('/'); return }
       if (profile?.full_name) {
         const parts = profile.full_name.split(' ')
@@ -39,13 +39,13 @@ export default function WelcomePage() {
   async function handleComplete() {
     setLoading(true)
     const supabase = createClient()
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) { router.push('/signin'); return }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { router.push('/signin'); return }
     const { error } = await supabase.from('profiles').update({
       full_name: firstName,
       newsletter_subscribed: newsletter,
       onboarding_complete: true,
-    }).eq('id', session.user.id)
+    }).eq('id', user.id)
     if (!error) setStep(3)
     else { alert('Something went wrong. Please try again.'); setLoading(false) }
   }
