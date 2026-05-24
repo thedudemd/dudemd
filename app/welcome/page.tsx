@@ -1,5 +1,3 @@
-
-cat > app/welcome/page.tsx << 'ENDOFFILE'
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -136,4 +134,3 @@ export default function WelcomePage() {
     </div>
   )
 }
-ENDOFFILE
