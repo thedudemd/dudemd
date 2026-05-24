@@ -11,9 +11,9 @@ export default function AccountPage() {
   useEffect(() => {
     async function load() {
       const supabase = createClient()
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) { router.push('/signin'); return }
-      const { data } = await supabase.from('profiles').select('*').eq('id', session.user.id).single()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/signin'); return }
+      const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single()
       setProfile(data)
       setLoading(false)
     }
