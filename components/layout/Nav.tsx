@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
@@ -61,7 +61,6 @@ export default function Nav() {
   const [session, setSession] = useState<any>(undefined)
   const userRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
-  const router = useRouter()
 
   useEffect(() => {
     function getTokenAndUser() {
@@ -86,10 +85,7 @@ export default function Nav() {
     if (result) {
       setSession({ user: { id: result.uid } })
       fetch(`${SUPABASE_URL}/rest/v1/profiles?select=full_name,avatar_url&id=eq.${result.uid}&limit=1`, {
-        headers: {
-          apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${result.token}`
-        }
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${result.token}` }
       }).then(r => r.json()).then(profiles => {
         if (profiles?.[0]) setProfile(profiles[0])
       }).catch(() => {})
@@ -112,9 +108,6 @@ export default function Nav() {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.dudemd.com`
     })
-    setSession(null)
-    setProfile(null)
-    setUserOpen(false)
     window.location.href = '/signin'
   }
 
@@ -132,7 +125,7 @@ export default function Nav() {
       </Link>
     )
     return (
-      <button onClick={() => setUserOpen(!userOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', color: '#f7f4ee', padding: '0.25rem' }}>
+      <button onClick={() => setUserOpen(o => !o)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', color: '#f7f4ee', padding: '0.25rem' }}>
         {profile?.avatar_url ? (
           <img src={profile.avatar_url} alt={firstName} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f' }} />
         ) : (
@@ -155,7 +148,7 @@ export default function Nav() {
       </Link>
     )
     return (
-      <button onClick={() => setUserOpen(!userOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+      <button onClick={() => setUserOpen(o => !o)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
         {profile?.avatar_url ? (
           <img src={profile.avatar_url} alt={firstName} style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f' }} />
         ) : (
@@ -260,14 +253,14 @@ export default function Nav() {
               <UserSection />
               {userOpen && session && (
                 <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, backgroundColor: '#ffffff', borderTop: '3px solid #c9b28f', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', zIndex: 999, minWidth: '180px', padding: '0.5rem 0' }}>
-                  <Link href="/account" onClick={() => setUserOpen(false)}
-                    style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', padding: '0.6rem 1.25rem', borderBottom: '1px solid #f0ede8' }}>
+                  <div onMouseDown={(e) => { e.preventDefault(); window.location.href = '/account' }}
+                    style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', padding: '0.6rem 1.25rem', borderBottom: '1px solid #f0ede8', cursor: 'pointer' }}>
                     My Account
-                  </Link>
-                  <button onClick={handleSignOut}
-                    style={{ display: 'block', width: '100%', textAlign: 'left', fontSize: '14px', fontWeight: 500, color: '#a32d2d', background: 'none', border: 'none', padding: '0.6rem 1.25rem', cursor: 'pointer' }}>
+                  </div>
+                  <div onMouseDown={(e) => { e.preventDefault(); handleSignOut() }}
+                    style={{ display: 'block', width: '100%', textAlign: 'left', fontSize: '14px', fontWeight: 500, color: '#a32d2d', padding: '0.6rem 1.25rem', cursor: 'pointer' }}>
                     Sign Out
-                  </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -288,18 +281,18 @@ export default function Nav() {
           </div>
 
           <div className="nav-mobile-only" style={{ alignItems: 'center', gap: '1rem' }}>
-            <div ref={userRef} style={{ position: 'relative' }}>
+            <div style={{ position: 'relative' }}>
               <MobileUserSection />
               {userOpen && session && (
                 <div style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, backgroundColor: '#ffffff', borderTop: '3px solid #c9b28f', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', zIndex: 999, minWidth: '180px', padding: '0.5rem 0' }}>
-                  <Link href="/account" onClick={() => setUserOpen(false)}
-                    style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', textDecoration: 'none', padding: '0.6rem 1.25rem', borderBottom: '1px solid #f0ede8' }}>
+                  <div onMouseDown={(e) => { e.preventDefault(); window.location.href = '/account' }}
+                    style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', padding: '0.6rem 1.25rem', borderBottom: '1px solid #f0ede8', cursor: 'pointer' }}>
                     My Account
-                  </Link>
-                  <button onClick={handleSignOut}
-                    style={{ display: 'block', width: '100%', textAlign: 'left', fontSize: '14px', fontWeight: 500, color: '#a32d2d', background: 'none', border: 'none', padding: '0.6rem 1.25rem', cursor: 'pointer' }}>
+                  </div>
+                  <div onMouseDown={(e) => { e.preventDefault(); handleSignOut() }}
+                    style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#a32d2d', padding: '0.6rem 1.25rem', cursor: 'pointer' }}>
                     Sign Out
-                  </button>
+                  </div>
                 </div>
               )}
             </div>
