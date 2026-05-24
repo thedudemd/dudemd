@@ -97,7 +97,7 @@ export default function Nav() {
     setSession(null)
     setProfile(null)
     setUserOpen(false)
-    router.push('/')
+    router.push('/signin')
   }
 
   if (pathname?.startsWith('/admin')) return null
