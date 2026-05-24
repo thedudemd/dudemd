@@ -18,13 +18,7 @@ export async function GET(request: NextRequest) {
           getAll() { return cookieStore.getAll() },
           setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, {
-                ...options,
-                domain: '.dudemd.com',
-                path: '/',
-                sameSite: 'lax',
-                secure: true,
-              } as Parameters<typeof cookieStore.set>[2])
+              cookieStore.set(name, value, options as Parameters<typeof cookieStore.set>[2])
             )
           },
         },
