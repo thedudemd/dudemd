@@ -2,7 +2,43 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/auth/supabase-auth'
+
+const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
+
+async function dbQuery(path: string, options?: RequestInit) {
+  return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      ...(options?.headers || {}),
+    },
+  })
+}
+
+function getTokenFromCookie(): string | null {
+  try {
+    const cookies = document.cookie.split(';')
+    for (const cookie of cookies) {
+      const [name, value] = cookie.trim().split('=')
+      if (name === 'sb-bicljoujevywrkzjeaoy-auth-token.0') {
+        const decoded = atob(value.replace('base64-', ''))
+        const parsed = JSON.parse(decoded)
+        return parsed.access_token || null
+      }
+    }
+  } catch {}
+  return null
+}
+
+function getUserIdFromToken(token: string): string | null {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return payload.sub || null
+  } catch {}
+  return null
+}
 
 export default function WelcomePage() {
   const router = useRouter()
@@ -13,19 +49,22 @@ export default function WelcomePage() {
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
+  const [accessToken, setAccessToken] = useState<string | null>(null)
 
   useEffect(() => {
     async function check() {
       try {
-        const supabase = createClient()
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session?.user) { router.push('/signin'); return }
-        setUserId(session.user.id)
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
+        const token = getTokenFromCookie()
+        if (!token) { router.push('/signin'); return }
+        const uid = getUserIdFromToken(token)
+        if (!uid) { router.push('/signin'); return }
+        setUserId(uid)
+        setAccessToken(token)
+        const res = await dbQuery(`profiles?select=*&id=eq.${uid}&limit=1`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        const profiles = await res.json()
+        const profile = profiles?.[0]
         if (profile?.onboarding_complete) { router.push('/'); return }
         if (profile?.full_name) {
           setFirstName(profile.full_name.split(' ')[0] || '')
@@ -46,16 +85,22 @@ export default function WelcomePage() {
   }, [step])
 
   async function handleComplete() {
-    if (!userId) return
+    if (!userId || !accessToken) return
     setLoading(true)
     try {
-      const supabase = createClient()
-      const { error } = await supabase.from('profiles').update({
-        full_name: firstName,
-        newsletter_subscribed: newsletter,
-        onboarding_complete: true,
-      }).eq('id', userId)
-      if (!error) setStep(3)
+      const res = await dbQuery(`profiles?id=eq.${userId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({
+          full_name: firstName,
+          newsletter_subscribed: newsletter,
+          onboarding_complete: true,
+        }),
+      })
+      if (res.ok) setStep(3)
       else { alert('Something went wrong.'); setLoading(false) }
     } catch {
       alert('Something went wrong.')
