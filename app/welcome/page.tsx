@@ -22,7 +22,7 @@ function getTokenFromCookie(): string | null {
     const cookies = document.cookie.split(';')
     for (const cookie of cookies) {
       const [name, value] = cookie.trim().split('=')
-      if (name === 'sb-bicljoujevywrkzjeaoy-auth-token.0') {
+      if (name.trim() === 'sb-bicljoujevywrkzjeaoy-auth-token.0') {
         const decoded = atob(value.replace('base64-', ''))
         const parsed = JSON.parse(decoded)
         return parsed.access_token || null
