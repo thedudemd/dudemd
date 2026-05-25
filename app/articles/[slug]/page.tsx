@@ -124,11 +124,27 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     ]
   }
 
+  const faqSchema = article.faq_items && Array.isArray(article.faq_items) && article.faq_items.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": article.faq_items.map((item: any) => ({
+      "@type": "Question",
+      "name": item.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.answer
+      }
+    }))
+  } : null
+
+  const schemas = [articleSchema, breadcrumbSchema]
+  if (faqSchema) schemas.push(faqSchema)
+
   return (
     <main>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([articleSchema, breadcrumbSchema]) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }}
       />
       
       <style>{`
@@ -182,6 +198,24 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             </div>
 
             <div style={{ fontSize: '16px', color: '#1B1D21', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: article.content || '' }} />
+
+            {article.faq_items && article.faq_items.length > 0 && (
+              <div style={{ marginTop: '3rem', padding: '2rem', backgroundColor: '#f7f4ee', borderRadius: '8px' }}>
+                <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '1.5rem' }}>
+                  Frequently Asked Questions
+                </h2>
+                {article.faq_items.map((item: any, idx: number) => (
+                  <div key={idx} style={{ marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: idx < article.faq_items.length - 1 ? '1px solid #ede8df' : 'none' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.75rem' }}>
+                      {item.question}
+                    </h3>
+                    <p style={{ fontSize: '15px', color: '#4A5563', lineHeight: 1.7, margin: 0 }}>
+                      {item.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div style={{ marginTop: '3rem', padding: '1.5rem', backgroundColor: '#f7f4ee', borderLeft: '3px solid #c9b28f' }}>
               <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.5rem' }}>About the Author</p>
