@@ -11,7 +11,13 @@ export default function ArticlesPage() {
   const [deleteInput, setDeleteInput] = useState('')
 
   useEffect(() => {
-    supabase.from('articles').select('*, authors(name), categories(name)').order('created_at', { ascending: false }).then(({ data }) => setArticles(data || []))
+    async function load() {
+      const { data, error } = await supabase.from('articles').select('*, authors(name), categories(name)').order('created_at', { ascending: false })
+      console.log('ARTICLES DATA:', data)
+      console.log('ARTICLES ERROR:', error)
+      setArticles(data || [])
+    }
+    load()
   }, [])
 
   const filtered = filter === 'all' ? articles : articles.filter(a => a.status === filter)
