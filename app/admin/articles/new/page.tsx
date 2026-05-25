@@ -224,50 +224,6 @@ function NewArticleInner() {
               <div><label style={lbl}>Cover Image URL</label><input name="cover_image_url" value={form.cover_image_url} onChange={handleChange} placeholder="https://..." style={inp} />{form.cover_image_url && <img src={form.cover_image_url} alt="preview" style={{ width: '100%', height: '120px', objectFit: 'cover', marginTop: '0.5rem' }} />}<a href="/api/canva/auth" style={{ display: 'block', marginTop: '0.75rem', padding: '0.6rem 1rem', backgroundColor: '#7B2FBE', color: '#fff', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>🎨 Design in Canva</a>{showCanvaPicker && canvaDesigns.length > 0 && <div style={{ marginTop: '0.75rem', border: '1px solid #7B2FBE', padding: '1rem', backgroundColor: '#faf5ff' }}><p style={{ fontSize: '12px', fontWeight: 700, color: '#7B2FBE', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Your Canva Designs</p><div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>{canvaDesigns.map((d: any) => <div key={d.id} onClick={() => { setForm(f => ({ ...f, cover_image_url: d.thumbnail?.url || '' })); setShowCanvaPicker(false) }} style={{ cursor: 'pointer' }}><img src={d.thumbnail?.url} alt={d.title} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} /><p style={{ fontSize: '10px', color: '#4A5563', marginTop: '0.25rem', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.title}</p></div>)}</div></div>}</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <div>
-              <label style={lbl}>Content</label>
-              <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap', padding: '0.5rem', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#f7f4ee' }}>
-                {[
-                  { l: 'B', a: () => editor?.chain().focus().toggleBold().run(), act: () => !!editor?.isActive('bold') },
-                  { l: 'I', a: () => editor?.chain().focus().toggleItalic().run(), act: () => !!editor?.isActive('italic') },
-                  { l: 'U', a: () => editor?.chain().focus().toggleUnderline().run(), act: () => !!editor?.isActive('underline') },
-                  { l: 'H1', a: () => editor?.chain().focus().toggleHeading({ level: 1 }).run(), act: () => !!editor?.isActive('heading', { level: 1 }) },
-                  { l: 'H2', a: () => editor?.chain().focus().toggleHeading({ level: 2 }).run(), act: () => !!editor?.isActive('heading', { level: 2 }) },
-                  { l: 'H3', a: () => editor?.chain().focus().toggleHeading({ level: 3 }).run(), act: () => !!editor?.isActive('heading', { level: 3 }) },
-                  { l: '• List', a: () => editor?.chain().focus().toggleBulletList().run(), act: () => !!editor?.isActive('bulletList') },
-                  { l: '1. List', a: () => editor?.chain().focus().toggleOrderedList().run(), act: () => !!editor?.isActive('orderedList') },
-                  { l: '" Quote', a: () => editor?.chain().focus().toggleBlockquote().run(), act: () => !!editor?.isActive('blockquote') },
-                  { l: 'Undo', a: () => editor?.chain().focus().undo().run(), act: () => false },
-                  { l: 'Redo', a: () => editor?.chain().focus().redo().run(), act: () => false },
-                ].map(({ l, a, act }) => <button key={l} onClick={a} className={act() ? 'tb on' : 'tb'}>{l}</button>)}
-              </div>
-              <div style={{ border: '1px solid #ede8df', backgroundColor: '#fff' }}><EditorContent editor={editor} /></div>
-            </div>
-            <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
-              <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>SEO Settings</p>
-              <div style={{ marginBottom: '1rem' }}><label style={lbl}>Meta Title ({form.meta_title.length}/60)</label><input name="meta_title" value={form.meta_title} onChange={handleChange} style={inp} /></div>
-              <div><label style={lbl}>Meta Description ({form.meta_description.length}/160)</label><textarea name="meta_description" value={form.meta_description} onChange={handleChange} rows={2} style={{ ...inp, resize: 'vertical' as const }} /></div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '1rem' }}>
-            <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
-              <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Article Scores</p>
-              {[{ label: 'SEO', score: seoScore }, { label: 'AEO', score: aeoScore }, { label: 'Readability', score: readabilityScore }].map(({ label, score }) => (
-                <div key={label} style={{ marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#4A5563' }}>{label}</span>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: scoreColor(score), backgroundColor: scoreBg(score), padding: '0.1rem 0.4rem' }}>{score}/100</span>
-                  </div>
-                  <div style={{ height: '6px', backgroundColor: '#f0ede8' }}><div style={{ height: '100%', width: `${score}%`, backgroundColor: scoreColor(score), transition: 'width 0.3s' }} /></div>
-                </div>
-              ))}
-            </div>
-            <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
-              <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Settings</p>
-              <div style={{ marginBottom: '1rem' }}><label style={lbl}>Category</label><select name="category_id" value={form.category_id} onChange={handleChange} style={inp}><option value="">Select...</option>{categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
-              <div style={{ marginBottom: '1rem' }}><label style={lbl}>Author</label><select name="author_id" value={form.author_id} onChange={handleChange} style={inp}><option value="">Select...</option>{authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}</select></div>
-              <div><label style={lbl}>Cover Image URL</label><input name="cover_image_url" value={form.cover_image_url} onChange={handleChange} placeholder="https://..." style={inp} />{form.cover_image_url && <img src={form.cover_image_url} alt="preview" style={{ width: '100%', height: '120px', objectFit: 'cover', marginTop: '0.5rem' }} />}<a href="/api/canva/auth" style={{ display: 'block', marginTop: '0.75rem', padding: '0.6rem 1rem', backgroundColor: '#7B2FBE', color: '#fff', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', textAlign: 'center' }}>🎨 Design in Canva</a>{showCanvaPicker && canvaDesigns.length > 0 && <div style={{ marginTop: '0.75rem', border: '1px solid #7B2FBE', padding: '1rem', backgroundColor: '#faf5ff' }}><p style={{ fontSize: '12px', fontWeight: 700, color: '#7B2FBE', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Your Canva Designs</p><div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>{canvaDesigns.map((d: any) => <div key={d.id} onClick={() => { setForm(f => ({ ...f, cover_image_url: d.thumbnail?.url || '' })); setShowCanvaPicker(false) }} style={{ cursor: 'pointer' }}><img src={d.thumbnail?.url} alt={d.title} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover' }} /><p style={{ fontSize: '10px', color: '#4A5563', marginTop: '0.25rem', textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.title}</p></div>)}</div></div>}</div>
-            </div>
               <button onClick={() => handleSave("draft")} disabled={saving} style={{ width: '100%', padding: '0.875rem', backgroundColor: 'transparent', border: '1px solid #0e1a2b', color: '#0e1a2b', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>Save as Draft</button>
               <button onClick={() => handleSave("review")} disabled={saving} style={{ width: '100%', padding: '0.875rem', backgroundColor: '#d4820a', color: '#fff', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>Submit for Review</button>
               <button onClick={() => handleSave("published")} disabled={saving} style={{ width: '100%', padding: '0.875rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>{saving ? 'Publishing...' : 'Publish Article'}</button>
@@ -282,44 +238,3 @@ function NewArticleInner() {
 export default function NewArticle() {
   return <Suspense><NewArticleInner /></Suspense>
 }
-
-            <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem', marginTop: '1.5rem' }}>
-              <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>AI Article Suggestions</p>
-              <input 
-                type="text" 
-                placeholder="Enter keyword..." 
-                value={suggestKeyword} 
-                onChange={(e) => setSuggestKeyword(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && fetchSuggestions(suggestKeyword)}
-                style={inp} 
-              />
-              <button 
-                onClick={() => fetchSuggestions(suggestKeyword)} 
-                disabled={suggestLoading}
-                style={{ width: '100%', marginTop: '0.75rem', padding: '0.75rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}
-              >
-                {suggestLoading ? 'Loading...' : 'SUGGEST'}
-              </button>
-              
-              {suggestions.existing && suggestions.existing.length > 0 && (
-                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #ede8df' }}>
-                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Existing Articles to Link</p>
-                  {suggestions.existing.map((article: any, idx: number) => (
-                    <div key={idx} style={{ fontSize: '13px', color: '#0e1a2b', marginBottom: '0.5rem', paddingLeft: '0.75rem', borderLeft: '2px solid #c9b28f' }}>
-                      • {article}
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {suggestions.topics && suggestions.topics.length > 0 && (
-                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #ede8df' }}>
-                  <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>New Topic Ideas</p>
-                  {suggestions.topics.map((topic: any, idx: number) => (
-                    <div key={idx} style={{ fontSize: '13px', color: '#0e1a2b', marginBottom: '0.5rem', paddingLeft: '0.75rem', borderLeft: '2px solid #c9b28f' }}>
-                      • {topic}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
