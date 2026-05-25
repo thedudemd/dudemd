@@ -24,7 +24,7 @@ function NewArticleInner() {
   const [seoScore, setSeoScore] = useState(0)
   const [aeoScore, setAeoScore] = useState(0)
   const [readabilityScore, setReadabilityScore] = useState(0)
-  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft' })
+  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '' })
   const [canvaDesigns, setCanvaDesigns] = useState<any[]>([])
   const [showCanvaPicker, setShowCanvaPicker] = useState(false)
   const searchParams = useSearchParams()
@@ -135,7 +135,7 @@ function NewArticleInner() {
   function handleTitleChange(e: any) {
     const title = e.target.value
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-    setForm(f => ({ ...f, title, slug, meta_title: title }))
+    setForm(f => ({ ...f, title, slug, meta_title: title, social_title: title }))
   }
 
   function getWordCount() { return editor ? editor.getText().split(/\s+/).filter(Boolean).length : 0 }
@@ -264,6 +264,23 @@ function NewArticleInner() {
               <div>
                 <label style={lbl}>Meta Description ({form.meta_description.length}/160)</label>
                 <textarea name="meta_description" value={form.meta_description} onChange={handleChange} rows={3} style={{ ...inp, resize: 'vertical' as const }} />
+              </div>
+            </div>
+
+            {/* FACEBOOK / SOCIAL */}
+            <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
+              <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Facebook &amp; Social</p>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={lbl}>Social Title</label>
+                <input name="social_title" value={form.social_title} onChange={handleChange} placeholder="Defaults to meta title" style={inp} />
+              </div>
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={lbl}>Social Description</label>
+                <textarea name="social_description" value={form.social_description} onChange={handleChange} rows={2} placeholder="Defaults to meta description" style={{ ...inp, resize: 'vertical' as const }} />
+              </div>
+              <div>
+                <label style={lbl}>Facebook Teaser Text</label>
+                <textarea name="facebook_teaser_text" value={form.facebook_teaser_text} onChange={handleChange} rows={3} placeholder="2-3 sentence teaser for Facebook posts..." style={{ ...inp, resize: 'vertical' as const }} />
               </div>
             </div>
           </div>
