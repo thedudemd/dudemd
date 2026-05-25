@@ -60,7 +60,7 @@ export default async function HomePage() {
             {/* MAIN FEATURED */}
             {featured && (
               <div className="hero-featured">
-                <Link href={`/articles/${featured.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
+                <Link href={`/articles/${featured.categories?.slug}/${featured.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '1.25rem' }}>
                     <img
                       src={featured.cover_image_url || 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=900&q=80'}
@@ -76,7 +76,7 @@ export default async function HomePage() {
                     <span style={{ fontSize: '11px', color: '#9a9085' }}>{featured.read_time}</span>
                   </div>
                   <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.6rem, 2.8vw, 2.2rem)', lineHeight: 1.15, color: '#0e1a2b', marginBottom: '0.75rem' }}>
-                    <Link href={`/articles/${featured.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{featured.title}</Link>
+                    <Link href={`/articles/${featured.categories?.slug}/${featured.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{featured.title}</Link>
                   </h2>
                   <p style={{ fontSize: '15px', color: '#4A5563', lineHeight: 1.65, marginBottom: '0.75rem' }}>{featured.excerpt}</p>
                   <p style={{ fontSize: '12px', color: '#9a9085' }}>By {featured.authors?.name}</p>
