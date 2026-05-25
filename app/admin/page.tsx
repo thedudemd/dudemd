@@ -5,9 +5,6 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
 export default function AdminDashboard() {
   const router = useRouter()
   const [stats, setStats] = useState({ total: 0, published: 0, draft: 0, review: 0 })
@@ -33,7 +30,7 @@ export default function AdminDashboard() {
   return (
     <AdminShell>
       <div style={{ padding: '2rem 2.5rem' }}>
-        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '2rem' }}>Dashboard</h1>
+        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '2rem' }}>Dashboard v{Date.now()}</h1>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
           <div style={{ backgroundColor: '#fff', border: '1px solid #e8e4de', padding: '1.5rem' }}>
