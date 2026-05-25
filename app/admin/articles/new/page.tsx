@@ -8,12 +8,10 @@ import dynamic from 'next/dynamic'
 const Editor = dynamic(() => import('@tiptap/react').then((mod) => {
   const { useEditor, EditorContent } = mod
   const StarterKit = require('@tiptap/starter-kit').default
-  const Link = require('@tiptap/extension-link').default
-  const Image = require('@tiptap/extension-image').default
 
   return function EditorWrapper({ content, onChange }: any) {
     const editor = useEditor({
-      extensions: [StarterKit, Link, Image],
+      extensions: [StarterKit],
       content,
       onUpdate: ({ editor }) => onChange(editor.getHTML()),
     })
@@ -132,7 +130,6 @@ export default function NewArticlePage() {
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
         <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '2rem' }}>Create New Article</h1>
 
-        {/* ARTICLE TEMPLATE */}
         <div style={section}>
           <label style={lbl}>Article Template</label>
           <select style={inp} value={form.article_template} onChange={e => setForm({...form, article_template: e.target.value})}>
@@ -146,7 +143,6 @@ export default function NewArticlePage() {
           </select>
         </div>
 
-        {/* BASIC INFO */}
         <div style={section}>
           <label style={lbl}>Title</label>
           <input type="text" style={inp} value={form.title} onChange={e => setForm({...form, title: e.target.value, slug: generateSlug(e.target.value)})} />
@@ -164,7 +160,6 @@ export default function NewArticlePage() {
           <input type="text" style={inp} value={form.cover_image_url} onChange={e => setForm({...form, cover_image_url: e.target.value})} />
         </div>
 
-        {/* TAXONOMY */}
         <div style={section}>
           <label style={lbl}>Category</label>
           <select style={inp} value={form.category_id} onChange={e => setForm({...form, category_id: e.target.value})}>
@@ -179,7 +174,6 @@ export default function NewArticlePage() {
           </select>
         </div>
 
-        {/* CONTENT STRUCTURE */}
         <div style={section}>
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -230,7 +224,6 @@ export default function NewArticlePage() {
           </select>
         </div>
 
-        {/* MONETIZATION */}
         <div style={section}>
           <label style={lbl}>Monetization Type</label>
           <select style={inp} value={form.monetization_type} onChange={e => setForm({...form, monetization_type: e.target.value})}>
@@ -253,7 +246,6 @@ export default function NewArticlePage() {
           </select>
         </div>
 
-        {/* SEO */}
         <div style={section}>
           <label style={lbl}>Meta Title (SEO)</label>
           <input type="text" style={inp} placeholder="Leave blank to use article title" value={form.meta_title} onChange={e => setForm({...form, meta_title: e.target.value})} />
@@ -262,7 +254,6 @@ export default function NewArticlePage() {
           <textarea style={{...inp, minHeight: '60px'}} placeholder="Leave blank to use excerpt" value={form.meta_description} onChange={e => setForm({...form, meta_description: e.target.value})} />
         </div>
 
-        {/* SOCIAL */}
         <div style={section}>
           <label style={lbl}>Social Title (Facebook/Twitter)</label>
           <input type="text" style={inp} placeholder="Leave blank to use meta title" value={form.social_title} onChange={e => setForm({...form, social_title: e.target.value})} />
@@ -274,13 +265,11 @@ export default function NewArticlePage() {
           <textarea style={{...inp, minHeight: '80px'}} placeholder="Optimized teaser for Facebook posts" value={form.facebook_teaser_text} onChange={e => setForm({...form, facebook_teaser_text: e.target.value})} />
         </div>
 
-        {/* CONTENT EDITOR */}
         <div style={section}>
           <label style={lbl}>Article Content</label>
           <Editor content={form.content} onChange={(html: string) => { setForm({...form, content: html}); setEditor({ getHTML: () => html, getText: () => html.replace(/<[^>]*>/g, '') }) }} />
         </div>
 
-        {/* ACTIONS */}
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
           <button onClick={saveDraft} disabled={saving} style={{ padding: '0.85rem 1.5rem', backgroundColor: '#4A5563', color: '#fff', fontWeight: 600, fontSize: '14px', border: 'none', cursor: 'pointer' }}>
             {saving ? 'Saving...' : 'Save Draft Locally'}
