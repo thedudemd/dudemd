@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: '%s | DudeMD',
   },
   description: "DudeMD covers health, fitness, recovery, style, gear, and performance for real men.",
-  metadataBase: new URL('https://dudemd.com'),
+  metadataBase: new URL('https://www.dudemd.com'),
   openGraph: {
     type: 'website',
     locale: 'en_US',

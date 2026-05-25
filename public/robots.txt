@@ -3,5 +3,7 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 Disallow: /auth/
+Disallow: /account/
+Disallow: /welcome/
 
 Sitemap: https://www.dudemd.com/sitemap.xml
