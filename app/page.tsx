@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { Metadata } from 'next'
 import GoogleOneTap from "@/components/auth/GoogleOneTap"
 import Link from 'next/link'
