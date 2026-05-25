@@ -3,10 +3,8 @@ import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import Nav from '@/components/layout/Nav'
 import Footer from '@/components/layout/Footer'
-
 const inter = Inter({ subsets: ['latin'], variable: '--font-body', display: 'swap' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display', display: 'swap', style: ['normal', 'italic'] })
-
 export const metadata: Metadata = {
   title: {
     default: "DudeMD — Modern Men's Wellness for Real Life",
@@ -23,42 +21,40 @@ export const metadata: Metadata = {
     description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
     images: [
       {
-        url: '/IMG_5432-removebg-preview%20(1).png',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'DudeMD',
+        alt: 'DudeMD — Modern Men\'s Wellness for Real Life',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@mydudemd',
-    creator: '@mydudemd',
+    site: '@_dudemd',
+    creator: '@_dudemd',
     title: "DudeMD — Modern Men's Wellness for Real Life",
     description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
-    images: ['/IMG_5432-removebg-preview%20(1).png'],
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
     follow: true,
   },
 }
-
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "DudeMD",
   "url": "https://www.dudemd.com",
-  "logo": "https://www.dudemd.com/dude md.svg",
+  "logo": "https://www.dudemd.com/og-image.png",
   "sameAs": [
-    "https://twitter.com/mydudemd",
-    "https://instagram.com/mydudemd",
+    "https://twitter.com/_dudemd",
+    "https://instagram.com/thedudemd_",
     "https://facebook.com/MyDudeMD",
     "https://tiktok.com/@TheDudeMd"
   ],
   "description": "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way."
 }
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
