@@ -9,18 +9,18 @@ const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-displa
 
 export const metadata: Metadata = {
   title: {
-    default: "DudeMD — Modern Wellness for Real Life",
+    default: "DudeMD — Modern Men's Wellness for Real Life",
     template: '%s | DudeMD',
   },
-  description: "DudeMD covers health, fitness, recovery, style, gear, and performance for real men.",
+  description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
   metadataBase: new URL('https://www.dudemd.com'),
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://dudemd.com',
+    url: 'https://www.dudemd.com',
     siteName: 'DudeMD',
-    title: 'DudeMD — Modern Wellness for Real Life',
-    description: 'Health. Recovery. Performance. Style. Built for real life.',
+    title: "DudeMD — Modern Men's Wellness for Real Life",
+    description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
     images: [
       {
         url: '/IMG_5432-removebg-preview%20(1).png',
@@ -32,10 +32,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@_dudemd',
-    creator: '@_dudemd',
-    title: 'DudeMD — Modern Wellness for Real Life',
-    description: 'Health. Recovery. Performance. Style. Built for real life.',
+    site: '@mydudemd',
+    creator: '@mydudemd',
+    title: "DudeMD — Modern Men's Wellness for Real Life",
+    description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
     images: ['/IMG_5432-removebg-preview%20(1).png'],
   },
   robots: {
@@ -44,10 +44,29 @@ export const metadata: Metadata = {
   },
 }
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "DudeMD",
+  "url": "https://www.dudemd.com",
+  "logo": "https://www.dudemd.com/dude md.svg",
+  "sameAs": [
+    "https://twitter.com/mydudemd",
+    "https://instagram.com/mydudemd",
+    "https://facebook.com/MyDudeMD",
+    "https://tiktok.com/@TheDudeMd"
+  ],
+  "description": "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way."
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <body style={{ backgroundColor: '#f7f4ee', color: '#0e1a2b' }}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         <Nav />
         <main className="min-h-screen">{children}</main>
         <Footer />
