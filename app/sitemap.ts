@@ -26,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   return [
-    { url: 'https://www.dudemd.com', lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
+    { url: 'https://www.dudemd.com', lastModified: new Date(), changeFrequency: 'daily' as const, priority: 1.0 },
     ...categoryUrls,
     ...articleUrls,
   ]
