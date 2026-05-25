@@ -57,7 +57,7 @@ const nav = [
   {
     group: 'Platform',
     items: [
-      { label: 'Feature Flags', href: '/admin/flags', icon: '⊛' },
+      { label: 'Feature Controls', href: '/admin/flags', icon: '⊛' },
       { label: 'Writers & Roles', href: '/admin/writers', icon: '◈' },
       { label: 'Settings', href: '/admin/settings', icon: '◎' },
       { label: 'Audit Log', href: '/admin/audit', icon: '▤', soon: true },
@@ -132,7 +132,7 @@ export default function AdminSidebar({ role }: { role: string }) {
       <nav style={{ flex: 1, padding: '0.5rem 0', overflowY: 'auto', overflowX: 'hidden' }}>
         {nav.map(({ group, items }) => {
           const visibleItems = items.filter(item => {
-            if (!isAdmin && ['Feature Flags', 'Writers & Roles', 'Settings', 'Audit Log'].includes(item.label)) return false
+            if (!isAdmin && ['Feature Controls', 'Writers & Roles', 'Settings', 'Audit Log'].includes(item.label)) return false
             return true
           })
           if (visibleItems.length === 0) return null
