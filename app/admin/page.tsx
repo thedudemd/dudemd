@@ -1,37 +1,28 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
 
 export default function AdminDashboard() {
-  const router = useRouter()
   const [stats, setStats] = useState({ total: 0, published: 0, draft: 0, review: 0 })
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function load() {
-      const { data: articles } = await supabase.from('articles').select('*')
-      const all = articles || []
+    supabase.from('articles').select('*').then(({ data }) => {
+      const all = data || []
       setStats({
         total: all.length,
         published: all.filter((a: any) => a.status === 'published').length,
         draft: all.filter((a: any) => a.status === 'draft').length,
         review: all.filter((a: any) => a.status === 'review').length,
       })
-      setLoading(false)
-    }
-    load()
+    })
   }, [])
-
-  if (loading) return <AdminShell><p style={{ padding: '2rem', color: '#9a9085' }}>Loading...</p></AdminShell>
 
   return (
     <AdminShell>
       <div style={{ padding: '2rem 2.5rem' }}>
-        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '2rem' }}>Dashboard v{Date.now()}</h1>
-        
+        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '2rem' }}>Dashboard</h1>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
           <div style={{ backgroundColor: '#fff', border: '1px solid #e8e4de', padding: '1.5rem' }}>
             <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.5rem' }}>Total Articles</p>
@@ -50,7 +41,6 @@ export default function AdminDashboard() {
             <p style={{ fontSize: '2rem', fontWeight: 800, color: '#0e1a2b', fontFamily: 'Georgia, serif', margin: 0 }}>{stats.draft}</p>
           </div>
         </div>
-
         <div style={{ backgroundColor: '#0e1a2b', padding: '1.5rem' }}>
           <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', fontWeight: 700, color: '#f7f4ee', margin: '0 0 1rem' }}>Quick Actions</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
