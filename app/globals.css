@@ -1,50 +1,42 @@
-html { overflow-x: hidden; } body { overflow-x: hidden; }
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    background-color: #f7f4ee;
-    color: #0e1a2b;
-  }
+:root {
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
 }
 
-@layer components {
-  .container-content {
-    max-width: 80rem;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  .label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #c9b28f;
-  }
+* {
+  box-sizing: border-box;
 }
 
-/* Admin Editor Styles */
-.ProseMirror { outline: none; min-height: 400px; padding: 1rem; font-size: 16px; line-height: 1.8; color: #1B1D21; }
-.ProseMirror p { margin-bottom: 1rem; }
-.ProseMirror h1 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; font-family: Georgia, serif; }
-.ProseMirror h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; font-family: Georgia, serif; }
-.ProseMirror h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; font-family: Georgia, serif; }
-.ProseMirror ul, .ProseMirror ol { padding-left: 1.5rem; margin-bottom: 1rem; }
-.ProseMirror blockquote { border-left: 3px solid #c9b28f; padding-left: 1rem; color: #4A5563; font-style: italic; margin: 1rem 0; }
-.ProseMirror p.is-editor-empty:first-child::before { content: attr(data-placeholder); color: #9a9085; pointer-events: none; float: left; height: 0; }
-.tb { padding: 0.4rem 0.6rem; border: 1px solid #ede8df; background: #fff; cursor: pointer; font-size: 13px; color: #0e1a2b; }
-.tb:hover { background: #f7f4ee; }
-.tb.on { background: #0e1a2b; color: #fff; }
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-.hero-grid { display: grid; grid-template-columns: 1fr 340px; gap: 0; align-items: stretch; }
-.hero-featured { border-right: 1px solid #ede8df; padding-right: 2rem; }
-.hero-picks { padding-left: 2rem; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.container-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
 @media (max-width: 768px) {
-  .hero-grid { grid-template-columns: 1fr; }
-  .hero-featured { border-right: none; padding-right: 0; }
-  .hero-picks { padding-left: 0; }
+  .container-content {
+    padding: 0 1rem;
+  }
 }
