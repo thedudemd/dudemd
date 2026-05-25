@@ -3,21 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
-import dynamic from 'next/dynamic'
-
-const Editor = dynamic(() => import('@tiptap/react').then((mod) => {
-  const { useEditor, EditorContent } = mod
-  const StarterKit = require('@tiptap/starter-kit').default
-
-  return function EditorWrapper({ content, onChange }: any) {
-    const editor = useEditor({
-      extensions: [StarterKit],
-      content,
-      onUpdate: ({ editor }) => onChange(editor.getHTML()),
-    })
-    return <EditorContent editor={editor} style={{ border: '1px solid #ede8df', padding: '1rem', minHeight: '300px', backgroundColor: '#fff' }} />
-  }
-}), { ssr: false })
 
 export default function NewArticlePage() {
   const router = useRouter()
@@ -27,7 +12,6 @@ export default function NewArticlePage() {
   const [allArticles, setAllArticles] = useState<any[]>([])
   const [pillarArticles, setPillarArticles] = useState<any[]>([])
   const [saving, setSaving] = useState(false)
-  const [editor, setEditor] = useState<any>(null)
   
   const [form, setForm] = useState({
     title: '',
@@ -76,16 +60,8 @@ export default function NewArticlePage() {
   const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
   
   const getReadTime = () => {
-    const words = (editor?.getText() || '').split(/\s+/).length
+    const words = form.content.split(/\s+/).length
     return `${Math.ceil(words / 200)} min read`
-  }
-
-  async function saveDraft() {
-    setSaving(true)
-    const draft = { ...form, content: editor?.getHTML() || '', read_time: getReadTime() }
-    localStorage.setItem('draft_' + session.user.id, JSON.stringify(draft))
-    setSaving(false)
-    alert('Draft saved locally')
   }
 
   async function publish(status: 'draft' | 'published') {
@@ -94,7 +70,6 @@ export default function NewArticlePage() {
     
     const payload = { 
       ...form, 
-      content: editor?.getHTML() || '', 
       read_time: getReadTime(), 
       status, 
       published: status === 'published', 
@@ -107,7 +82,7 @@ export default function NewArticlePage() {
     
     const { error } = await supabase.from('articles').insert(payload)
     if (error) { alert('Error: ' + error.message); setSaving(false) }
-    else { localStorage.removeItem('draft_' + session.user.id); router.push('/admin') }
+    else { router.push('/admin') }
   }
 
   const handleRelatedPostToggle = (articleId: string) => {
@@ -266,14 +241,11 @@ export default function NewArticlePage() {
         </div>
 
         <div style={section}>
-          <label style={lbl}>Article Content</label>
-          <Editor content={form.content} onChange={(html: string) => { setForm({...form, content: html}); setEditor({ getHTML: () => html, getText: () => html.replace(/<[^>]*>/g, '') }) }} />
+          <label style={lbl}>Article Content (HTML)</label>
+          <textarea style={{...inp, minHeight: '400px', fontFamily: 'monospace'}} value={form.content} onChange={e => setForm({...form, content: e.target.value})} />
         </div>
 
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-          <button onClick={saveDraft} disabled={saving} style={{ padding: '0.85rem 1.5rem', backgroundColor: '#4A5563', color: '#fff', fontWeight: 600, fontSize: '14px', border: 'none', cursor: 'pointer' }}>
-            {saving ? 'Saving...' : 'Save Draft Locally'}
-          </button>
           <button onClick={() => publish('draft')} disabled={saving} style={{ padding: '0.85rem 1.5rem', backgroundColor: '#9a9085', color: '#fff', fontWeight: 600, fontSize: '14px', border: 'none', cursor: 'pointer' }}>
             {saving ? 'Saving...' : 'Save as Draft'}
           </button>
