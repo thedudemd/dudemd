@@ -4,7 +4,7 @@ import { MetadataRoute } from 'next'
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: articles } = await supabase
     .from('articles')
-    .select('slug, published_at, updated_at')
+    .select('slug, published_at, updated_at, categories(slug)')
     .eq('published', true)
 
   const { data: categories } = await supabase
@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select('slug')
 
   const articleUrls = (articles || []).map((a) => ({
-    url: `https://www.dudemd.com/articles/${a.slug}`,
+    url: `https://www.dudemd.com/articles/${a.categories?.slug}/${a.slug}`,
     lastModified: new Date(a.updated_at || a.published_at),
     changeFrequency: 'weekly' as const,
     priority: 0.8,
