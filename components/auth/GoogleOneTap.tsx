@@ -48,9 +48,11 @@ export default function GoogleOneTap() {
             if (!error) window.location.reload()
           },
           nonce: hashedNonce,
-          use_fedcm_for_prompt: false,
+          use_fedcm_for_prompt: true,
           auto_select: false,
           cancel_on_tap_outside: false,
+          context: 'signin',
+          itp_support: true,
         })
         window.google.accounts.id.prompt()
       }
