@@ -17,13 +17,53 @@ async function getArticle(slug: string) {
 }
 
 async function getRelated(categorySlug: string, currentSlug: string) {
+  const { data: category } = await supabase
+    .from('categories')
+    .select('id')
+    .eq('slug', categorySlug)
+    .single()
+  
+  if (!category) return []
+
   const { data } = await supabase
     .from('articles')
     .select('*, authors(name), categories(name, slug)')
+    .eq('category_id', category.id)
     .eq('published', true)
     .neq('slug', currentSlug)
     .limit(3)
   return data || []
+}
+
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const { slug } = await params
+  const article = await getArticle(slug)
+  if (!article) return {}
+  
+  return {
+    title: article.meta_title || article.title,
+    description: article.meta_description || article.excerpt,
+    alternates: {
+      canonical: `https://www.dudemd.com/articles/${slug}`,
+    },
+    openGraph: {
+      type: 'article',
+      title: article.meta_title || article.title,
+      description: article.meta_description || article.excerpt,
+      url: `https://www.dudemd.com/articles/${slug}`,
+      siteName: 'DudeMD',
+      images: article.cover_image_url ? [{ url: article.cover_image_url, width: 1200, height: 630 }] : [],
+      publishedTime: article.published_at,
+      modifiedTime: article.updated_at,
+      authors: article.authors?.name ? [article.authors.name] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.meta_title || article.title,
+      description: article.meta_description || article.excerpt,
+      images: article.cover_image_url ? [article.cover_image_url] : [],
+    },
+  }
 }
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -32,8 +72,36 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   if (!article) notFound()
   const related = await getRelated(article.categories?.slug, slug)
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": article.title,
+    "description": article.excerpt,
+    "image": article.cover_image_url,
+    "datePublished": article.published_at,
+    "dateModified": article.updated_at || article.published_at,
+    "author": {
+      "@type": "Person",
+      "name": article.authors?.name
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "DudeMD",
+      "url": "https://www.dudemd.com"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://www.dudemd.com/articles/${slug}`
+    }
+  }
+
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      
       <style>{`
         .article-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
         .article-sidebar { order: 0; }
