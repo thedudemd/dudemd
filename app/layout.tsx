@@ -30,8 +30,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@_dudemd',
-    creator: '@_dudemd',
+    site: '@mydudemd',
+    creator: '@mydudemd',
     title: "DudeMD — Modern Men's Wellness for Real Life",
     description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
     images: ['/og-image.png'],

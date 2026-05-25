@@ -28,8 +28,8 @@ export default function ContactPage() {
           
           <div style={{ marginBottom: '2rem' }}>
             <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.25rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.5rem' }}>Social Media</h2>
-            <p style={{ marginBottom: '0.5rem' }}>Instagram: <a href="https://instagram.com/thedudemd_" target="_blank" rel="noopener noreferrer" style={{ color: '#c9b28f', textDecoration: 'none', fontWeight: 600 }}>@thedudemd_</a></p>
-            <p style={{ marginBottom: '0.5rem' }}>X (Twitter): <a href="https://twitter.com/_dudemd" target="_blank" rel="noopener noreferrer" style={{ color: '#c9b28f', textDecoration: 'none', fontWeight: 600 }}>@_dudemd</a></p>
+            <p style={{ marginBottom: '0.5rem' }}>Instagram: <a href="https://instagram.com/mydudemd" target="_blank" rel="noopener noreferrer" style={{ color: '#c9b28f', textDecoration: 'none', fontWeight: 600 }}>@thedudemd_</a></p>
+            <p style={{ marginBottom: '0.5rem' }}>X (Twitter): <a href="https://twitter.com/mydudemd" target="_blank" rel="noopener noreferrer" style={{ color: '#c9b28f', textDecoration: 'none', fontWeight: 600 }}>@_dudemd</a></p>
             <p style={{ marginBottom: '0.5rem' }}>Facebook: <a href="https://facebook.com/MyDudeMD" target="_blank" rel="noopener noreferrer" style={{ color: '#c9b28f', textDecoration: 'none', fontWeight: 600 }}>@MyDudeMD</a></p>
             <p>TikTok: <a href="https://tiktok.com/@TheDudeMd" target="_blank" rel="noopener noreferrer" style={{ color: '#c9b28f', textDecoration: 'none', fontWeight: 600 }}>@TheDudeMd</a></p>
           </div>
