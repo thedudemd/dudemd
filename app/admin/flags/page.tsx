@@ -21,7 +21,7 @@ export default function FlagsPage() {
       <div style={{ padding: '2rem 2.5rem', maxWidth: '1100px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div>
-            <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', margin: 0, marginBottom: '0.25rem' }}>Feature Flags</h1>
+            <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', margin: 0, marginBottom: '0.25rem' }}>Feature Controls</h1>
             <p style={{ fontSize: '13px', color: '#9a9085', margin: 0 }}>Enable or disable platform features</p>
           </div>
           <div style={{ backgroundColor: '#fff', border: '1px solid #e8e4de', padding: '0.75rem 1.25rem', textAlign: 'center' }}>
