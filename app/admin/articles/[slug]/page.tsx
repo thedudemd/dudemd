@@ -87,7 +87,7 @@ function EditArticleInner({ slug }: { slug: string }) {
 
   async function handleSave(status: string) {
     setSaving(true)
-    const { error } = await supabase.from('articles').update({
+    const { error } = await supabase.from<any>('articles').update({
       ...form,
       content: editor?.getHTML() || '',
       read_time: getReadTime(),
