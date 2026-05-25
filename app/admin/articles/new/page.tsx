@@ -18,6 +18,9 @@ function NewArticleInner() {
   const [authors, setAuthors] = useState<any[]>([])
   const [saving, setSaving] = useState(false)
   const [autoSaved, setAutoSaved] = useState('')
+  const [suggestions, setSuggestions] = useState({existing: [], topics: []})
+  const [suggestLoading, setSuggestLoading] = useState(false)
+  const [suggestKeyword, setSuggestKeyword] = useState('')
   const autoSaveTimer = typeof window !== 'undefined' ? null : null
   const [seoScore, setSeoScore] = useState(0)
   const [aeoScore, setAeoScore] = useState(0)
@@ -114,7 +117,18 @@ function NewArticleInner() {
     if (editor) loadDraft()
   }, [editor])
 
-  function handleChange(e: any) {
+  async function fetchSuggestions(kw) {
+    if (kw.trim().length < 3) return
+    setSuggestLoading(true)
+    try {
+      const res = await fetch('/api/suggestions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ keywords: kw, currentSlug: form.slug }) })
+      const data = await res.json()
+      setSuggestions(data)
+    } catch(e) {}
+    setSuggestLoading(false)
+  }
+
+  function handleChange(e) {
     const { name, value } = e.target
     setForm(f => ({ ...f, [name]: value }))
   }
