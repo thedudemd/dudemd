@@ -1,8 +1,13 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@supabase/supabase-js'
 import AdminShell from '@/components/admin/AdminShell'
+
+const supabase = createClient(
+  'https://bicljoujevywrkzjeaoy.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
+)
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<any[]>([])
@@ -11,7 +16,10 @@ export default function ArticlesPage() {
   const [deleteInput, setDeleteInput] = useState('')
 
   useEffect(() => {
-    supabase.from('articles').select('*, authors(name), categories(name)').order('created_at', { ascending: false }).then(({ data }) => setArticles(data || []))
+    supabase.from('articles').select('*, authors(name), categories(name)').order('created_at', { ascending: false }).then(({ data, error }) => {
+      console.log('articles:', data, 'error:', error)
+      setArticles(data || [])
+    })
   }, [])
 
   const filtered = filter === 'all' ? articles : articles.filter(a => a.status === filter)
