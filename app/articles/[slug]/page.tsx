@@ -87,7 +87,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     "publisher": {
       "@type": "Organization",
       "name": "DudeMD",
-      "url": "https://www.dudemd.com"
+      "url": "https://www.dudemd.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.dudemd.com/og-image.png"
+      }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
@@ -95,11 +99,36 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     }
   }
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://www.dudemd.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": article.categories?.name,
+        "item": `https://www.dudemd.com/category/${article.categories?.slug}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": article.title,
+        "item": `https://www.dudemd.com/articles/${slug}`
+      }
+    ]
+  }
+
   return (
     <main>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([articleSchema, breadcrumbSchema]) }}
       />
       
       <style>{`
@@ -113,7 +142,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
       {/* HERO */}
       <div style={{ width: '100%', overflow: 'hidden', maxHeight: "380px" }}>
-        <img src={article.cover_image_url} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <img src={article.cover_image_url} alt={`Cover image for ${article.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
       </div>
 
       <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
@@ -175,7 +204,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', borderBottom: '1px solid #ede8df', paddingBottom: '0.5rem', marginBottom: '1.25rem' }}>Related Articles</p>
                 {related.map((a) => (
                   <Link key={a.slug} href={`/articles/${a.slug}`} style={{ display: 'flex', gap: '0.75rem', textDecoration: 'none', marginBottom: '1.25rem', alignItems: 'start' }}>
-                    <img src={a.cover_image_url} alt={a.title} style={{ width: '72px', height: '54px', objectFit: 'cover', flexShrink: 0 }} />
+                    <img src={a.cover_image_url} alt={`${a.title} thumbnail`} style={{ width: '72px', height: '54px', objectFit: 'cover', flexShrink: 0 }} />
                     <div>
                       <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '0.25rem' }}>{a.categories?.name}</p>
                       <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.3, margin: 0 }}>{a.title}</p>
@@ -196,7 +225,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               {related.map((a) => (
                 <article key={a.slug}>
                   <Link href={`/articles/${a.slug}`}>
-                    <img src={a.cover_image_url} alt={a.title} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block', marginBottom: '1rem' }} />
+                    <img src={a.cover_image_url} alt={`${a.title} thumbnail`} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block', marginBottom: '1rem' }} />
                   </Link>
                   <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c9b28f' }}>{a.categories?.name}</span>
                   <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1.3, color: '#0e1a2b', marginTop: '0.4rem' }}>
