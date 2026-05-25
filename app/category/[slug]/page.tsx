@@ -33,6 +33,27 @@ async function getAllCategories() {
   return data || []
 }
 
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const { slug } = await params
+  const category = await getCategory(slug)
+  if (!category) return {}
+  
+  return {
+    title: `${category.name} — DudeMD`,
+    description: `Evidence-based ${category.name.toLowerCase()} articles for men. Real-world advice on wellness, fitness, recovery, and lifestyle.`,
+    alternates: {
+      canonical: `https://www.dudemd.com/category/${slug}`,
+    },
+    openGraph: {
+      type: 'website',
+      title: `${category.name} — DudeMD`,
+      description: `Evidence-based ${category.name.toLowerCase()} articles for men.`,
+      url: `https://www.dudemd.com/category/${slug}`,
+      siteName: 'DudeMD',
+    },
+  }
+}
+
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const category = await getCategory(slug)
@@ -80,7 +101,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                 <article key={a.slug}>
                   <Link href={`/articles/${a.slug}`}>
                     <div style={{ width: '100%', aspectRatio: '16/10', overflow: 'hidden', marginBottom: '1rem' }}>
-                      <img src={a.cover_image_url} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      <img src={a.cover_image_url} alt={`${a.title} — ${a.categories?.name}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </div>
                   </Link>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.5rem' }}>
