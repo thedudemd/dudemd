@@ -5,6 +5,9 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default function AdminDashboard() {
   const router = useRouter()
   const [stats, setStats] = useState({ total: 0, published: 0, draft: 0, review: 0 })
