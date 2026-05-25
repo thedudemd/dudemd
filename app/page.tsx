@@ -34,6 +34,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <h1 className="sr-only">DudeMD — Modern Men's Wellness for Real Life</h1>
       <GoogleOneTap />
       {/* BREAKING TICKER */}
       <div style={{ backgroundColor: '#c9b28f', padding: '0.4rem 0', overflow: 'hidden' }}>
@@ -63,7 +64,7 @@ export default async function HomePage() {
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '1.25rem' }}>
                     <img
                       src={featured.cover_image_url || 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=900&q=80'}
-                      alt={featured.title}
+                      alt={`${featured.title} — ${featured.categories?.name}`}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}
                     />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(14,26,43,0.55) 0%, transparent 50%)' }} />
@@ -74,9 +75,9 @@ export default async function HomePage() {
                     <Link href={`/category/${featured.categories?.slug}`} style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f7f4ee', backgroundColor: '#c9b28f', padding: '0.2rem 0.6rem', textDecoration: 'none' }}>{featured.categories?.name}</Link>
                     <span style={{ fontSize: '11px', color: '#9a9085' }}>{featured.read_time}</span>
                   </div>
-                  <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.6rem, 2.8vw, 2.2rem)', lineHeight: 1.15, color: '#0e1a2b', marginBottom: '0.75rem' }}>
+                  <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.6rem, 2.8vw, 2.2rem)', lineHeight: 1.15, color: '#0e1a2b', marginBottom: '0.75rem' }}>
                     <Link href={`/articles/${featured.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{featured.title}</Link>
-                  </h1>
+                  </h2>
                   <p style={{ fontSize: '15px', color: '#4A5563', lineHeight: 1.65, marginBottom: '0.75rem' }}>{featured.excerpt}</p>
                   <p style={{ fontSize: '12px', color: '#9a9085' }}>By {featured.authors?.name}</p>
                 </div>
@@ -92,7 +93,7 @@ export default async function HomePage() {
                     <div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '0.75rem' }}>
                       <img
                         src={a.cover_image_url || 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80'}
-                        alt={a.title}
+                        alt={`${a.title} — ${a.categories?.name}`}
                         style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                       />
                     </div>
@@ -142,7 +143,7 @@ export default async function HomePage() {
                   <div style={{ width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
                     <img
                       src={a.cover_image_url || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80'}
-                      alt={a.title}
+                      alt={`${a.title} — ${a.categories?.name}`}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                     />
                   </div>
