@@ -38,15 +38,15 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   const article = await getArticle(slug)
   if (!article) return {}
   return {
-    title: article.meta_title || article.title,
+    title: article.social_title || article.meta_title || article.title,
     description: article.meta_description || article.excerpt,
     alternates: {
       canonical: `https://www.dudemd.com/articles/${category}/${slug}`,
     },
     openGraph: {
       type: 'article',
-      title: article.meta_title || article.title,
-      description: article.meta_description || article.excerpt,
+      title: article.social_title || article.meta_title || article.title,
+      description: article.social_description || article.meta_description || article.excerpt,
       url: `https://www.dudemd.com/articles/${category}/${slug}`,
       siteName: 'DudeMD',
       images: article.cover_image_url ? [{ url: article.cover_image_url, width: 1200, height: 630 }] : [],
@@ -56,7 +56,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: article.meta_title || article.title,
+      title: article.social_title || article.meta_title || article.title,
       description: article.meta_description || article.excerpt,
       images: article.cover_image_url ? [article.cover_image_url] : [],
     },
