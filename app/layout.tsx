@@ -48,8 +48,8 @@ const organizationSchema = {
   "url": "https://www.dudemd.com",
   "logo": "https://www.dudemd.com/og-image.png",
   "sameAs": [
-    "https://twitter.com/_dudemd",
-    "https://instagram.com/thedudemd_",
+    "https://twitter.com/mydudemd",
+    "https://instagram.com/mydudemd",
     "https://facebook.com/MyDudeMD",
     "https://tiktok.com/@TheDudeMd"
   ],
