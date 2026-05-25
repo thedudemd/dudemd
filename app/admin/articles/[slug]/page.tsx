@@ -41,7 +41,7 @@ function EditArticleInner({ slug }: { slug: string }) {
       const { data: auths } = await supabase.from('authors').select('*').order('name')
       setCategories(cats || [])
       setAuthors(auths || [])
-      const { data: article } = await supabase.from('articles').select('*').eq('slug', slug).single()
+      const { data: article } = await (supabase.from as any)('articles').select('*').eq('slug', slug).single()
       if (!article) { router.push('/admin'); return }
       setArticleId(article.id)
       setForm({
