@@ -149,7 +149,7 @@ export default function AdminSidebar({ role }: { role: string }) {
               )}
               {collapsed && <div style={{ height: '0.5rem' }} />}
               {visibleItems.map(item => {
-                const active = isActive(item.href, item.exact)
+                const active = isActive(item.href, (item as any).exact)
                 return (
                   <Link
                     key={item.href}
@@ -164,14 +164,14 @@ export default function AdminSidebar({ role }: { role: string }) {
                       textDecoration: 'none',
                       backgroundColor: active ? 'rgba(201,178,143,0.08)' : 'transparent',
                       borderLeft: active ? '2px solid #c9b28f' : '2px solid transparent',
-                      opacity: item.soon && !active ? 0.4 : 1,
+                      opacity: (item as any).soon && !active ? 0.4 : 1,
                     }}
                   >
                     <span style={{ fontSize: '12px', color: active ? '#c9b28f' : 'rgba(247,244,238,0.45)', flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
                     {!collapsed && (
                       <span style={{ fontSize: '12.5px', fontWeight: active ? 600 : 400, color: active ? '#f7f4ee' : 'rgba(247,244,238,0.5)', whiteSpace: 'nowrap' }}>
                         {item.label}
-                        {item.soon && <span style={{ fontSize: '9px', marginLeft: '0.4rem', color: 'rgba(247,244,238,0.2)', fontWeight: 400 }}>soon</span>}
+                        {(item as any).soon && <span style={{ fontSize: '9px', marginLeft: '0.4rem', color: 'rgba(247,244,238,0.2)', fontWeight: 400 }}>soon</span>}
                       </span>
                     )}
                   </Link>
@@ -184,13 +184,12 @@ export default function AdminSidebar({ role }: { role: string }) {
 
       {!collapsed && (
         <div style={{ padding: '0.75rem 1.125rem', borderTop: '1px solid rgba(247,244,238,0.06)' }}>
-          <a href="/" target="_blank" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}
+          <a href="/" target="_blank" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', opacity: 0.3 }}
             onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
             onMouseLeave={e => (e.currentTarget.style.opacity = '0.3')}
-            className="view-site-link"
           >
-            <span style={{ fontSize: '11px', color: '#f7f4ee', opacity: 0.3 }}>↗</span>
-            <span style={{ fontSize: '11px', color: '#f7f4ee', opacity: 0.3, fontWeight: 500 }}>dudemd.com</span>
+            <span style={{ fontSize: '11px', color: '#f7f4ee' }}>↗</span>
+            <span style={{ fontSize: '11px', color: '#f7f4ee', fontWeight: 500 }}>dudemd.com</span>
           </a>
         </div>
       )}
