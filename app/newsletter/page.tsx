@@ -2,7 +2,6 @@
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { createClient } from '@/lib/auth/supabase-auth'
 
 function NewsletterInner() {
   const [email, setEmail] = useState('')
@@ -17,22 +16,6 @@ function NewsletterInner() {
     e.preventDefault()
     if (!email) return
     setStatus('loading')
-    const supabase = createClient()
-
-    // Check if user exists
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: false }
-    })
-
-    if (!signInError) {
-      // User exists — tell them to sign in
-      setStep('existing')
-      setStatus('idle')
-      return
-    }
-
-    // New user — subscribe them
     const res = await fetch('/api/newsletter/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
