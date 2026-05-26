@@ -9,7 +9,7 @@ export const revalidate = 60
 async function getArticle(slug: string) {
   const { data } = await supabase
     .from('articles')
-    .select('*, authors(name, slug), categories(name, slug)')
+    .select('*, authors(name, slug, avatar_url, title), categories(name, slug)')
     .eq('slug', slug)
     .eq('published', true)
     .single()
@@ -163,7 +163,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid #ede8df', marginBottom: '2rem' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: '#c9b28f' }}>{article.authors?.name?.charAt(0)}</span>
+                {article.authors?.avatar_url ? (
+                    <img src={article.authors.avatar_url} alt={article.authors.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                  ) : (
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#c9b28f' }}>{article.authors?.name?.charAt(0)}</span>
+                  )}
               </div>
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 600, color: '#0e1a2b', margin: 0 }}>
