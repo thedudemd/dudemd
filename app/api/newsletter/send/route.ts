@@ -6,15 +6,38 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 export async function POST(req: NextRequest) {
-  const { subject, body } = await req.json()
+  const { subject, body, segment } = await req.json()
   if (!subject || !body) return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
 
-  const { data: subscribers } = await supabase.from('subscribers').select('email').eq('unsubscribed', false)
-  if (!subscribers?.length) return NextResponse.json({ error: 'No active subscribers' }, { status: 400 })
+  let emails: string[] = []
 
-  const emails = subscribers.map(s => s.email)
+  if (!segment || segment === 'all') {
+    const { data } = await supabase.from('subscribers').select('email').eq('unsubscribed', false)
+    emails = (data || []).map(s => s.email)
+  } else {
+    // Get user_ids with score > 0 for this category
+    const { data: scores } = await supabase.from('user_scores').select('user_id, category_scores')
+    const matchingUserIds = (scores || [])
+      .filter(s => s.category_scores?.[segment] > 0)
+      .map(s => s.user_id)
 
-  // Send in batches of 50
+    if (matchingUserIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('email')
+        .in('id', matchingUserIds)
+        .eq('newsletter_subscribed', true)
+      const segmentEmails = (profiles || []).map(p => p.email).filter(Boolean)
+
+      // Cross-reference with active subscribers
+      const { data: subs } = await supabase.from('subscribers').select('email').eq('unsubscribed', false)
+      const activeEmails = new Set((subs || []).map(s => s.email))
+      emails = segmentEmails.filter(e => activeEmails.has(e))
+    }
+  }
+
+  if (!emails.length) return NextResponse.json({ error: 'No subscribers in this segment' }, { status: 400 })
+
   const batchSize = 50
   for (let i = 0; i < emails.length; i += batchSize) {
     const batch = emails.slice(i, i + batchSize)
