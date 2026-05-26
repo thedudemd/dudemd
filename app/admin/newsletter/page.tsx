@@ -53,7 +53,7 @@ export default function NewsletterAdmin() {
       })
       setSending(false)
       if (res.ok) { setSent(true); setSubject('') }
-      else alert('Send failed.')
+      else { const err = await res.json(); alert('Send failed: ' + JSON.stringify(err)) }
     })
   }
 
