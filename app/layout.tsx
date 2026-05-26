@@ -81,6 +81,7 @@ const websiteSchema = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+      <head><meta name='facebook-domain-verification' content='at3t423mnp96egxz0gammrzkx46nie' /></head>
       <body style={{ backgroundColor: '#f7f4ee', color: '#0e1a2b' }}>
         <script dangerouslySetInnerHTML={{ __html: `
           fbq('init', '214618978894432');
