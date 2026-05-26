@@ -36,6 +36,7 @@ export default async function HomePage() {
     <>
       <h1 className="sr-only">DudeMD — Modern Men's Wellness for Real Life</h1>
       <GoogleOneTap />
+      <PersonalizedWelcome />
       {/* TOP BAR */}
       <div style={{ backgroundColor: '#c9b28f', padding: '0.4rem 0' }}>
         <div className="container-content">
