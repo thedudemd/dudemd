@@ -45,27 +45,63 @@ function NewArticleInner() {
   })
 
   function calcScores(title: string, content: string, words: number) {
-    let seo = 0
-    if (title.length > 20) seo += 20
-    if (form.meta_title.length > 0) seo += 20
-    if (form.meta_description.length > 0) seo += 20
-    if (words > 300) seo += 20
-    if (form.excerpt.length > 0) seo += 20
-    setSeoScore(seo)
-    let aeo = 0
     const tl = title.toLowerCase()
-    if (tl.includes('?') || tl.includes('how') || tl.includes('what') || tl.includes('why') || tl.includes('best')) aeo += 25
-    if (content.includes('?')) aeo += 25
-    if (words > 500) aeo += 25
-    if (form.excerpt.length > 50) aeo += 25
-    setAeoScore(aeo)
+    const cl = content.toLowerCase()
     const sentences = content.split(/[.!?]+/).filter(Boolean)
+    const paragraphs = content.split(/\n+/).filter(Boolean)
+    const hasH2 = content.includes('<h2')
+    const hasH3 = content.includes('<h3')
+    const hasLinks = content.includes('<a ')
+    const hasImages = content.includes('<img')
+    const metaDescLen = form.meta_description.length
+    const metaTitleLen = form.meta_title.length
+
+    // SEO Score (100 points)
+    let seo = 0
+    if (title.length >= 30 && title.length <= 65) seo += 15       // Title length optimal
+    else if (title.length > 0) seo += 7
+    if (metaTitleLen >= 30 && metaTitleLen <= 65) seo += 15        // Meta title optimal
+    else if (metaTitleLen > 0) seo += 7
+    if (metaDescLen >= 120 && metaDescLen <= 160) seo += 15        // Meta desc optimal
+    else if (metaDescLen > 0) seo += 7
+    if (words >= 800) seo += 15                                     // Long form content
+    else if (words >= 300) seo += 8
+    if (form.excerpt.length > 50) seo += 10                        // Has excerpt
+    if (hasH2) seo += 10                                           // Has H2 headings
+    if (hasH3) seo += 5                                            // Has H3 headings
+    if (hasLinks) seo += 10                                        // Has links
+    if (hasImages) seo += 5                                        // Has images
+    setSeoScore(Math.min(100, seo))
+
+    // AEO Score (100 points) - Answer Engine Optimization
+    let aeo = 0
+    const questionWords = ['?', 'how', 'what', 'why', 'when', 'where', 'who', 'which', 'best', 'top', 'vs', 'versus', 'guide', 'tips', 'ways']
+    const questionMatches = questionWords.filter(w => tl.includes(w)).length
+    aeo += Math.min(20, questionMatches * 5)                       // Question intent in title
+    if (content.includes('?')) aeo += 15                           // Questions in content
+    if (words >= 800) aeo += 20                                    // Comprehensive content
+    else if (words >= 400) aeo += 10
+    if (form.excerpt.length >= 100) aeo += 15                      // Detailed excerpt
+    else if (form.excerpt.length > 0) aeo += 7
+    if (hasH2 && hasH3) aeo += 15                                  // Structured headings
+    else if (hasH2) aeo += 8
+    const listItems = (content.match(/<li/g) || []).length
+    if (listItems >= 3) aeo += 15                                  // Has lists (featured snippets)
+    setAeoScore(Math.min(100, aeo))
+
+    // Readability Score (100 points)
     const avg = sentences.length > 0 ? words / sentences.length : 0
     let read = 100
-    if (avg > 25) read -= 30
-    else if (avg > 20) read -= 15
-    if (words < 300) read -= 20
-    setReadabilityScore(Math.max(0, read))
+    if (avg > 30) read -= 30
+    else if (avg > 25) read -= 20
+    else if (avg > 20) read -= 10
+    if (words < 300) read -= 25
+    else if (words < 150) read -= 40
+    const longSentences = sentences.filter(s => s.split(' ').length > 30).length
+    const longPct = sentences.length > 0 ? longSentences / sentences.length : 0
+    if (longPct > 0.3) read -= 15
+    if (paragraphs.length < 3 && words > 200) read -= 10
+    setReadabilityScore(Math.max(0, Math.min(100, read)))
   }
 
   async function fetchSuggestions(kw: string) {
