@@ -17,6 +17,7 @@ const nav = [
       { label: 'Articles', href: '/admin/articles', icon: '▤' },
       { label: 'Media Library', href: '/admin/media', icon: '⊞' },
       { label: 'Categories', href: '/admin/categories', icon: '◉' },
+      { label: 'Pages', href: '/admin/pages', icon: '☷' },
       { label: 'Comments', href: '/admin/comments', icon: '◎', soon: true },
     ]
   },
