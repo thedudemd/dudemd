@@ -18,6 +18,8 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://www.dudemd.com',
     siteName: 'DudeMD',
+    url: 'https://www.dudemd.com',
+    locale: 'en_US',
     title: "DudeMD — Modern Men's Wellness for Real Life",
     description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
     images: [
@@ -28,6 +30,10 @@ export const metadata: Metadata = {
         alt: 'DudeMD — Modern Men\'s Wellness for Real Life',
       },
     ],
+  },
+  other: {
+    'fb:page_id': '849615384891054',
+    'fb:app_id': '849615384891054',
   },
   twitter: {
     card: 'summary_large_image',
