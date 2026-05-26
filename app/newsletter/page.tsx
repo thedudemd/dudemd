@@ -42,7 +42,7 @@ function NewsletterInner() {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
-        await supabase.from('profiles').upsert({ id: session.user.id, full_name: firstName, email })
+        await supabase.from('profiles').upsert({ id: session.user.id, full_name: firstName, email, newsletter_subscribed: true })
       }
     } catch(e) {}
     setStatus('idle')
