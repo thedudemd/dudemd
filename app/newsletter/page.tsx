@@ -78,7 +78,7 @@ function NewsletterInner() {
                 <button type="submit" disabled={status === 'loading'} style={btn}>
                   {status === 'loading' ? 'Checking...' : 'Subscribe Free'}
                 </button>
-                {status === 'error' && <p style={{ fontSize: '13px', color: '#a32d2d' }}>Something went wrong. Try again.</p>}
+                {status === 'error' && <p style={{ fontSize: '13px', color: '#a32d2d' }}>This email is already subscribed. <Link href="/signin" style={{ color: '#0e1a2b', fontWeight: 700 }}>Sign in here.</Link></p>}
               </form>
               <p style={{ fontSize: '12px', color: '#9a9085', marginTop: '1rem' }}>Unsubscribe anytime. No spam, ever.</p>
             </div>
@@ -117,7 +117,7 @@ function NewsletterInner() {
               </form>
               <div style={{ textAlign: 'center', margin: '1rem 0', color: '#9a9085', fontSize: '12px' }}>or</div>
               <Link href={'/signin?from=' + encodeURIComponent(from)} style={{ display: 'block', padding: '0.85rem', textAlign: 'center', border: '1px solid #ede8df', color: '#0e1a2b', textDecoration: 'none', fontWeight: 600, fontSize: '13px' }}>Continue with Google</Link>
-              <button onClick={handleSkip} style={{ display: 'block', width: '100%', marginTop: '0.75rem', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', color: '#9a9085', fontSize: '12px', cursor: 'pointer', textAlign: 'center' }}>Skip for now</button>
+
             </div>
           </div>
         )}
