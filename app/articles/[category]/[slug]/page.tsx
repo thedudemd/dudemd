@@ -9,7 +9,7 @@ export const revalidate = 60
 async function getArticle(slug: string) {
   const { data } = await supabase
     .from('articles')
-    .select('*, authors(name, slug, avatar_url, title), categories(name, slug)')
+    .select('*, authors(name, slug, avatar_url, title, bio, twitter, instagram, linkedin, website), categories(name, slug)')
     .eq('slug', slug)
     .eq('published', true)
     .single()
