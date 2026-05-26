@@ -30,13 +30,18 @@ export async function POST(req: NextRequest) {
 
   const wrapHtml = (innerBody: string, email: string) => `<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #f7f4ee; padding: 2rem;"><div style="text-align: center; margin-bottom: 2rem; border-bottom: 2px solid #c9b28f; padding-bottom: 1.5rem;"><h1 style="font-size: 1.5rem; color: #0e1a2b; margin: 0;">DudeMD</h1><p style="color: #c9b28f; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; margin: 0.25rem 0 0;">Modern Wellness for Real Life</p></div><div style="background: #fff; padding: 2rem; border: 1px solid #ede8df;">${innerBody}</div><p style="text-align: center; font-size: 0.75rem; color: #9a9085; margin-top: 1.5rem;">You subscribed at dudemd.com. <a href="https://www.dudemd.com/unsubscribe?email=${email}" style="color: #9a9085;">Unsubscribe</a></p></div>`
 
-  const batchSize = 50
-  for (let i = 0; i < emails.length; i += batchSize) {
-    const batch = emails.slice(i, i + batchSize)
-    await Promise.all(batch.map(email =>
-      resend.emails.send({ from: 'DudeMD <hello@dudemd.com>', to: email, subject, html: wrapHtml(body, email) })
-    ))
+  const results: any[] = []
+  const errors: any[] = []
+  for (const email of emails) {
+    try {
+      const result = await resend.emails.send({ from: 'DudeMD <hello@dudemd.com>', to: email, subject, html: wrapHtml(body, email) })
+      if (result.error) errors.push({ email, error: result.error })
+      else results.push({ email, id: result.data?.id })
+      await new Promise(r => setTimeout(r, 600))
+    } catch(e: any) {
+      errors.push({ email, error: e.message })
+    }
   }
 
-  return NextResponse.json({ success: true, sent: emails.length })
+  return NextResponse.json({ success: true, sent: results.length, failed: errors.length, errors, results })
 }
