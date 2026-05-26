@@ -39,5 +39,22 @@ export async function POST(req: NextRequest) {
     `
   })
 
+  // Fire Meta pixel server-side conversion event
+  try {
+    await fetch('https://graph.facebook.com/v18.0/214618978894432/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: [{
+          event_name: 'Lead',
+          event_time: Math.floor(Date.now() / 1000),
+          user_data: { em: email },
+          action_source: 'website'
+        }],
+        access_token: process.env.META_CONVERSIONS_API_TOKEN || ''
+      })
+    })
+  } catch(e) {}
+
   return NextResponse.json({ success: true })
 }
