@@ -176,7 +176,7 @@ export default function AccountPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', alignItems: 'center' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
                 <input type="checkbox" checked={profile?.newsletter_subscribed !== false} onChange={handleNewsletterToggle} style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#0e1a2b' }} />
-                <span style={{ color: '#4A5563' }}>Subscribed to DudeMD Newsletter</span>
+                <span style={{ color: '#4A5563' }}>Unsubscribe from Newsletter</span>
               </label>
             </div>
           </div>
