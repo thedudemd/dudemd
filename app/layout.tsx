@@ -83,8 +83,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
           <meta name='facebook-domain-verification' content='at3t423mnp96egxz0gammrzkx46nie' />
-          <meta property='fb:app_id' content='2107832130079548' />
-          <meta property='fb:pages' content='849615384891054' />
         </head>
       <body style={{ backgroundColor: '#f7f4ee', color: '#0e1a2b' }}>
         <script dangerouslySetInnerHTML={{ __html: `
