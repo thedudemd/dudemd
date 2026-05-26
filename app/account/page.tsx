@@ -175,8 +175,8 @@ export default function AccountPage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', alignItems: 'center' }}>
               <span style={{ color: '#4A5563' }}>Newsletter</span>
-              <button onClick={handleNewsletterToggle} style={{ padding: '0.35rem 0.75rem', fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', border: '1px solid #ede8df', backgroundColor: profile?.newsletter_subscribed ? '#e8f5ea' : '#f7f4ee', color: profile?.newsletter_subscribed ? '#2d7a3a' : '#9a9085', cursor: 'pointer' }}>
-                {profile?.newsletter_subscribed ? 'Subscribed ✓' : 'Subscribe'}
+              <button onClick={handleNewsletterToggle} style={{ padding: '0.35rem 0.75rem', fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', border: '1px solid #ede8df', backgroundColor: profile?.newsletter_subscribed !== false ? '#fdecea' : '#e8f5ea', color: profile?.newsletter_subscribed !== false ? '#a32d2d' : '#2d7a3a', cursor: 'pointer' }}>
+                {profile?.newsletter_subscribed !== false ? 'Unsubscribe from Newsletter' : 'Resubscribe to Newsletter'}
               </button>
             </div>
           </div>
