@@ -15,9 +15,9 @@ function getTokenAndUser() {
     if (jar['sb-bicljoujevywrkzjeaoy-auth-token']) {
       raw = jar['sb-bicljoujevywrkzjeaoy-auth-token'].replace('base64-', '')
     } else {
-      const part0 = jar['sb-bicljoujevywrkzjeaoy-auth-token.0'] || ''
-      const part1 = jar['sb-bicljoujevywrkzjeaoy-auth-token.1'] || ''
-      raw = part0.replace('base64-', '') + decodeURIComponent(part1)
+      const p0 = jar['sb-bicljoujevywrkzjeaoy-auth-token.0'] || ''
+      const p1 = jar['sb-bicljoujevywrkzjeaoy-auth-token.1'] || ''
+      raw = p0.replace('base64-', '') + decodeURIComponent(p1)
     }
     const parsed = JSON.parse(atob(raw))
     return { token: parsed.access_token, uid: parsed.user?.id }
@@ -28,15 +28,15 @@ function getTokenAndUser() {
 export default function AccountPage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [showDelete, setShowDelete] = useState(false)
-  const [deleteInput, setDeleteInput] = useState('')
-  const [deleting, setDeleting] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [editing, setEditing] = useState(false)
-  const [form, setForm] = useState({ full_name: '', avatar_url: '' })
   const [auth, setAuth] = useState<any>(null)
+  const [fullName, setFullName] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [deleteInput, setDeleteInput] = useState('')
+  const [showDelete, setShowDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     const a = getTokenAndUser()
@@ -45,7 +45,11 @@ export default function AccountPage() {
     fetch(`${SUPABASE_URL}/rest/v1/profiles?select=*&id=eq.${a.uid}&limit=1`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${a.token}` }
     }).then(r => r.json()).then(data => {
-      if (data?.[0]) { setProfile(data[0]); setForm({ full_name: data[0].full_name || '', avatar_url: data[0].avatar_url || '' }) }
+      if (data?.[0]) {
+        setProfile(data[0])
+        setFullName(data[0].full_name || '')
+        setAvatarUrl(data[0].avatar_url || '')
+      }
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])
@@ -56,16 +60,14 @@ export default function AccountPage() {
     setUploading(true)
     const ext = file.name.split('.').pop()
     const path = `avatars/${auth.uid}.${ext}`
-    const formData = new FormData()
-    formData.append('file', file)
     const res = await fetch(`${SUPABASE_URL}/storage/v1/object/media/${path}`, {
       method: 'POST',
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` },
-      body: formData
+      body: file
     })
     if (res.ok) {
-      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/media/${path}`
-      setForm(f => ({ ...f, avatar_url: publicUrl }))
+      const url = `${SUPABASE_URL}/storage/v1/object/public/media/${path}`
+      setAvatarUrl(url)
     }
     setUploading(false)
   }
@@ -76,46 +78,59 @@ export default function AccountPage() {
     await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
       method: 'PATCH',
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({ full_name: form.full_name, avatar_url: form.avatar_url })
+      body: JSON.stringify({ full_name: fullName, avatar_url: avatarUrl })
     })
-    setProfile({ ...profile, ...form })
+    setProfile({ ...profile, full_name: fullName, avatar_url: avatarUrl })
     setSaving(false)
     setSaved(true)
-    setEditing(false)
     setTimeout(() => setSaved(false), 3000)
+  }
+
+  async function handleUnsubscribe() {
+    await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ newsletter_subscribed: false })
+    })
+    await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${profile.email}`, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ unsubscribed: true })
+    })
+    setProfile({ ...profile, newsletter_subscribed: false })
+  }
+
+  async function handleResubscribe() {
+    await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ newsletter_subscribed: true })
+    })
+    await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${profile.email}`, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ unsubscribed: false })
+    })
+    setProfile({ ...profile, newsletter_subscribed: true })
   }
 
   async function handleDeleteAccount() {
     if (deleteInput !== 'DELETE') return
     setDeleting(true)
-    // Remove from subscribers
     await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${profile.email}`, {
       method: 'DELETE',
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
     })
-    // Delete profile
     await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
       method: 'DELETE',
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
     })
-    // Sign out
-    handleSignOut()
-  }
-
-  async function handleNewsletterToggle() {
-    const newVal = !profile.newsletter_subscribed
-    await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
-      method: 'PATCH',
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({ newsletter_subscribed: newVal })
+    document.cookie.split(';').forEach(c => {
+      const name = c.split('=')[0].trim()
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.dudemd.com`
     })
-    // Also update subscribers table
-    await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${profile.email}`, {
-      method: 'PATCH',
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({ unsubscribed: !newVal })
-    })
-    setProfile({ ...profile, newsletter_subscribed: newVal })
+    window.location.href = '/'
   }
 
   function handleSignOut() {
@@ -124,126 +139,121 @@ export default function AccountPage() {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.dudemd.com`
     })
-    window.location.href = '/signin'
+    window.location.href = '/'
   }
 
   if (loading) return (
-    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f7f4ee' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f7f4ee' }}>
       <div style={{ width: 32, height: 32, border: '3px solid #c9b28f', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
     </div>
   )
 
-  const firstName = profile?.full_name?.split(' ')[0] || 'Member'
-  const inp: any = { width: '100%', padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#f7f4ee', fontFamily: 'inherit' }
+  const firstName = fullName?.split(' ')[0] || 'Member'
+  const inp: any = { width: '100%', padding: '0.85rem', border: '1px solid #ede8df', fontSize: '15px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit', color: '#0e1a2b' }
+  const sectionTitle: any = { fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1.25rem' }
+  const card: any = { backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem', marginBottom: '1.5rem' }
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee' }}>
-      <div style={{ maxWidth: '640px', margin: '0 auto', padding: '3rem 1.5rem' }}>
+      <div style={{ maxWidth: '560px', margin: '0 auto', padding: '3rem 1.5rem' }}>
 
-        {/* HEADER */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid #ede8df' }}>
-          {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt={firstName} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '3px solid #c9b28f' }} />
+        {/* AVATAR + NAME HEADER */}
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <div style={{ position: 'relative', display: 'inline-block', marginBottom: '1rem' }}>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={firstName} style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: '3px solid #c9b28f' }} />
+            ) : (
+              <div style={{ width: 90, height: 90, borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 700, color: '#c9b28f' }}>
+                {firstName.charAt(0).toUpperCase()}
+              </div>
+            )}
+          </div>
+          <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.25rem' }}>{fullName || firstName}</h1>
+          <p style={{ fontSize: '13px', color: '#9a9085', margin: 0 }}>{profile?.email}</p>
+        </div>
+
+        {/* EDIT PROFILE */}
+        <div style={card}>
+          <p style={sectionTitle}>Edit Profile</p>
+          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#4A5563', marginBottom: '0.4rem' }}>Full Name</label>
+              <input style={inp} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#4A5563', marginBottom: '0.75rem' }}>Profile Picture</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="preview" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f', flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: 52, height: 52, borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: 20, fontWeight: 700, color: '#c9b28f' }}>{firstName.charAt(0)}</span>
+                  </div>
+                )}
+                <label style={{ padding: '0.6rem 1.25rem', border: '1px solid #0e1a2b', backgroundColor: '#fff', color: '#0e1a2b', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
+                  {uploading ? 'Uploading...' : 'Upload Photo'}
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} disabled={uploading} />
+                </label>
+              </div>
+            </div>
+            <button type="submit" disabled={saving} style={{ padding: '0.875rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', marginTop: '0.5rem' }}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+            {saved && <p style={{ fontSize: '13px', color: '#2d7a3a', textAlign: 'center', margin: 0 }}>✓ Profile updated successfully.</p>}
+          </form>
+        </div>
+
+        {/* NEWSLETTER */}
+        <div style={card}>
+          <p style={sectionTitle}>Newsletter</p>
+          {profile?.newsletter_subscribed !== false ? (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: '#0e1a2b', margin: '0 0 0.25rem' }}>You're subscribed ✓</p>
+                <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>Weekly men's wellness delivered to your inbox.</p>
+              </div>
+              <button onClick={handleUnsubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid #a32d2d', backgroundColor: '#fff', color: '#a32d2d', fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', flexShrink: 0 }}>
+                Unsubscribe
+              </button>
+            </div>
           ) : (
-            <div style={{ width: 72, height: 72, borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, fontWeight: 700, color: '#c9b28f', flexShrink: 0 }}>
-              {firstName.charAt(0).toUpperCase()}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: '#9a9085', margin: '0 0 0.25rem' }}>Not subscribed</p>
+                <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>Want weekly men's wellness in your inbox?</p>
+              </div>
+              <button onClick={handleResubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid #0e1a2b', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', flexShrink: 0 }}>
+                Subscribe
+              </button>
             </div>
           )}
-          <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: '24px', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.25rem' }}>{profile?.full_name || firstName}</h1>
-            <p style={{ fontSize: '13px', color: '#4A5563', margin: 0 }}>{profile?.email}</p>
-            <p style={{ fontSize: '11px', color: '#9a9085', margin: '0.25rem 0 0', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Member since {new Date(profile?.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
-          </div>
-          <button onClick={() => setEditing(!editing)} style={{ padding: '0.5rem 1rem', border: '1px solid #0e1a2b', backgroundColor: 'transparent', color: '#0e1a2b', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', flexShrink: 0 }}>
-            {editing ? 'Cancel' : 'Edit Profile'}
-          </button>
         </div>
 
-        {/* EDIT FORM */}
-        {editing && (
-          <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem', marginBottom: '1.5rem' }}>
-            <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Edit Profile</p>
-            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4A5563', marginBottom: '0.4rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Full Name</label>
-                <input style={inp} value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} placeholder="Your full name" />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4A5563', marginBottom: '0.4rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Profile Picture</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  {form.avatar_url ? (
-                    <img src={form.avatar_url} alt="preview" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f', flexShrink: 0 }} />
-                  ) : (
-                    <div style={{ width: 60, height: 60, borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <span style={{ fontSize: 24, fontWeight: 700, color: '#c9b28f' }}>{form.full_name?.charAt(0) || '?'}</span>
-                    </div>
-                  )}
-                  <label style={{ padding: '0.6rem 1.25rem', border: '1px solid #0e1a2b', backgroundColor: '#fff', color: '#0e1a2b', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', display: 'inline-block' }}>
-                    {uploading ? 'Uploading...' : 'Upload Photo'}
-                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} disabled={uploading} />
-                  </label>
-                </div>
-              </div>
-              <button type="submit" disabled={saving} style={{ padding: '0.875rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>
-                {saving ? 'Saving...' : 'Save Changes'}
-              </button>
-              {saved && <p style={{ fontSize: '13px', color: '#2d7a3a', textAlign: 'center' }}>Profile updated.</p>}
-            </form>
-          </div>
-        )}
-
-        {/* ACCOUNT DETAILS */}
-        <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem', marginBottom: '1.5rem' }}>
-          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Account Details</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', paddingBottom: '0.75rem', borderBottom: '1px solid #f0ede8' }}>
-              <span style={{ color: '#4A5563' }}>Full Name</span>
-              <span style={{ color: '#0e1a2b', fontWeight: 500 }}>{profile?.full_name || '—'}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', paddingBottom: '0.75rem', borderBottom: '1px solid #f0ede8' }}>
-              <span style={{ color: '#4A5563' }}>Email</span>
-              <span style={{ color: '#0e1a2b', fontWeight: 500 }}>{profile?.email || '—'}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', alignItems: 'center' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                <input type="checkbox" checked={false} onChange={handleNewsletterToggle} style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#0e1a2b' }} />
-                <span style={{ color: '#a32d2d', fontWeight: 600 }}>Unsubscribe from Newsletter</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* COMING SOON */}
-        <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem', marginBottom: '1.5rem' }}>
-          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.5rem' }}>Coming Soon</p>
-          <p style={{ fontSize: '13px', color: '#4A5563', margin: 0, lineHeight: 1.6 }}>Saved articles, personalized feed, membership perks, and more — coming soon to The Dude Community.</p>
-        </div>
+        {/* SIGN OUT */}
+        <button onClick={handleSignOut} style={{ width: '100%', padding: '0.875rem', backgroundColor: 'transparent', border: '1px solid #0e1a2b', color: '#0e1a2b', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: '1rem' }}>
+          Sign Out
+        </button>
 
         {/* DELETE ACCOUNT */}
         {!showDelete ? (
-          <button onClick={() => setShowDelete(true)} style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', border: 'none', color: '#9a9085', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline', marginBottom: '0.5rem' }}>
-            Delete Account
+          <button onClick={() => setShowDelete(true)} style={{ width: '100%', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', color: '#9a9085', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}>
+            Delete My Account
           </button>
         ) : (
-          <div style={{ backgroundColor: '#fff', border: '1px solid #a32d2d', padding: '1.5rem', marginBottom: '1rem' }}>
-            <p style={{ fontSize: '14px', fontWeight: 700, color: '#a32d2d', marginBottom: '0.5rem' }}>Delete Account</p>
-            <p style={{ fontSize: '13px', color: '#4A5563', marginBottom: '1rem', lineHeight: 1.6 }}>This will permanently delete your account, profile, and remove you from our newsletter. This cannot be undone.</p>
-            <p style={{ fontSize: '13px', color: '#0e1a2b', marginBottom: '0.5rem', fontWeight: 600 }}>Type DELETE to confirm:</p>
-            <input style={{ ...inp, marginBottom: '0.75rem', border: '1px solid #a32d2d' }} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} placeholder="DELETE" />
+          <div style={{ ...card, border: '1px solid #a32d2d' }}>
+            <p style={{ fontSize: '14px', fontWeight: 700, color: '#a32d2d', marginBottom: '0.5rem' }}>⚠️ Delete Account</p>
+            <p style={{ fontSize: '13px', color: '#4A5563', marginBottom: '1.25rem', lineHeight: 1.6 }}>This permanently deletes your account and removes you from our newsletter. This cannot be undone.</p>
+            <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.5rem' }}>Type DELETE to confirm:</p>
+            <input style={{ ...inp, border: '1px solid #a32d2d', marginBottom: '1rem' }} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} placeholder="DELETE" />
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button onClick={() => { setShowDelete(false); setDeleteInput('') }} style={{ flex: 1, padding: '0.75rem', border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={handleDeleteAccount} disabled={deleteInput !== 'DELETE' || deleting} style={{ flex: 1, padding: '0.75rem', backgroundColor: deleteInput === 'DELETE' ? '#a32d2d' : '#f0ede8', color: deleteInput === 'DELETE' ? '#fff' : '#9a9085', border: 'none', fontWeight: 700, fontSize: '12px', cursor: deleteInput === 'DELETE' ? 'pointer' : 'not-allowed', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              <button onClick={() => { setShowDelete(false); setDeleteInput('') }} style={{ flex: 1, padding: '0.75rem', border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={handleDeleteAccount} disabled={deleteInput !== 'DELETE' || deleting} style={{ flex: 1, padding: '0.75rem', backgroundColor: deleteInput === 'DELETE' ? '#a32d2d' : '#f0ede8', color: deleteInput === 'DELETE' ? '#fff' : '#9a9085', border: 'none', fontWeight: 700, fontSize: '13px', cursor: deleteInput === 'DELETE' ? 'pointer' : 'not-allowed' }}>
                 {deleting ? 'Deleting...' : 'Delete Forever'}
               </button>
             </div>
           </div>
         )}
-
-        {/* SIGN OUT */}
-        <button onClick={handleSignOut} style={{ width: '100%', padding: '0.875rem', backgroundColor: 'transparent', border: '1px solid rgba(163,45,45,0.4)', color: '#a32d2d', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
-          Sign Out
-        </button>
       </div>
     </div>
   )
