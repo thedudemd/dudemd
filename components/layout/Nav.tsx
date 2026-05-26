@@ -71,9 +71,15 @@ export default function Nav() {
           const eq = c.indexOf('=')
           jar[c.substring(0, eq).trim()] = c.substring(eq + 1).trim()
         })
-        const part0 = jar['sb-bicljoujevywrkzjeaoy-auth-token.0'] || ''
-        const part1 = jar['sb-bicljoujevywrkzjeaoy-auth-token.1'] || ''
-        const raw = part0.replace('base64-', '') + decodeURIComponent(part1)
+        // Support both single cookie and split cookie formats
+        let raw = ''
+        if (jar['sb-bicljoujevywrkzjeaoy-auth-token']) {
+          raw = jar['sb-bicljoujevywrkzjeaoy-auth-token'].replace('base64-', '')
+        } else {
+          const part0 = jar['sb-bicljoujevywrkzjeaoy-auth-token.0'] || ''
+          const part1 = jar['sb-bicljoujevywrkzjeaoy-auth-token.1'] || ''
+          raw = part0.replace('base64-', '') + decodeURIComponent(part1)
+        }
         const parsed = JSON.parse(atob(raw))
         const token = parsed.access_token
         const uid = parsed.user?.id
