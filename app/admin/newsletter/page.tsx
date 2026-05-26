@@ -43,7 +43,7 @@ export default function NewsletterAdmin() {
   async function handleSend() {
     if (!subject) return alert('Subject required')
     if (!emailEditorRef.current) return
-    emailEditorRef.current.exportHtml(async ({ html }) => {
+    emailEditorRef.current.editor.exportHtml(async ({ html }) => {
       if (!confirm(`Send to ${audienceCount} subscribers?`)) return
       setSending(true)
       const res = await fetch('/api/newsletter/send', {
