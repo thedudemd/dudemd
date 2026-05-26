@@ -48,6 +48,7 @@ export default function AdminDashboard() {
             <Link href="/admin/articles/new" style={{ display: 'block', padding: '0.6rem 1rem', textDecoration: 'none', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'center', backgroundColor: '#c9b28f', color: '#0e1a2b' }}>+ New Article</Link>
             <Link href="/admin/media" style={{ display: 'block', padding: '0.6rem 1rem', textDecoration: 'none', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'center', backgroundColor: 'rgba(247,244,238,0.06)', color: 'rgba(247,244,238,0.55)', border: '1px solid rgba(247,244,238,0.08)' }}>Upload Media</Link>
             <Link href="/admin/flags" style={{ display: 'block', padding: '0.6rem 1rem', textDecoration: 'none', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'center', backgroundColor: 'rgba(247,244,238,0.06)', color: 'rgba(247,244,238,0.55)', border: '1px solid rgba(247,244,238,0.08)' }}>Feature Flags</Link>
+            <Link href="/admin/authors" style={{ display: 'block', padding: '0.6rem 1rem', textDecoration: 'none', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'center', backgroundColor: 'rgba(247,244,238,0.06)', color: 'rgba(247,244,238,0.55)', border: '1px solid rgba(247,244,238,0.08)' }}>Authors</Link>
           </div>
         </div>
       </div>
