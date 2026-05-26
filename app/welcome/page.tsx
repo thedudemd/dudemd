@@ -9,18 +9,21 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 function getTokenFromCookie(): string | null {
   try {
-    const cookies = document.cookie.split(';')
-    for (const cookie of cookies) {
-      const eqIdx = cookie.indexOf('=')
-      const name = cookie.substring(0, eqIdx).trim()
-      const value = cookie.substring(eqIdx + 1).trim()
-      if (name === 'sb-bicljoujevywrkzjeaoy-auth-token.0') {
-        const clean = value.replace('base64-', '')
-        const decoded = atob(clean)
-        const parsed = JSON.parse(decoded)
-        return parsed.access_token || null
-      }
+    const jar: Record<string, string> = {}
+    document.cookie.split(';').forEach(c => {
+      const eq = c.indexOf('=')
+      jar[c.substring(0, eq).trim()] = c.substring(eq + 1).trim()
+    })
+    let raw = ''
+    if (jar['sb-bicljoujevywrkzjeaoy-auth-token']) {
+      raw = jar['sb-bicljoujevywrkzjeaoy-auth-token'].replace('base64-', '')
+    } else {
+      const part0 = jar['sb-bicljoujevywrkzjeaoy-auth-token.0'] || ''
+      const part1 = jar['sb-bicljoujevywrkzjeaoy-auth-token.1'] || ''
+      raw = part0.replace('base64-', '') + decodeURIComponent(part1)
     }
+    const parsed = JSON.parse(atob(raw))
+    return parsed.access_token || null
   } catch (e) {
     console.error('Cookie parse error:', e)
   }
