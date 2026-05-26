@@ -9,8 +9,12 @@ export async function POST(req: NextRequest) {
   const { email } = await req.json()
   if (!email) return NextResponse.json({ error: 'Email required' }, { status: 400 })
 
+  // Check if already subscribed
+  const { data: existing } = await supabase.from('subscribers').select('email').eq('email', email).single()
+  if (existing) return NextResponse.json({ exists: true }, { status: 200 })
+
   const { error } = await supabase.from('subscribers').insert({ email, source: 'newsletter_page' })
-  if (error && error.code !== '23505') return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   await resend.emails.send({
     from: 'DudeMD <hello@dudemd.com>',

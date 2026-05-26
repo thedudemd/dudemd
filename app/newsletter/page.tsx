@@ -39,6 +39,8 @@ function NewsletterInner() {
       body: JSON.stringify({ email })
     })
 
+    const data = await res.json()
+    if (data.exists) { setStep('existing'); setStatus('idle'); return }
     if (!res.ok) { setStatus('error'); return }
 
     setStep('success')
