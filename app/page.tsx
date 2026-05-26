@@ -1,6 +1,7 @@
 // @ts-nocheck
 import type { Metadata } from 'next'
 import GoogleOneTap from "@/components/auth/GoogleOneTap"
+import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcome"
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 
