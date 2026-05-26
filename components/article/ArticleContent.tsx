@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 
 export default function ArticleContent({ article, slug, category }: { article: any, slug: string, category: string }) {
@@ -13,6 +13,36 @@ export default function ArticleContent({ article, slug, category }: { article: a
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
+
+  useEffect(() => {
+    // Page view
+    try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event_type: 'view', article_slug: slug, category_slug: category }) }) } catch(e) {}
+
+    // Scroll depth
+    const checkpoints = { 25: false, 50: false, 75: false, 100: false }
+    function onScroll() {
+      const el = document.documentElement
+      const pct = Math.round((el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100)
+      for (const [depth, fired] of Object.entries(checkpoints)) {
+        if (!fired && pct >= Number(depth)) {
+          checkpoints[Number(depth)] = true
+          try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event_type: `scroll_${depth}`, article_slug: slug, category_slug: category }) }) } catch(e) {}
+        }
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+
+    // Time on page
+    const start = Date.now()
+    function onExit() {
+      const seconds = Math.round((Date.now() - start) / 1000)
+      if (seconds > 10) {
+        try { navigator.sendBeacon('/api/personalization/score', JSON.stringify({ event_type: 'time_on_page', article_slug: slug, category_slug: category, metadata: { seconds } })) } catch(e) {}
+      }
+    }
+    window.addEventListener('beforeunload', onExit)
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('beforeunload', onExit) }
+  }, [slug, category])
 
   const btn: any = { display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.25rem', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '13px', textDecoration: 'none', flexShrink: 0 }
 
