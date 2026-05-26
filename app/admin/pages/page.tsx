@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
+import RichTextEditor from '@/components/admin/RichTextEditor'
 
 export default function PagesAdmin() {
   const [pages, setPages] = useState<any[]>([])
@@ -150,8 +151,8 @@ export default function PagesAdmin() {
               </div>
 
               <div style={{ marginBottom: '1rem' }}>
-                <label style={lbl}>Content (HTML supported)</label>
-                <textarea style={{ ...inp, minHeight: 280, resize: 'vertical', fontFamily: 'monospace' }} value={editing.content || ''} onChange={e => setEditing({ ...editing, content: e.target.value })} placeholder="<h1>About Us</h1><p>Write your content here. HTML tags work.</p>" />
+                <label style={lbl}>Content</label>
+                <RichTextEditor content={editing.content || ''} onChange={html => setEditing({ ...editing, content: html })} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
