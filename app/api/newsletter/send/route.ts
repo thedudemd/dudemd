@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
   let emails: string[] = []
 
-  if (!segment || segment === 'all') {
+  if (!segment || segment === 'all' || segment === '') {
     const { data } = await supabase.from('subscribers').select('email').eq('unsubscribed', false)
     emails = (data || []).map(s => s.email)
   } else {
