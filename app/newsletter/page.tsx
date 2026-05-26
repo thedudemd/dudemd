@@ -38,9 +38,14 @@ function NewsletterInner() {
     const supabase = createClient()
     const { error } = await supabase.auth.signUp({ email, password })
     if (error) { setStatus('error'); return }
+    
+    // Sign in immediately after signup to set session
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    if (signInError) { setStatus('error'); return }
+    
     setStatus('idle')
-    setTimeout(() => router.push(from), 1500)
     setStep('done')
+    setTimeout(() => { window.location.href = from }, 1500)
   }
 
   async function handleSkip() {
