@@ -77,7 +77,18 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     "image": article.cover_image_url,
     "datePublished": article.published_at,
     "dateModified": article.updated_at || article.published_at,
-    "author": { "@type": "Person", "name": article.authors?.name },
+    "author": {
+      "@type": "Person",
+      "name": article.authors?.name,
+      "url": article.authors?.website || `https://www.dudemd.com/author/${article.authors?.slug}`,
+      "image": article.authors?.avatar_url,
+      "jobTitle": article.authors?.title,
+      "sameAs": [
+        article.authors?.twitter,
+        article.authors?.instagram,
+        article.authors?.linkedin
+      ].filter(Boolean)
+    },
     "publisher": {
       "@type": "Organization",
       "name": "DudeMD",
