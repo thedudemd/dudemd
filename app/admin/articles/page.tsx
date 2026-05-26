@@ -5,6 +5,38 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
 
+function calcSeoScore(a: any) {
+  const content = a.content || ''
+  const words = content.replace(/<[^>]+>/g, '').split(/\s+/).filter(Boolean).length
+  let seo = 0
+  if (a.title?.length >= 30 && a.title?.length <= 65) seo += 15; else if (a.title?.length > 0) seo += 7
+  if (a.meta_title?.length >= 30 && a.meta_title?.length <= 65) seo += 15; else if (a.meta_title?.length > 0) seo += 7
+  if (a.meta_description?.length >= 120 && a.meta_description?.length <= 160) seo += 15; else if (a.meta_description?.length > 0) seo += 7
+  if (words >= 800) seo += 15; else if (words >= 300) seo += 8
+  if (a.excerpt?.length > 50) seo += 10
+  if (content.includes('<h2')) seo += 10
+  if (content.includes('<h3')) seo += 5
+  if (content.includes('<a ')) seo += 10
+  if (content.includes('<img')) seo += 5
+  return Math.min(100, seo)
+}
+
+function calcAeoScore(a: any) {
+  const content = a.content || ''
+  const words = content.replace(/<[^>]+>/g, '').split(/\s+/).filter(Boolean).length
+  const tl = (a.title || '').toLowerCase()
+  let aeo = 0
+  const qWords = ['?','how','what','why','when','where','who','which','best','top','vs','guide','tips','ways']
+  aeo += Math.min(20, qWords.filter(w => tl.includes(w)).length * 5)
+  if (content.includes('?')) aeo += 15
+  if (words >= 800) aeo += 20; else if (words >= 400) aeo += 10
+  if (a.excerpt?.length >= 100) aeo += 15; else if (a.excerpt?.length > 0) aeo += 7
+  if (content.includes('<h2') && content.includes('<h3')) aeo += 15; else if (content.includes('<h2')) aeo += 8
+  const lists = (content.match(/<li/g) || []).length
+  if (lists >= 3) aeo += 15
+  return Math.min(100, aeo)
+}
+
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<any[]>([])
   const [filter, setFilter] = useState('all')
@@ -61,7 +93,7 @@ export default function ArticlesPage() {
           ))}
         </div>
         <div style={{ backgroundColor: '#fff', border: '1px solid #e8e4de' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', gap: '1rem', padding: '0.75rem 1.5rem', borderBottom: '2px solid #e8e4de', backgroundColor: '#f7f4ee' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr', gap: '1rem', padding: '0.75rem 1.5rem', borderBottom: '2px solid #e8e4de', backgroundColor: '#f7f4ee' }}>
             {['Title', 'Category', 'Author', 'Status', 'Actions'].map(h => (
               <span key={h} style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085' }}>{h}</span>
             ))}
@@ -72,7 +104,7 @@ export default function ArticlesPage() {
               <Link href="/admin/articles/new" style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', backgroundColor: '#c9b28f', padding: '0.625rem 1.25rem', textDecoration: 'none' }}>Write your first article</Link>
             </div>
           ) : filtered.map((a, i) => (
-            <div key={a.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', gap: '1rem', padding: '1rem 1.5rem', borderBottom: i < filtered.length - 1 ? '1px solid #f0ede8' : 'none', alignItems: 'center' }}>
+            <div key={a.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr', gap: '1rem', padding: '1rem 1.5rem', borderBottom: i < filtered.length - 1 ? '1px solid #f0ede8' : 'none', alignItems: 'center' }}>
               <div>
                 <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', margin: 0, marginBottom: '0.2rem' }}>{a.title}</p>
                 <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>{a.slug}</p>
@@ -82,6 +114,10 @@ export default function ArticlesPage() {
               <span style={{ fontSize: '10px', fontWeight: 700, color: a.status === 'published' ? '#2d7a3a' : a.status === 'review' ? '#d4820a' : '#9a9085', backgroundColor: a.status === 'published' ? '#e8f5ea' : a.status === 'review' ? '#fef3e2' : '#f0ede8', padding: '0.25rem 0.5rem', display: 'inline-block', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                 {a.status || 'draft'}
               </span>
+              <div style={{ display: 'flex', gap: '0.4rem' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, padding: '0.2rem 0.4rem', backgroundColor: calcSeoScore(a) >= 70 ? '#e8f5ea' : calcSeoScore(a) >= 40 ? '#fef3e2' : '#fdecea', color: calcSeoScore(a) >= 70 ? '#2d7a3a' : calcSeoScore(a) >= 40 ? '#d4820a' : '#c0392b' }}>SEO {calcSeoScore(a)}</span>
+                <span style={{ fontSize: '10px', fontWeight: 700, padding: '0.2rem 0.4rem', backgroundColor: calcAeoScore(a) >= 70 ? '#e8f5ea' : calcAeoScore(a) >= 40 ? '#fef3e2' : '#fdecea', color: calcAeoScore(a) >= 70 ? '#2d7a3a' : calcAeoScore(a) >= 40 ? '#d4820a' : '#c0392b' }}>AEO {calcAeoScore(a)}</span>
+              </div>
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                 <Link href={`/admin/articles/${a.slug}`} style={{ fontSize: '12px', fontWeight: 600, color: '#0e1a2b', textDecoration: 'none' }}>Edit</Link>
                 <a href={`/articles/${a.slug}`} target="_blank" style={{ fontSize: '12px', fontWeight: 600, color: '#c9b28f', textDecoration: 'none' }}>View</a>
