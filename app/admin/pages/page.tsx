@@ -121,7 +121,7 @@ export default function PagesAdmin() {
         {/* EDITOR MODAL */}
         {editing && (
           <div onClick={() => !saving && setEditing(null)} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '2rem', overflowY: 'auto' }}>
-            <div onClick={e => e.stopPropagation()} style={{ backgroundColor: '#fff', maxWidth: '760px', width: '100%', padding: '2rem', position: 'relative', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div onClick={e => e.stopPropagation()} style={{ backgroundColor: '#fff', maxWidth: '1200px', width: '100%', padding: '2.5rem', position: 'relative', maxHeight: '95vh', overflowY: 'auto' }}>
               <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '1.5rem' }}>{creating ? 'New Page' : 'Edit Page'}</h2>
 
               <div style={{ marginBottom: '1rem' }}>
