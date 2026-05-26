@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import EditProfileButton from './EditProfileButton'
 import type { Metadata } from 'next'
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -67,6 +68,7 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
                 {author.instagram && <a href={author.instagram} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', fontWeight: 700, color: '#c9b28f', textDecoration: 'none', letterSpacing: '0.08em' }}>Instagram ↗</a>}
                 {author.linkedin && <a href={author.linkedin} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', fontWeight: 700, color: '#c9b28f', textDecoration: 'none', letterSpacing: '0.08em' }}>LinkedIn ↗</a>}
                 {author.website && <a href={author.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', fontWeight: 700, color: '#c9b28f', textDecoration: 'none', letterSpacing: '0.08em' }}>Website ↗</a>}
+              <EditProfileButton authorId={author.id} />
               </div>
             </div>
           </div>
