@@ -41,6 +41,11 @@ export const metadata: Metadata = {
     description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
     images: ['/og-image.png'],
   },
+  verification: {
+    other: {
+      'fb:app_id': ['2107832130079548'],
+    },
+  },
   robots: {
     index: true,
     follow: true,
