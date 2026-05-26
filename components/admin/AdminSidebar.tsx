@@ -23,7 +23,7 @@ const nav = [
   {
     group: 'Audience',
     items: [
-      { label: 'Readers', href: '/admin/readers', icon: '⊙', soon: true },
+      { label: 'Audience', href: '/admin/audience', icon: '⊙' },
       { label: 'Subscribers', href: '/admin/subscribers', icon: '◈' },
       { label: 'Engagement', href: '/admin/engagement', icon: '▲' },
       { label: 'Newsletter', href: '/admin/newsletter', icon: '◻' },
