@@ -18,8 +18,6 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://www.dudemd.com',
     siteName: 'DudeMD',
-    url: 'https://www.dudemd.com',
-    locale: 'en_US',
     title: "DudeMD — Modern Men's Wellness for Real Life",
     description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
     images: [
@@ -96,6 +94,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]) }}
         />
+        <meta property="fb:app_id" content="2107832130079548" />
+        <meta property="fb:pages" content="849615384891054" />
         <Nav />
         <GoogleOneTap />
         <main className="min-h-screen">{children}</main>
