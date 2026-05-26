@@ -86,10 +86,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </head>
       <body style={{ backgroundColor: '#f7f4ee', color: '#0e1a2b' }}>
         <script dangerouslySetInnerHTML={{ __html: `
-          fbq('init', '214618978894432');
+          fbq('init', '2107832130079548');
           fbq('track', 'PageView');
         ` }} />
-        <noscript dangerouslySetInnerHTML={{ __html: '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=214618978894432&ev=PageView&noscript=1"/>' }} />
+        <noscript dangerouslySetInnerHTML={{ __html: '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2107832130079548&ev=PageView&noscript=1"/>' }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]) }}
