@@ -172,7 +172,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 600, color: '#0e1a2b', margin: 0 }}>
                   {article.authors?.slug ? (
-                    <Link href={`/authors/${article.authors.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{article.authors.name}</Link>
+                    <Link href={`/authors/${article.authors.slug}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{article.authors.name}</Link>
                   ) : article.authors?.name}
                 </p>
                 <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>{new Date(article.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
@@ -197,10 +197,18 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.5rem' }}>About the Author</p>
               <p style={{ fontSize: '15px', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.25rem' }}>
                 {article.authors?.slug ? (
-                  <Link href={`/authors/${article.authors.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{article.authors.name}</Link>
+                  <Link href={`/authors/${article.authors.slug}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{article.authors.name}</Link>
                 ) : article.authors?.name}
               </p>
-              <p style={{ fontSize: '14px', color: '#4A5563', lineHeight: 1.6, margin: 0 }}>Contributing writer at DudeMD.</p>
+              {article.authors?.title && <p style={{ fontSize: '13px', color: '#9a9085', marginBottom: '0.5rem' }}>{article.authors.title}</p>}
+              {article.authors?.bio && <p style={{ fontSize: '14px', color: '#4A5563', lineHeight: 1.6, marginBottom: '0.75rem' }}>{article.authors.bio}</p>}
+              {!article.authors?.bio && <p style={{ fontSize: '14px', color: '#4A5563', lineHeight: 1.6, marginBottom: '0.75rem' }}>Contributing writer at DudeMD.</p>}
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                {article.authors?.twitter && <a href={article.authors.twitter} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', fontWeight: 700, color: '#0e1a2b', textDecoration: 'none' }}>𝕏 Twitter</a>}
+                {article.authors?.instagram && <a href={article.authors.instagram} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', fontWeight: 700, color: '#0e1a2b', textDecoration: 'none' }}>Instagram</a>}
+                {article.authors?.linkedin && <a href={article.authors.linkedin} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', fontWeight: 700, color: '#0e1a2b', textDecoration: 'none' }}>LinkedIn</a>}
+                {article.authors?.website && <a href={article.authors.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: '12px', fontWeight: 700, color: '#0e1a2b', textDecoration: 'none' }}>Website</a>}
+              </div>
             </div>
           </article>
 
