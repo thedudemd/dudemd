@@ -58,6 +58,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
     other: {
       'fb:app_id': ['2107832130079548'],
       'fb:pages': ['849615384891054'],
+      'article:publisher': ['https://www.facebook.com/MyDudeMD'],
     },
     twitter: {
       card: 'summary_large_image',
