@@ -2,6 +2,7 @@
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/auth/supabase-auth'
 
 function NewsletterInner() {
   const [email, setEmail] = useState('')
