@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   let emails: string[] = []
 
   if (!segment || segment === 'all' || segment === '') {
-    const { data } = await supabase.from('subscribers').select('email').eq('unsubscribed', false)
+    const { data } = await supabase.from('subscribers').select('email').is('unsubscribed', null).or('unsubscribed.eq.false')
     emails = (data || []).map(s => s.email)
   } else {
     // Get user_ids with score > 0 for this category
