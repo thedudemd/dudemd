@@ -171,7 +171,7 @@ export default function Nav() {
         .hero-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 900px) { .hero-grid { grid-template-columns: 2fr 1fr; gap: 3rem; } }
         .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
-        .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 22rem; background: #0e1a2b; z-index: 50; transform: translateX(100%); transition: transform 0.3s ease; overflow-y: auto; }
+        .drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 100%; max-width: 22rem; background: #0e1a2b; z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
         .drawer.open { transform: translateX(0); }
         .drawer-item { border-bottom: 1px solid rgba(255,255,255,0.1); }
         .drawer-cat-header { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.5rem; cursor: pointer; }
