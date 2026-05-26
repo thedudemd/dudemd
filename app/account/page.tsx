@@ -149,7 +149,7 @@ export default function AccountPage() {
                 <input style={inp} value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} placeholder="Your full name" />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4A5563', marginBottom: '0.4rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Avatar URL (optional)</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4A5563', marginBottom: '0.4rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Profile Picture URL (optional)</label>
                 <input style={inp} value={form.avatar_url} onChange={e => setForm({...form, avatar_url: e.target.value})} placeholder="https://..." />
                 {form.avatar_url && <img src={form.avatar_url} alt="preview" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', marginTop: '0.5rem', border: '2px solid #c9b28f' }} />}
               </div>
@@ -174,10 +174,10 @@ export default function AccountPage() {
               <span style={{ color: '#0e1a2b', fontWeight: 500 }}>{profile?.email || '—'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', alignItems: 'center' }}>
-              <span style={{ color: '#4A5563' }}>Newsletter</span>
-              <button onClick={handleNewsletterToggle} style={{ padding: '0.35rem 0.75rem', fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', border: '1px solid #ede8df', backgroundColor: profile?.newsletter_subscribed !== false ? '#fdecea' : '#e8f5ea', color: profile?.newsletter_subscribed !== false ? '#a32d2d' : '#2d7a3a', cursor: 'pointer' }}>
-                {profile?.newsletter_subscribed !== false ? 'Unsubscribe from Newsletter' : 'Resubscribe to Newsletter'}
-              </button>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <input type="checkbox" checked={profile?.newsletter_subscribed !== false} onChange={handleNewsletterToggle} style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#0e1a2b' }} />
+                <span style={{ color: '#4A5563' }}>Subscribed to DudeMD Newsletter</span>
+              </label>
             </div>
           </div>
         </div>
