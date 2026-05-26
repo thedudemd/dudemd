@@ -179,10 +179,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
 
-            <ShareButtons title={article.title} slug={slug} categorySlug={article.categories?.slug || ''} />
-            <div style={{ fontSize: '16px', color: '#1B1D21', lineHeight: 1.8, marginTop: '2rem' }} dangerouslySetInnerHTML={{ __html: article.content || '' }} />
+            <div style={{ fontSize: '16px', color: '#1B1D21', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: article.content || '' }} />
 
-            <ShareButtons title={article.title} slug={slug} categorySlug={article.categories?.slug || ''} />
             {article.faq_items && article.faq_items.length > 0 && (
               <div style={{ marginTop: '3rem', padding: '2rem', backgroundColor: '#f7f4ee', borderRadius: '8px' }}>
                 <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '1.5rem' }}>Frequently Asked Questions</h2>
