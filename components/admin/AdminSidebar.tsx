@@ -26,7 +26,7 @@ const nav = [
       { label: 'Readers', href: '/admin/readers', icon: '⊙', soon: true },
       { label: 'Subscribers', href: '/admin/subscribers', icon: '◈' },
       { label: 'Engagement', href: '/admin/engagement', icon: '▲' },
-      { label: 'Newsletter', href: '/admin/newsletter', icon: '◻', soon: true },
+      { label: 'Newsletter', href: '/admin/newsletter', icon: '◻' },
     ]
   },
   {

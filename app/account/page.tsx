@@ -29,6 +29,9 @@ export default function AccountPage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [showDelete, setShowDelete] = useState(false)
+  const [deleteInput, setDeleteInput] = useState('')
+  const [deleting, setDeleting] = useState(false)
   const [saved, setSaved] = useState(false)
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ full_name: '', avatar_url: '' })
@@ -59,6 +62,39 @@ export default function AccountPage() {
     setSaved(true)
     setEditing(false)
     setTimeout(() => setSaved(false), 3000)
+  }
+
+  async function handleDeleteAccount() {
+    if (deleteInput !== 'DELETE') return
+    setDeleting(true)
+    // Remove from subscribers
+    await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${profile.email}`, {
+      method: 'DELETE',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+    })
+    // Delete profile
+    await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
+      method: 'DELETE',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+    })
+    // Sign out
+    handleSignOut()
+  }
+
+  async function handleNewsletterToggle() {
+    const newVal = !profile.newsletter_subscribed
+    await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ newsletter_subscribed: newVal })
+    })
+    // Also update subscribers table
+    await fetch(`${SUPABASE_URL}/rest/v1/subscribers?email=eq.${profile.email}`, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ unsubscribed: !newVal })
+    })
+    setProfile({ ...profile, newsletter_subscribed: newVal })
   }
 
   function handleSignOut() {
@@ -137,9 +173,11 @@ export default function AccountPage() {
               <span style={{ color: '#4A5563' }}>Email</span>
               <span style={{ color: '#0e1a2b', fontWeight: 500 }}>{profile?.email || '—'}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', alignItems: 'center' }}>
               <span style={{ color: '#4A5563' }}>Newsletter</span>
-              <span style={{ color: profile?.newsletter_subscribed ? '#2d7a3a' : '#9a9085', fontWeight: 500 }}>{profile?.newsletter_subscribed ? 'Subscribed' : 'Not subscribed'}</span>
+              <button onClick={handleNewsletterToggle} style={{ padding: '0.35rem 0.75rem', fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', border: '1px solid #ede8df', backgroundColor: profile?.newsletter_subscribed ? '#e8f5ea' : '#f7f4ee', color: profile?.newsletter_subscribed ? '#2d7a3a' : '#9a9085', cursor: 'pointer' }}>
+                {profile?.newsletter_subscribed ? 'Subscribed ✓' : 'Subscribe'}
+              </button>
             </div>
           </div>
         </div>
@@ -149,6 +187,26 @@ export default function AccountPage() {
           <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.5rem' }}>Coming Soon</p>
           <p style={{ fontSize: '13px', color: '#4A5563', margin: 0, lineHeight: 1.6 }}>Saved articles, personalized feed, membership perks, and more — coming soon to The Dude Community.</p>
         </div>
+
+        {/* DELETE ACCOUNT */}
+        {!showDelete ? (
+          <button onClick={() => setShowDelete(true)} style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', border: 'none', color: '#9a9085', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline', marginBottom: '0.5rem' }}>
+            Delete Account
+          </button>
+        ) : (
+          <div style={{ backgroundColor: '#fff', border: '1px solid #a32d2d', padding: '1.5rem', marginBottom: '1rem' }}>
+            <p style={{ fontSize: '14px', fontWeight: 700, color: '#a32d2d', marginBottom: '0.5rem' }}>Delete Account</p>
+            <p style={{ fontSize: '13px', color: '#4A5563', marginBottom: '1rem', lineHeight: 1.6 }}>This will permanently delete your account, profile, and remove you from our newsletter. This cannot be undone.</p>
+            <p style={{ fontSize: '13px', color: '#0e1a2b', marginBottom: '0.5rem', fontWeight: 600 }}>Type DELETE to confirm:</p>
+            <input style={{ ...inp, marginBottom: '0.75rem', border: '1px solid #a32d2d' }} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} placeholder="DELETE" />
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button onClick={() => { setShowDelete(false); setDeleteInput('') }} style={{ flex: 1, padding: '0.75rem', border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={handleDeleteAccount} disabled={deleteInput !== 'DELETE' || deleting} style={{ flex: 1, padding: '0.75rem', backgroundColor: deleteInput === 'DELETE' ? '#a32d2d' : '#f0ede8', color: deleteInput === 'DELETE' ? '#fff' : '#9a9085', border: 'none', fontWeight: 700, fontSize: '12px', cursor: deleteInput === 'DELETE' ? 'pointer' : 'not-allowed', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                {deleting ? 'Deleting...' : 'Delete Forever'}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* SIGN OUT */}
         <button onClick={handleSignOut} style={{ width: '100%', padding: '0.875rem', backgroundColor: 'transparent', border: '1px solid rgba(163,45,45,0.4)', color: '#a32d2d', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
