@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   other: {
     'fb:page_id': '849615384891054',
-    'fb:app_id': '849615384891054',
+    'fb:app_id': '2107832130079548',
   },
   twitter: {
     card: 'summary_large_image',
