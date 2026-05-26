@@ -25,7 +25,7 @@ const nav = [
     items: [
       { label: 'Audience', href: '/admin/audience', icon: '⊙' },
       { label: 'Subscribers', href: '/admin/subscribers', icon: '◈' },
-      { label: 'Engagement', href: '/admin/engagement', icon: '▲' },
+      { label: 'Analytics', href: '/admin/analytics', icon: '▲' },
       { label: 'Newsletter', href: '/admin/newsletter', icon: '◻' },
     ]
   },
