@@ -59,6 +59,7 @@ const nav = [
     items: [
       { label: 'Feature Controls', href: '/admin/flags', icon: '⊛' },
       { label: 'Writers & Roles', href: '/admin/writers', icon: '◈' },
+      { label: 'Authors', href: '/admin/authors', icon: '◎' },
       { label: 'Settings', href: '/admin/settings', icon: '◎' },
       { label: 'Audit Log', href: '/admin/audit', icon: '▤', soon: true },
     ]
