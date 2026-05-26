@@ -1,22 +1,44 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/auth/supabase-auth'
 
-export default function NewsletterPage() {
+function NewsletterInner() {
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState('idle')
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const from = searchParams.get('from') || '/'
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e) {
     e.preventDefault()
     if (!email) return
     setStatus('loading')
-    const res = await fetch('/api/newsletter/subscribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    })
-    if (res.ok) setStatus('success')
-    else setStatus('error')
+
+    try {
+      const supabase = createClient()
+
+      // Sign up / sign in (creates account if not exists)
+      await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: true }
+      })
+
+      // Save to subscribers table
+      await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+
+      setStatus('success')
+
+      // Redirect after 3 seconds
+      setTimeout(() => router.push(from), 3000)
+    } catch(e) {
+      setStatus('error')
+    }
   }
 
   return (
@@ -43,7 +65,7 @@ export default function NewsletterPage() {
             <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.75rem' }}>You are In.</h2>
             <p style={{ fontSize: '1.1rem', color: '#4A5563', lineHeight: 1.65 }}>Welcome to the DudeMD Community.</p>
             <p style={{ fontSize: '0.9rem', color: '#9a9085', marginTop: '0.5rem' }}>Check your inbox for a welcome email.</p>
-            <Link href="/" style={{ display: 'inline-block', marginTop: '2rem', padding: '0.75rem 1.5rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', textDecoration: 'none', fontWeight: 700, fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Read Latest Articles</Link>
+            <p style={{ fontSize: '0.85rem', color: '#c9b28f', marginTop: '1rem' }}>Taking you back in a moment...</p>
           </div>
         ) : (
           <div style={{ textAlign: 'center' }}>
@@ -78,4 +100,8 @@ export default function NewsletterPage() {
       </div>
     </main>
   )
+}
+
+export default function NewsletterPage() {
+  return <Suspense><NewsletterInner /></Suspense>
 }
