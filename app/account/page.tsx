@@ -32,6 +32,7 @@ export default function AccountPage() {
   const [showDelete, setShowDelete] = useState(false)
   const [deleteInput, setDeleteInput] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [saved, setSaved] = useState(false)
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ full_name: '', avatar_url: '' })
@@ -48,6 +49,26 @@ export default function AccountPage() {
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !auth) return
+    setUploading(true)
+    const ext = file.name.split('.').pop()
+    const path = `avatars/${auth.uid}.${ext}`
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/media/${path}`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` },
+      body: formData
+    })
+    if (res.ok) {
+      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/media/${path}`
+      setForm(f => ({ ...f, avatar_url: publicUrl }))
+    }
+    setUploading(false)
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -149,9 +170,20 @@ export default function AccountPage() {
                 <input style={inp} value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} placeholder="Your full name" />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4A5563', marginBottom: '0.4rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Profile Picture URL (optional)</label>
-                <input style={inp} value={form.avatar_url} onChange={e => setForm({...form, avatar_url: e.target.value})} placeholder="https://..." />
-                {form.avatar_url && <img src={form.avatar_url} alt="preview" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', marginTop: '0.5rem', border: '2px solid #c9b28f' }} />}
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4A5563', marginBottom: '0.4rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Profile Picture</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  {form.avatar_url ? (
+                    <img src={form.avatar_url} alt="preview" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f', flexShrink: 0 }} />
+                  ) : (
+                    <div style={{ width: 60, height: 60, borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ fontSize: 24, fontWeight: 700, color: '#c9b28f' }}>{form.full_name?.charAt(0) || '?'}</span>
+                    </div>
+                  )}
+                  <label style={{ padding: '0.6rem 1.25rem', border: '1px solid #0e1a2b', backgroundColor: '#fff', color: '#0e1a2b', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', display: 'inline-block' }}>
+                    {uploading ? 'Uploading...' : 'Upload Photo'}
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} disabled={uploading} />
+                  </label>
+                </div>
               </div>
               <button type="submit" disabled={saving} style={{ padding: '0.875rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>
                 {saving ? 'Saving...' : 'Save Changes'}
