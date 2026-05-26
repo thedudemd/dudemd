@@ -96,8 +96,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]) }}
         />
-        <meta property="fb:app_id" content="2107832130079548" />
-        <meta property="fb:pages" content="849615384891054" />
         <Nav />
         <GoogleOneTap />
         <main className="min-h-screen">{children}</main>
