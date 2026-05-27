@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 
-export default function ArticleContent({ article, slug, category }: { article: any, slug: string, category: string }) {
+export default function ArticleContent({ article, slug, category, relatedArticles = [] }: { article: any, slug: string, category: string, relatedArticles?: any[] }) {
   const [copied, setCopied] = useState(false)
   const url = `https://www.dudemd.com/articles/${category}/${slug}`
   const encoded = encodeURIComponent(url)
@@ -46,6 +46,26 @@ export default function ArticleContent({ article, slug, category }: { article: a
 
   const btn: any = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.5rem 0.85rem', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '12px', textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap' }
 
+
+  function RelatedArticles() {
+    if (!relatedArticles.length) return null
+    return (
+      <div style={{ margin: '2.5rem 0', borderTop: '1px solid #ede8df', paddingTop: '2rem' }}>
+        <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '1.25rem' }}>Read Next</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1.25rem' }}>
+          {relatedArticles.map((a: any, i: number) => (
+            <a key={i} href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', backgroundColor: '#fff', border: '1px solid #ede8df', overflow: 'hidden' }}>
+              {a.cover_image_url && <img src={a.cover_image_url} alt={a.title} style={{ width: '100%', height: '140px', objectFit: 'cover', display: 'block' }} />}
+              <div style={{ padding: '0.875rem' }}>
+                <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '0.35rem' }}>{a.categories?.name}</p>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.4, margin: 0 }}>{a.title}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   function Disclaimer() {
     return (
