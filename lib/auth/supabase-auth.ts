@@ -34,12 +34,9 @@ export async function signInWithFacebook() {
   if (error) throw error
 }
 
-export async function signInWithMagicLink(email: string) {
+export async function signInWithEmailPassword(email: string, password: string) {
   const supabase = createClient()
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: 'https://www.dudemd.com/auth/callback' },
-  })
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) throw error
 }
 

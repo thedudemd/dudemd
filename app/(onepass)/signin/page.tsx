@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
-import { signInWithGoogle, signInWithApple, signInWithFacebook, signInWithMagicLink } from '@/lib/auth/supabase-auth'
+import { signInWithGoogle, signInWithApple, signInWithFacebook, signInWithEmailPassword } from '@/lib/auth/supabase-auth'
 
 function GoogleIcon() {
   return (
@@ -33,7 +33,7 @@ function FacebookIcon() {
 
 export default function SignInPage() {
   const [email, setEmail] = useState('')
-  const [magicLinkSent, setMagicLinkSent] = useState(false)
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -57,15 +57,15 @@ export default function SignInPage() {
     try { setLoading('facebook'); setError(null); await signInWithFacebook() }
     catch { setError('Facebook sign-in not yet available.'); setLoading(null) }
   }
-  async function handleMagicLink(e: React.FormEvent) {
+  async function handleEmailPassword(e: React.FormEvent) {
     e.preventDefault()
-    if (!email) return
+    if (!email || !password) { setError('Email and password required'); return }
     try {
       setLoading('magic'); setError(null)
-      await signInWithMagicLink(email)
-      setMagicLinkSent(true)
-    } catch {
-      setError('Could not send magic link.')
+      await signInWithEmailPassword(email, password)
+      window.location.href = '/'
+    } catch (err: any) {
+      setError(err.message || 'Sign in failed.')
     } finally { setLoading(null) }
   }
 
@@ -109,19 +109,15 @@ export default function SignInPage() {
               <span style={{fontSize:11,color:'#4A5563'}}>or</span>
               <div style={{flex:1,height:1,background:'#d1cfc9'}}/>
             </div>
-            {magicLinkSent ? (
-              <div style={{background:'#eef7ee',color:'#2d6a2d',border:'1px solid #b6ddb6',borderRadius:8,padding:14,fontSize:13,textAlign:'center'}}>
-                ✓ Magic link sent to <strong>{email}</strong>
-              </div>
-            ) : (
-              <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'#4A5563'}}>Email address</label>
-                <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'#0e1a2b',outline:'none',width:'100%',boxSizing:'border-box'}}/>
-                <button onClick={handleMagicLink} disabled={loading!==null||!email} style={{...btn,background:'#0e1a2b',color:'#f7f4ee',fontWeight:600,opacity:(!email||loading!==null)?0.5:1}}>
-                  {loading==='magic'?'Sending…':'Sign in with Email'}
-                </button>
-              </div>
-            )}
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'#4A5563'}}>Email address</label>
+              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'#0e1a2b',outline:'none',width:'100%',boxSizing:'border-box'}}/>
+              <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'#4A5563'}}>Password</label>
+              <input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Your password" onKeyDown={e=>e.key==='Enter'&&handleEmailPassword(e)} style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'#0e1a2b',outline:'none',width:'100%',boxSizing:'border-box'}}/>
+              <button onClick={handleEmailPassword} disabled={loading!==null||!email||!password} style={{...btn,background:'#0e1a2b',color:'#f7f4ee',fontWeight:600,opacity:(!email||!password||loading!==null)?0.5:1}}>
+                {loading==='magic'?'Signing in…':'Sign In'}
+              </button>
+            </div>
             <p style={{fontSize:11,color:'#4A5563',textAlign:'center',margin:0,lineHeight:1.6}}>
               By signing in you agree to our <a href="/terms" style={{color:'#0e1a2b'}}>Terms</a> and <a href="/privacy" style={{color:'#0e1a2b'}}>Privacy Policy</a>.
             </p>
