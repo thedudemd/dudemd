@@ -66,14 +66,6 @@ export default function Nav() {
   useEffect(() => {
     function getTokenAndUser() {
       try {
-        // First check localStorage for dudemd-auth (email/password signin)
-        const lsRaw = localStorage.getItem('dudemd-auth')
-        if (lsRaw) {
-          const parsed = JSON.parse(lsRaw)
-          const token = parsed.access_token
-          const uid = parsed.user?.id
-          if (token && uid) return { token, uid }
-        }
         const jar: Record<string, string> = {}
         document.cookie.split(';').forEach(c => {
           const eq = c.indexOf('=')
