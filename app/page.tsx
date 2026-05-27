@@ -5,7 +5,7 @@ import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcom
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 
-export const metadata: Metadata = { title: "DudeMD — Modern Wellness for Real Life" }
+export const metadata: Metadata = { title: "DudeMD — Modern Men's Wellness for Real Life" }
 
 export const revalidate = 60
 
