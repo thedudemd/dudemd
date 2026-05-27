@@ -39,14 +39,14 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   if (!category) return {}
   
   return {
-    title: `${category.name} — DudeMD`,
+    title: category.name,
     description: `Evidence-based ${category.name.toLowerCase()} articles for men. Real-world advice on wellness, fitness, recovery, and lifestyle.`,
     alternates: {
       canonical: `https://www.dudemd.com/category/${slug}`,
     },
     openGraph: {
       type: 'website',
-      title: `${category.name} — DudeMD`,
+      title: category.name,
       description: `Evidence-based ${category.name.toLowerCase()} articles for men.`,
       url: `https://www.dudemd.com/category/${slug}`,
       siteName: 'DudeMD',

@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const author = await getAuthor(slug)
   if (!author) return {}
   return {
-    title: `${author.name} | DudeMD`,
+    title: author.name,
     description: author.meta_description || author.bio?.substring(0, 160),
     openGraph: {
-      title: `${author.name} | DudeMD`,
+      title: author.name,
       description: author.meta_description || author.bio?.substring(0, 160),
       images: author.avatar_url ? [{ url: author.avatar_url, width: 400, height: 400 }] : [],
     }
