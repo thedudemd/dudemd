@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { PlasmicComponent, PlasmicRootProvider } from '@plasmicapp/loader-nextjs'
+import { PlasmicComponent, PlasmicRootProvider } from '@plasmicapp/loader-nextjs/react-server'
 import { PLASMIC } from '@/lib/plasmic-init'
 import { notFound } from 'next/navigation'
 
