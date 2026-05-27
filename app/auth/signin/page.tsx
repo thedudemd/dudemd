@@ -30,7 +30,7 @@ export default function SignIn() {
     <main style={{ minHeight: '100vh', backgroundColor: '#f7f4ee', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
       <div style={{ width: '100%', maxWidth: '400px' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <Link href="/"><img src="/dude md.svg" alt="DudeMD" style={{ height: '60px', width: 'auto', marginBottom: '1rem' }} /></Link>
+          <Link href="/"><img src="/dude-md.svg" alt="DudeMD" style={{ height: '60px', width: 'auto', marginBottom: '1rem' }} /></Link>
           <p style={{ fontSize: '13px', color: '#9a9085', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Sign in to your account</p>
         </div>
         {sent ? (

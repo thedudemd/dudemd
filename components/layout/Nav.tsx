@@ -190,7 +190,7 @@ export default function Nav() {
         <div className="container-content">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 0' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
-              <img src="/dude%20md.svg" alt="DudeMD — Modern Men's Wellness" style={{ height: '48px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
+              <img src="/dude-md.svg" alt="DudeMD — Modern Men's Wellness" style={{ height: '48px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
             </Link>
 
             <nav style={{ display: 'none', gap: '2rem', position: 'relative' }} className="desktop-nav">
@@ -240,7 +240,7 @@ export default function Nav() {
       <div className={`drawer${drawerOpen ? ' open' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <Link href="/" onClick={() => setDrawerOpen(false)} style={{ textDecoration: 'none' }}>
-            <img src="/dude%20md.svg" alt="DudeMD" style={{ height: '44px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
+            <img src="/dude-md.svg" alt="DudeMD" style={{ height: '44px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
           </Link>
           <button onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#f7f4ee', fontSize: '24px', lineHeight: 1, padding: '0.25rem' }}>×</button>
         </div>

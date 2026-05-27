@@ -119,7 +119,7 @@ export default function AdminSidebar({ role }: { role: string }) {
       }}>
         {!collapsed && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <img src="/dude md.svg" alt="DudeMD" style={{ height: '24px', width: 'auto', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
+            <img src="/dude-md.svg" alt="DudeMD" style={{ height: '24px', width: 'auto', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
             <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(201,178,143,0.5)', whiteSpace: 'nowrap' }}>Control Center</span>
           </div>
         )}
