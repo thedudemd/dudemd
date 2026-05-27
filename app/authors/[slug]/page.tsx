@@ -52,7 +52,30 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
   if (!author) notFound()
   const articles = await getAuthorArticles(author.id)
 
+  const personSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": author.name,
+    "url": `https://www.dudemd.com/authors/${slug}`,
+    "image": author.avatar_url || undefined,
+    "jobTitle": author.title || "Contributing Writer",
+    "worksFor": {
+      "@type": "NewsMediaOrganization",
+      "name": "DudeMD",
+      "url": "https://www.dudemd.com"
+    },
+    "description": author.bio || undefined,
+    "sameAs": [
+      author.twitter,
+      author.instagram,
+      author.linkedin,
+      author.website
+    ].filter(Boolean)
+  }
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }} />
     <main style={{ backgroundColor: '#f7f4ee', minHeight: '100vh' }}>
       <style>{`
         .author-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
@@ -122,5 +145,6 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
         )}
       </div>
     </main>
+    </>
   )
 }
