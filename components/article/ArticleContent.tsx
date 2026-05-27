@@ -46,6 +46,14 @@ export default function ArticleContent({ article, slug, category }: { article: a
 
   const btn: any = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', padding: '0.5rem 0.85rem', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '12px', textDecoration: 'none', flexShrink: 0, whiteSpace: 'nowrap' }
 
+
+  function Disclaimer() {
+    return (
+      <div style={{ margin: '2rem 0', padding: '1rem 1.25rem', borderLeft: '3px solid #c9b28f', backgroundColor: '#f7f4ee', fontSize: '13px', color: '#4A5563', lineHeight: 1.6 }}>
+        <strong style={{ color: '#0e1a2b' }}>Editorial Disclaimer:</strong> DudeMD content is editorial and informational. It is not medical advice. Always consult a qualified healthcare provider before making changes to your diet, exercise, supplement, or treatment plan.
+      </div>
+    )
+  }
   function ShareButtons() {
     return (
       <div style={{ padding: '1rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df', marginTop: '1.5rem', marginBottom: '1.5rem' }}>
