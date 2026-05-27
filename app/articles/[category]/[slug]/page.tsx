@@ -186,7 +186,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
 
-            <ArticleContent article={article} slug={slug} category={category} relatedArticles={relatedArticles} />
+            <ArticleContent article={article} slug={slug} category={category} relatedArticles={related} />
           </article>
 
           <aside className="article-sidebar">
