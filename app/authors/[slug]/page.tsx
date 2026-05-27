@@ -20,14 +20,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const author = await getAuthor(slug)
   if (!author) return {}
+  const desc = author.meta_description || author.bio?.substring(0, 160) || `Articles by ${author.name} on DudeMD — modern men's wellness for real life.`
+  const url = `https://www.dudemd.com/authors/${slug}`
+  const image = author.avatar_url || 'https://www.dudemd.com/og-image.png'
   return {
     title: author.name,
-    description: author.meta_description || author.bio?.substring(0, 160),
+    description: desc,
+    alternates: { canonical: url },
     openGraph: {
       title: author.name,
-      description: author.meta_description || author.bio?.substring(0, 160),
-      images: author.avatar_url ? [{ url: author.avatar_url, width: 400, height: 400 }] : [],
-    }
+      description: desc,
+      url,
+      type: 'profile',
+      siteName: 'DudeMD',
+      images: [{ url: image, width: 1200, height: 630, alt: author.name }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      site: '@mydudemd',
+      creator: '@mydudemd',
+      title: author.name,
+      description: desc,
+      images: [image],
+    },
   }
 }
 
