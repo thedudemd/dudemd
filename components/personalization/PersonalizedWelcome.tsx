@@ -58,13 +58,7 @@ export default function PersonalizedWelcome() {
     <div style={{ backgroundColor: '#0e1a2b', borderBottom: '1px solid rgba(201,178,143,0.2)', padding: '0.75rem 0' }}>
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt={firstName} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', border: '1px solid #c9b28f' }} />
-          ) : (
-            <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: '#c9b28f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#0e1a2b' }}>{firstName.charAt(0)}</span>
-            </div>
-          )}
+
           <span style={{ fontSize: '13px', color: '#f7f4ee' }}>
             {greeting}, <strong style={{ color: '#c9b28f' }}>{firstName}</strong>. Welcome back to DudeMD.
           </span>
