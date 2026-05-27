@@ -38,18 +38,28 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   const category = await getCategory(slug)
   if (!category) return {}
   
+  const desc = category.description || `Evidence-based ${category.name.toLowerCase()} articles for men. Real-world advice on wellness, fitness, recovery, and lifestyle.`
+  const url = `https://www.dudemd.com/category/${slug}`
+  const image = category.cover_image_url || 'https://www.dudemd.com/og-image.png'
   return {
     title: category.name,
-    description: `Evidence-based ${category.name.toLowerCase()} articles for men. Real-world advice on wellness, fitness, recovery, and lifestyle.`,
-    alternates: {
-      canonical: `https://www.dudemd.com/category/${slug}`,
-    },
+    description: desc,
+    alternates: { canonical: url },
     openGraph: {
       type: 'website',
       title: category.name,
-      description: `Evidence-based ${category.name.toLowerCase()} articles for men.`,
-      url: `https://www.dudemd.com/category/${slug}`,
+      description: desc,
+      url,
       siteName: 'DudeMD',
+      images: [{ url: image, width: 1200, height: 630, alt: `${category.name} — DudeMD` }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      site: '@mydudemd',
+      creator: '@mydudemd',
+      title: category.name,
+      description: desc,
+      images: [image],
     },
   }
 }
