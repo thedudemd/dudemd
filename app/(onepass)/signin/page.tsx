@@ -63,8 +63,7 @@ export default function SignInPage() {
     if (!email || !password) { setError('Email and password required'); return }
     try {
       setLoading('magic'); setError(null)
-      const { createClient } = await import('@supabase/supabase-js')
-      const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+      const { supabase } = await import('@/lib/supabase/client')
       const { error: err } = await supabase.auth.signInWithPassword({ email, password })
       if (err) throw err
       window.location.href = '/'
