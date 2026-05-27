@@ -26,6 +26,50 @@ async function getCategories() {
   return data || []
 }
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "NewsMediaOrganization",
+  "name": "DudeMD",
+  "alternateName": "DudeMD Media",
+  "url": "https://www.dudemd.com",
+  "logo": "https://www.dudemd.com/dude%20md.svg",
+  "image": "https://www.dudemd.com/og-image.png",
+  "description": "DudeMD is a men's wellness authority covering the full spectrum of modern men's well-being — physical, mental, emotional, financial, relational, career, sexual, and lifestyle. Evidence-based, expert-reviewed editorial for men who want to live better in every dimension.",
+  "slogan": "Modern Wellness for Real Life",
+  "foundingLocation": {
+    "@type": "Place",
+    "name": "Seattle, WA"
+  },
+  "knowsAbout": [
+    "Men's Wellness",
+    "Men's Health",
+    "Physical Wellness",
+    "Mental Wellness",
+    "Emotional Wellness",
+    "Financial Wellness",
+    "Relationship Wellness",
+    "Career and Workplace Wellness",
+    "Spiritual Wellness",
+    "Social Wellness",
+    "Sexual Wellness",
+    "Nutritional Wellness",
+    "Fitness and Performance",
+    "Recovery and Sleep",
+    "Style and Grooming",
+    "Personal Growth",
+    "Mindset and Purpose",
+    "Modern Masculinity"
+  ],
+  "publishingPrinciples": "https://www.dudemd.com/editorial-policy",
+  "sameAs": [
+    "https://www.facebook.com/MyDudeMD",
+    "https://www.instagram.com/mydudemd",
+    "https://www.twitter.com/mydudemd",
+    "https://www.tiktok.com/@TheDudeMd",
+    "https://www.youtube.com/@dudemd"
+  ]
+}
+
 export default async function HomePage() {
   const articles = await getArticles()
   const categories = await getCategories()
@@ -34,6 +78,8 @@ export default async function HomePage() {
   const latest = articles.slice(3)
 
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
     <>
       <h1 className="sr-only">DudeMD — Modern Men's Wellness for Real Life</h1>
       <GoogleOneTap />
