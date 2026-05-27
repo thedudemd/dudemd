@@ -52,7 +52,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
       siteName: 'DudeMD',
       images: article.cover_image_url ? [{ url: article.cover_image_url, width: 1200, height: 630 }] : [],
       publishedTime: article.published_at,
-      modifiedTime: article.updated_at,
+      modifiedTime: article.updated_at && new Date(article.updated_at) > new Date(article.published_at) ? article.updated_at : article.published_at,
       authors: article.authors?.name ? [article.authors.name] : [],
     },
     other: {
@@ -82,7 +82,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     "description": article.excerpt,
     "image": article.cover_image_url,
     "datePublished": article.published_at,
-    "dateModified": article.updated_at || article.published_at,
+    "dateModified": article.updated_at && new Date(article.updated_at) > new Date(article.published_at) ? article.updated_at : article.published_at,
     "author": {
       "@type": "Person",
       "name": article.authors?.name,
