@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { PlasmicComponent, PlasmicRootProvider, extractPlasmicQueryData } from '@plasmicapp/loader-nextjs/react-server-conditional'
+import { PlasmicComponent, PlasmicRootProvider } from '@plasmicapp/loader-nextjs'
 import { PLASMIC } from '@/lib/plasmic-init'
 import { notFound } from 'next/navigation'
 
