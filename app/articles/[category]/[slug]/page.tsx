@@ -182,6 +182,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                   ) : article.authors?.name}
                 </p>
                 <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>{new Date(article.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                {article.updated_at && new Date(article.updated_at) > new Date(article.published_at) && <p style={{ fontSize: '11px', color: '#9a9085', margin: '2px 0 0' }}>Updated: {new Date(article.updated_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>}
               </div>
             </div>
 
