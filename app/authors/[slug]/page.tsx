@@ -87,7 +87,7 @@ export default async function AuthorPage({ params }: { params: Promise<{ slug: s
         ) : (
           <div className="author-grid">
             {articles.map((article: any) => (
-              <Link key={article.slug} href={`/articles/${article.categories?.slug}/${article.slug}`} className="article-card" style={{ textDecoration: 'none', backgroundColor: '#fff', border: '1px solid #ede8df', display: 'block' }}>
+              <Link key={article.slug} href={article.external_url || `/articles/${article.categories?.slug}/${article.slug}`} className="article-card" style={{ textDecoration: 'none', backgroundColor: '#fff', border: '1px solid #ede8df', display: 'block' }}>
                 {article.cover_image_url && (
                   <div style={{ overflow: 'hidden', height: '180px' }}>
                     <img src={article.cover_image_url} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }} />

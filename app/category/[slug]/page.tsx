@@ -99,7 +99,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2.5rem' }}>
               {articles.map((a) => (
                 <article key={a.slug}>
-                  <Link href={`/articles/${a.categories?.slug}/${a.slug}`}>
+                  <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`}>
                     <div style={{ width: '100%', aspectRatio: '16/10', overflow: 'hidden', marginBottom: '1rem' }}>
                       <img src={a.cover_image_url} alt={`${a.title} — ${a.categories?.name}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </div>
@@ -109,7 +109,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     <span style={{ fontSize: '11px', color: '#9a9085' }}>{a.read_time}</span>
                   </div>
                   <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', lineHeight: 1.3, color: '#0e1a2b', marginBottom: '0.5rem' }}>
-                    <Link href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
+                    <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
                   </h2>
                   <p style={{ fontSize: '13px', color: '#4A5563', lineHeight: 1.55, marginBottom: '0.5rem' }}>{a.excerpt}</p>
                   <p style={{ fontSize: '12px', color: '#9a9085' }}>{a.authors?.name}</p>

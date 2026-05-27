@@ -86,7 +86,7 @@ export default async function HomePage() {
               <p style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#9a9085', paddingBottom: '0.75rem', borderBottom: '2px solid #0e1a2b', marginBottom: '1.25rem' }}>Editor&apos;s Picks</p>
               {secondary.map((a, i) => (
                 <div key={a.slug} style={{ paddingBottom: '1.5rem', marginBottom: '1.5rem', borderBottom: i < secondary.length - 1 ? '1px solid #ede8df' : 'none' }}>
-                  <Link href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
+                  <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                     <div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '0.75rem' }}>
                       <img
                         src={a.cover_image_url || 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80'}
@@ -100,7 +100,7 @@ export default async function HomePage() {
                     <span style={{ fontSize: '10px', color: '#9a9085' }}>{a.read_time}</span>
                   </div>
                   <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1.3, color: '#0e1a2b' }}>
-                    <Link href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
+                    <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
                   </h3>
                   <p style={{ fontSize: '12px', color: '#9a9085', marginTop: '0.35rem' }}>By {a.authors?.name}</p>
                 </div>
@@ -136,7 +136,7 @@ export default async function HomePage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2.5rem' }}>
             {(latest.length > 0 ? latest : articles).map((a) => (
               <article key={a.slug}>
-                <Link href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
+                <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
                     <img
                       src={a.cover_image_url || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80'}
@@ -150,7 +150,7 @@ export default async function HomePage() {
                   <span style={{ fontSize: '10px', color: '#9a9085' }}>{a.read_time}</span>
                 </div>
                 <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.3, color: '#0e1a2b', marginBottom: '0.5rem' }}>
-                  <Link href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
+                  <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
                 </h3>
                 <p style={{ fontSize: '13px', color: '#4A5563', lineHeight: 1.55, marginBottom: '0.4rem' }}>{a.excerpt}</p>
                 <p style={{ fontSize: '11px', color: '#9a9085' }}>By {a.authors?.name}</p>
