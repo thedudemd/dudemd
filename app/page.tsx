@@ -58,7 +58,7 @@ const organizationSchema = {
     "Style and Grooming",
     "Personal Growth",
     "Mindset and Purpose",
-    "Modern Masculinity"
+    "Inclusive Wellness"
   ],
   "publishingPrinciples": "https://www.dudemd.com/editorial-policy",
   "sameAs": [
