@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
 import { signInWithGoogle, signInWithApple, signInWithFacebook, signInWithEmailPassword } from '@/lib/auth/supabase-auth'
 
 function GoogleIcon() {
@@ -87,10 +86,7 @@ export default function SignInPage() {
         <div className="signin-left">
           <div style={{display:'flex',flexDirection:'column',gap:18,maxWidth:'320px',width:'100%',margin:'0 auto'}}>
             <h1 style={{fontSize:26,fontWeight:700,color:'#0e1a2b',margin:0,textAlign:'center'}}>Sign in</h1>
-            <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
-              <p style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.15em',color:'#4A5563',margin:0}}>Powered by</p>
-              <Image src="/images/authly-logo.png" alt="Authly" width={160} height={48} style={{objectFit:'contain',mixBlendMode:'multiply'}} priority />
-            </div>
+
             <div style={{height:1,background:'#d1cfc9'}}/>
             {error && <div style={{background:'#fdecea',color:'#a32d2d',border:'1px solid #f09595',borderRadius:8,padding:'10px 14px',fontSize:13}}>{error}</div>}
             <div style={{display:'flex',flexDirection:'column',gap:9}}>
@@ -119,7 +115,10 @@ export default function SignInPage() {
               </button>
             </div>
             <p style={{fontSize:11,color:'#4A5563',textAlign:'center',margin:0,lineHeight:1.6}}>
-              By signing in you agree to our <a href="/terms" style={{color:'#0e1a2b'}}>Terms</a> and <a href="/privacy" style={{color:'#0e1a2b'}}>Privacy Policy</a>.
+              By signing in you agree to our <a href="/terms-of-use" style={{color:'#0e1a2b'}}>Terms</a> and <a href="/privacy-policy" style={{color:'#0e1a2b'}}>Privacy Policy</a>.
+            </p>
+            <p style={{fontSize:12,color:'#4A5563',textAlign:'center',margin:0}}>
+              Don't have an account? <a href="/newsletter" style={{color:'#c9b28f',fontWeight:600}}>Sign up free</a>
             </p>
             <p style={{fontSize:10,color:'#4A5563',textAlign:'center',margin:0}}>© {new Date().getFullYear()} DudeMD. A Rise Media Network publication.</p>
           </div>
