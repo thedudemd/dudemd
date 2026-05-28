@@ -99,16 +99,7 @@ export default async function HomePage() {
       <h1 className="sr-only">DudeMD — Modern Men's Wellness for Real Life</h1>
       <GoogleOneTap />
       <PersonalizedWelcome />
-      {/* TOP BAR */}
-      <div style={{ backgroundColor: '#c9b28f', padding: '0.4rem 0' }}>
-        <div className="container-content">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1.5rem' }}>
-            <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Sign In</Link>
-            <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>
-            <Link href="/newsletter" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Subscribe</Link>
-          </div>
-        </div>
-      </div>
+
 
       {/* HERO — FEATURED + TWO SECONDARY */}
       <section style={{ padding: '2.5rem 0 0', borderBottom: '1px solid #ede8df' }}>
