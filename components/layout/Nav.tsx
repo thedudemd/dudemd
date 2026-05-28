@@ -239,10 +239,17 @@ export default function Nav() {
       {/* GOLD BAR - below navy header */}
       <div style={{ backgroundColor: '#c9b28f', padding: '0.4rem 0' }}>
         <div className="container-content">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1.5rem' }}>
-            {!session && <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Sign In</Link>}
-            {!session && <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>}
-            <Link href="/newsletter" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Subscribe</Link>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
+            {session && profile ? (
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0e1a2b' }}>Welcome, <strong>{profile.full_name?.split(' ')[0]}</strong></span>
+            ) : (
+              <span />
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              {!session && <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Sign In</Link>}
+              {!session && <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>}
+              <Link href="/newsletter" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Subscribe</Link>
+            </div>
           </div>
         </div>
       </div>

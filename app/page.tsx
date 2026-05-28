@@ -98,7 +98,6 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
       <h1 className="sr-only">DudeMD — Modern Men's Wellness for Real Life</h1>
       <GoogleOneTap />
-      <PersonalizedWelcome />
 
 
       {/* HERO — FEATURED + TWO SECONDARY */}
