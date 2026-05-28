@@ -235,7 +235,6 @@ export default function Nav() {
             </div>
           )}
         </div>
-      </header>
       {/* GOLD BAR - below navy header */}
       <div style={{ backgroundColor: '#c9b28f', padding: '0.4rem 0' }}>
         <div className="container-content">
@@ -254,6 +253,7 @@ export default function Nav() {
           </div>
         </div>
       </div>
+      </header>
 
       {drawerOpen && <div className="drawer-overlay" onClick={() => setDrawerOpen(false)} />}
 
