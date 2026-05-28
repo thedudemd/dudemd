@@ -180,6 +180,16 @@ export default function Nav() {
           </div>
         </div>
       </div>
+      {/* GOLD TOP BAR */}
+      <div style={{ backgroundColor: '#c9b28f', padding: '0.4rem 0' }}>
+        <div className="container-content">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1.5rem' }}>
+            {!session && <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Sign In</Link>}
+            {!session && <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>}
+            <Link href="/newsletter" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Subscribe</Link>
+          </div>
+        </div>
+      </div>
       <style>{`
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
         .container-content { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
