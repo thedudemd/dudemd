@@ -8,7 +8,7 @@ export default function Footer() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
             <div style={{ gridColumn: 'span 2' }}>
               <img src="/md-transparent.svg" alt="DudeMD" style={{ height: '120px', width: 'auto', marginBottom: '1rem', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
-              <p style={{ fontSize: '13px', color: 'rgba(247,244,238,0.5)', marginBottom: '1.5rem', maxWidth: '22rem', lineHeight: 1.6 }}>Media for Men. Built Different. Evidence-based health, fitness, recovery, style and gear for real men.</p>
+              <p style={{ fontSize: '13px', color: 'rgba(247,244,238,0.5)', marginBottom: '1.5rem', maxWidth: '22rem', lineHeight: 1.6 }}>Media for Men. Built Different. Modern Men's Wellness for Real Life.</p>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 {[
                   { label: 'Instagram', url: 'https://instagram.com/mydudemd', svg: <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> },
