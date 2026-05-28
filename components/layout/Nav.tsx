@@ -32,7 +32,7 @@ const NAV_ITEMS = [
     ]
   },
   {
-    label: 'Style', href: '/category/style',
+    label: 'Lifestyle', href: '/category/lifestyle',
     subs: ['Grooming', 'Fashion', 'Watches', 'Shoes', 'Skincare'],
     articles: [
       { slug: 'grooming-routine', title: "A No-Nonsense Grooming Routine for Men Who Don't Have Time", image: 'https://images.unsplash.com/photo-1621607512022-6aecc4fed814?w=300&q=80' },
@@ -40,7 +40,7 @@ const NAV_ITEMS = [
     ]
   },
   {
-    label: 'Gear', href: '/category/gear',
+    label: 'Mind', href: '/category/mind',
     subs: ['Tech', 'Outdoors', 'Home', 'Travel', 'Reviews'],
     articles: [
       { slug: 'gear-essentials', title: 'The 10 Gear Essentials Every Man Should Own in 2025', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&q=80' },
