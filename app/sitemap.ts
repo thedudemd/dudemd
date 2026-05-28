@@ -9,7 +9,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const { data: categories } = await supabase
     .from('categories')
-    .select('slug')
+    .select('slug, parent_id, enabled, indexable')
+    .eq('enabled', true)
+    .eq('indexable', true)
 
   const { data: pages } = await supabase
     .from('static_pages')
@@ -28,11 +30,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  const categoryUrls = (categories || []).map((c) => ({
+  const categoryUrls = (categories || []).filter(c => !c.parent_id).map((c) => ({
     url: `https://www.dudemd.com/category/${c.slug}`,
     lastModified: new Date(),
     changeFrequency: 'daily' as const,
     priority: 0.9,
+  }))
+
+  const subcategoryUrls = (categories || []).filter(c => c.parent_id).map((c) => ({
+    url: `https://www.dudemd.com/category/${c.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
   }))
 
   const pageUrls = (pages || []).map((p) => ({
@@ -52,6 +61,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     { url: 'https://www.dudemd.com', lastModified: new Date(), changeFrequency: 'daily' as const, priority: 1.0 },
     ...categoryUrls,
+    ...subcategoryUrls,
     ...articleUrls,
     ...pageUrls,
     ...authorUrls,
