@@ -23,7 +23,7 @@ export default function Footer() {
             </div>
             <div>
               <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '1rem' }}>Categories</p>
-              {['Health','Fitness','Recovery','Mental Health','Style','Gear'].map((item) => (
+              {['Health','Fitness','Recovery','Lifestyle','Mind'].map((item) => (
                 <Link key={item} href={`/category/${item.toLowerCase().replace(' ','-')}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>{item}</Link>
               ))}
             </div>
