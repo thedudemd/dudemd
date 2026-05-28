@@ -93,9 +93,7 @@ export default function SignInPage() {
               <button onClick={handleGoogle} disabled={loading!==null} style={{...btn,background:'#fff',border:'1px solid #d1cfc9',color:'#1B1D21'}}>
                 <GoogleIcon/>{loading==='google'?'Connecting…':'Continue with Google'}
               </button>
-              <button onClick={handleApple} disabled={loading!==null} style={{...btn,background:'#1B1D21',color:'#f7f4ee'}}>
-                <AppleIcon/>{loading==='apple'?'Connecting…':'Continue with Apple'}
-              </button>
+
               <button onClick={handleFacebook} disabled={loading!==null} style={{...btn,background:'#1877F2',color:'#fff'}}>
                 <FacebookIcon/>{loading==='facebook'?'Connecting…':'Continue with Facebook'}
               </button>
