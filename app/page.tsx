@@ -22,7 +22,6 @@ async function getCategories() {
   const { data } = await supabase
     .from('categories')
     .select('*')
-    .filter('parent_id', 'is', null)
     .order('name')
   return data || []
 }
@@ -48,7 +47,7 @@ const organizationSchema = {
   "name": "DudeMD",
   "alternateName": "DudeMD Media",
   "url": "https://www.dudemd.com",
-  "logo": "https://www.dudemd.com/dude-md.svg",
+  "logo": "https://www.dudemd.com/dude%20md.svg",
   "image": "https://www.dudemd.com/og-image.png",
   "description": "DudeMD is a men's wellness authority covering the full spectrum of modern men's well-being — physical, mental, emotional, financial, relational, career, sexual, and lifestyle. Evidence-based, expert-reviewed editorial for men who want to live better in every dimension.",
   "slogan": "Modern Wellness for Real Life",
@@ -99,7 +98,17 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
       <h1 className="sr-only">DudeMD — Modern Men's Wellness for Real Life</h1>
       <GoogleOneTap />
-
+      <PersonalizedWelcome />
+      {/* TOP BAR */}
+      <div style={{ backgroundColor: '#c9b28f', padding: '0.4rem 0' }}>
+        <div className="container-content">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1.5rem' }}>
+            <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Sign In</Link>
+            <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>
+            <Link href="/newsletter" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Subscribe</Link>
+          </div>
+        </div>
+      </div>
 
       {/* HERO — FEATURED + TWO SECONDARY */}
       <section style={{ padding: '2.5rem 0 0', borderBottom: '1px solid #ede8df' }}>
