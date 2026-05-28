@@ -33,7 +33,7 @@ const NAV_ITEMS = [
   },
   {
     label: 'Lifestyle', href: '/category/lifestyle',
-    subs: ['Grooming', 'Fashion', 'Watches', 'Shoes', 'Skincare'],
+    subs: ['Grooming', 'Style', 'Skincare', 'Fashion', 'Home & Living'],
     articles: [
       { slug: 'grooming-routine', title: "A No-Nonsense Grooming Routine for Men Who Don't Have Time", image: 'https://images.unsplash.com/photo-1621607512022-6aecc4fed814?w=300&q=80' },
       { slug: 'gear-essentials', title: 'The 10 Gear Essentials Every Man Should Own', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&q=80' },
@@ -41,10 +41,10 @@ const NAV_ITEMS = [
   },
   {
     label: 'Mind', href: '/category/mind',
-    subs: ['Tech', 'Outdoors', 'Home', 'Travel', 'Reviews'],
+    subs: ['Mental Health', 'Mindset', 'Purpose', 'Relationships', 'Emotional Wellness'],
     articles: [
-      { slug: 'gear-essentials', title: 'The 10 Gear Essentials Every Man Should Own in 2025', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&q=80' },
-      { slug: 'gut-health', title: "Your Gut Is Running Your Brain. Here's How to Fix It", image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=300&q=80' },
+      { slug: 'stress-cortisol', title: 'Chronic Stress Is Wrecking Your Hormones', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=300&q=80' },
+      { slug: 'sleep-recovery', title: 'The 7-Day Sleep Reset That Actually Works', image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=300&q=80' },
     ]
   },
 ]
