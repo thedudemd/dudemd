@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase/client'
 
 export const metadata: Metadata = { title: "DudeMD — Modern Men's Wellness for Real Life" }
 
-export const revalidate = 60
+export const revalidate = 0
 
 async function getArticles() {
   const { data } = await supabase
