@@ -38,7 +38,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   const category = await getCategory(slug)
   if (!category) return {}
   
-  const desc = category.description || `Evidence-based ${category.name.toLowerCase()} articles for men. Real-world advice on wellness, fitness, recovery, and lifestyle.`
+  const desc = category.description || `Modern Men's Wellness for Real Life.`
   const url = `https://www.dudemd.com/category/${slug}`
   const image = category.cover_image_url || 'https://www.dudemd.com/og-image.png'
   return {
@@ -82,7 +82,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             <span style={{ fontSize: '12px', color: '#c9b28f' }}>{category.name}</span>
           </div>
           <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(2rem, 5vw, 3rem)', color: '#f7f4ee', marginBottom: '0.75rem' }}>{category.name}</h1>
-          <p style={{ fontSize: '15px', color: 'rgba(247,244,238,0.6)', margin: 0 }}>Evidence-based articles for real men.</p>
+          <p style={{ fontSize: '15px', color: 'rgba(247,244,238,0.6)', margin: 0 }}>Modern Men's Wellness for Real Life.</p>
         </div>
       </div>
 
