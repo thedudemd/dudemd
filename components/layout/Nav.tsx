@@ -188,7 +188,7 @@ export default function Nav() {
         .nav-dropdown-grid { display: grid; grid-template-columns: 200px 1fr; gap: 3rem; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
       `}</style>
 
-      <header style={{ backgroundColor: '#0e1a2b', borderBottom: '1px solid rgba(255,255,255,0.1)', position: 'sticky', top: 0, zIndex: 20 }}>
+      <header style={{ backgroundColor: '#0e1a2b', position: 'sticky', top: 0, zIndex: 20 }}>
         <div className="container-content">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 0' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
