@@ -22,7 +22,7 @@ async function getCategories() {
   const { data } = await supabase
     .from('categories')
     .select('*')
-    .is('parent_id', null)
+    .filter('parent_id', 'is', null)
     .order('name')
   return data || []
 }
