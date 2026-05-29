@@ -12,7 +12,7 @@ export const revalidate = 60
 async function getArticles() {
   const { data } = await supabase
     .from('articles')
-    .select('*, authors(name), categories(name, slug)')
+    .select('*, authors!articles_author_id_fkey(name), categories!articles_category_id_fkey(name, slug)')
     .eq('published', true)
     .order('published_at', { ascending: false })
   return data || []
