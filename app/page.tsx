@@ -1,12 +1,13 @@
 // @ts-nocheck
 import type { Metadata } from 'next'
 import GoogleOneTap from "@/components/auth/GoogleOneTap"
+import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcome"
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 
 export const metadata: Metadata = { title: "DudeMD — Modern Men's Wellness for Real Life" }
 
-export const revalidate = 0
+export const revalidate = 60
 
 async function getArticles() {
   const { data } = await supabase
@@ -21,7 +22,6 @@ async function getCategories() {
   const { data } = await supabase
     .from('categories')
     .select('*')
-    .in('slug', ['health', 'fitness', 'recovery', 'lifestyle', 'mind'])
     .order('name')
   return data || []
 }
@@ -47,7 +47,7 @@ const organizationSchema = {
   "name": "DudeMD",
   "alternateName": "DudeMD Media",
   "url": "https://www.dudemd.com",
-  "logo": "https://www.dudemd.com/dude%20md.svg",
+  "logo": "https://www.dudemd.com/dude-md.svg",
   "image": "https://www.dudemd.com/og-image.png",
   "description": "DudeMD is a men's wellness authority covering the full spectrum of modern men's well-being — physical, mental, emotional, financial, relational, career, sexual, and lifestyle. Evidence-based, expert-reviewed editorial for men who want to live better in every dimension.",
   "slogan": "Modern Wellness for Real Life",
