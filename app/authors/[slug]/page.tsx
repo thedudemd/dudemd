@@ -12,7 +12,7 @@ async function getAuthor(slug: string) {
 }
 
 async function getAuthorArticles(authorId: string) {
-  const { data } = await supabase.from('articles').select('title, slug, excerpt, cover_image_url, published_at, categories(name, slug)').eq('author_id', authorId).eq('published', true).order('published_at', { ascending: false })
+  const { data } = await supabase.from('articles').select('title, slug, excerpt, cover_image_url, published_at, categories!articles_category_id_fkey(name, slug)').eq('author_id', authorId).eq('published', true).order('published_at', { ascending: false })
   return data || []
 }
 

@@ -13,7 +13,7 @@ async function searchArticles(query: string) {
   
   const { data } = await supabase
     .from('articles')
-    .select('*, authors(name), categories(name, slug)')
+    .select('*, authors(name), categories!articles_category_id_fkey(name, slug)')
     .eq('published', true)
     .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%,content.ilike.%${query}%`)
     .order('published_at', { ascending: false })

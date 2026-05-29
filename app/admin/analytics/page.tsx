@@ -17,7 +17,7 @@ export default function AnalyticsAdmin() {
       if (!session) { router.push('/admin/login'); return }
       const since = range === 'all' ? '2020-01-01' : new Date(Date.now() - Number(range) * 86400000).toISOString()
       const { data: events } = await supabase.from('user_events').select('*').gte('created_at', since)
-      const { data: articles } = await supabase.from('articles').select('slug, title, categories(name, slug)').eq('published', true)
+      const { data: articles } = await supabase.from('articles').select('slug, title, categories!articles_category_id_fkey(name, slug)').eq('published', true)
       const { data: subs } = await supabase.from('subscribers').select('created_at').gte('created_at', since)
       setData({ events: events || [], articles: articles || [], subs: subs || [] })
       setLoading(false)

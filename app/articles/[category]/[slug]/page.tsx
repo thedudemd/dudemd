@@ -10,7 +10,7 @@ export const revalidate = 60
 async function getArticle(slug: string) {
   const { data } = await supabase
     .from('articles')
-    .select('*, authors(name, slug, avatar_url, title, bio, twitter, instagram, linkedin, website), categories(name, slug)')
+    .select('*, authors(name, slug, avatar_url, title, bio, twitter, instagram, linkedin, website), categories!articles_category_id_fkey(name, slug)')
     .eq('slug', slug)
     .eq('published', true)
     .single()
@@ -26,7 +26,7 @@ async function getRelated(categorySlug: string, currentSlug: string) {
   if (!category) return []
   const { data } = await supabase
     .from('articles')
-    .select('*, authors(name), categories(name, slug)')
+    .select('*, authors(name), categories!articles_category_id_fkey(name, slug)')
     .eq('category_id', category.id)
     .eq('published', true)
     .neq('slug', currentSlug)
