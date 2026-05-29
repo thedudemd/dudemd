@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import GoogleOneTap from "@/components/auth/GoogleOneTap"
 import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcome"
 import Link from 'next/link'
-import { supabaseServer as supabase } from '@/lib/supabase/server'
+import { supabase } from '@/lib/supabase/client'
 
 export const metadata: Metadata = { title: "DudeMD — Modern Men's Wellness for Real Life" }
 
@@ -22,7 +22,6 @@ async function getCategories() {
   const { data } = await supabase
     .from('categories')
     .select('*')
-    .in('slug', ['health', 'fitness', 'recovery', 'lifestyle', 'mind'])
     .order('name')
   return data || []
 }
@@ -250,5 +249,3 @@ export default async function HomePage() {
     </>
   )
 }
-// Thu May 28 20:09:27 PDT 2026
-// Thu May 28 20:20:01 PDT 2026
