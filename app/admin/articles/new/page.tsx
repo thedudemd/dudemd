@@ -263,7 +263,7 @@ function NewArticleInner() {
                   <button key={l} onClick={a} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: act() ? '#0e1a2b' : '#fff', color: act() ? '#fff' : '#0e1a2b', cursor: 'pointer' }}>{l}</button>
                 ))}
               </div>
-              <div style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: '500px', padding: '1rem' }}>
+              <div style={{ border: '1px solid #ede8df', minHeight: '500px', padding: form.layout === 'longform' ? '2.5rem 3rem' : form.layout === 'magazine' ? '2rem' : '1.5rem', backgroundColor: form.layout === 'longform' ? '#0e1a2b' : '#fff', color: form.layout === 'longform' ? '#f7f4ee' : '#0e1a2b', fontFamily: form.layout === 'magazine' ? 'Georgia, serif' : 'inherit', lineHeight: 1.8 }}>
                 <EditorContent editor={editor} />
               </div>
             </div>
