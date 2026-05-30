@@ -219,9 +219,9 @@ function NewArticleInner() {
               <label style={lbl}>Choose Article Layout</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '0.5rem' }}>
                 {[
-                  { value: 'standard', label: 'Standard', desc: 'Classic layout with header image on top' },
-                  { value: 'magazine', label: 'Magazine', desc: 'Full-bleed hero with title overlaid on image' },
-                  { value: 'longform', label: 'Long Form', desc: 'Dark header with title, image below' },
+                  { value: 'standard', label: 'Standard', desc: 'Best for most articles. Clean image, title, and body. Ideal for SEO.' },
+                  { value: 'magazine', label: 'Magazine', desc: 'Bold visual impact. Title overlays a full-screen image. Best for features and trending stories.' },
+                  { value: 'longform', label: 'Long Form', desc: 'Best for deep dives and guides. Dark intro header draws readers in. Strongest for AEO.' },
                 ].map(opt => (
                   <button key={opt.value} type="button" onClick={() => setForm(f => ({ ...f, layout: opt.value }))} style={{ padding: '0.875rem 0.75rem', border: '2px solid ' + (form.layout === opt.value ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === opt.value ? '#0e1a2b' : '#fff', color: form.layout === opt.value ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
                     <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>{opt.label}</div>
