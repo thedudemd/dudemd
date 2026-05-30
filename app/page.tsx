@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import GoogleOneTap from "@/components/auth/GoogleOneTap"
 import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcome"
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase/client'
+import { supabaseServer as supabase } from '@/lib/supabase/server'
 
 export const metadata: Metadata = { title: "DudeMD — Modern Men's Wellness for Real Life" }
 
