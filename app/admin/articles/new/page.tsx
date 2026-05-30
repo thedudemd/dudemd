@@ -25,7 +25,7 @@ function NewArticleInner() {
   const [seoScore, setSeoScore] = useState(0)
   const [aeoScore, setAeoScore] = useState(0)
   const [readabilityScore, setReadabilityScore] = useState(0)
-  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '' })
+  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '', layout: 'standard' })
   const [canvaDesigns, setCanvaDesigns] = useState<any[]>([])
   const [showCanvaPicker, setShowCanvaPicker] = useState(false)
   const searchParams = useSearchParams()
@@ -156,7 +156,7 @@ function NewArticleInner() {
       const saved = localStorage.getItem(draftKey)
       if (saved) {
         const d = JSON.parse(saved)
-        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'', status: d.status||'draft', social_title: d.social_title||'', social_description: d.social_description||'', facebook_teaser_text: d.facebook_teaser_text||'', external_url: d.external_url||'', subcategory_id: d.subcategory_id||'' })
+        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'', status: d.status||'draft', social_title: d.social_title||'', social_description: d.social_description||'', facebook_teaser_text: d.facebook_teaser_text||'', external_url: d.external_url||'', subcategory_id: d.subcategory_id||'', layout: d.layout||'standard' })
         if (editor && d.content) editor.commands.setContent(d.content)
         setAutoSaved('Draft restored')
       }
@@ -218,7 +218,7 @@ function NewArticleInner() {
             <div style={{ padding: '1rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
               <label style={lbl}>Article Type</label>
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <button type="button" onClick={() => setForm(f => ({ ...f, external_url: '', subcategory_id: '' }))} style={{ flex: 1, padding: '0.75rem', border: '1px solid ' + (!form.external_url ? '#0e1a2b' : '#ede8df'), backgroundColor: !form.external_url ? '#0e1a2b' : '#fff', color: !form.external_url ? '#f7f4ee' : '#4A5563', fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>Standard Article</button>
+                <button type="button" onClick={() => setForm(f => ({ ...f, external_url: '', subcategory_id: '', layout: 'standard' }))} style={{ flex: 1, padding: '0.75rem', border: '1px solid ' + (!form.external_url ? '#0e1a2b' : '#ede8df'), backgroundColor: !form.external_url ? '#0e1a2b' : '#fff', color: !form.external_url ? '#f7f4ee' : '#4A5563', fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>Standard Article</button>
                 <button type="button" onClick={() => setForm(f => ({ ...f, external_url: form.external_url || '/' }))} style={{ flex: 1, padding: '0.75rem', border: '1px solid ' + (form.external_url ? '#c9b28f' : '#ede8df'), backgroundColor: form.external_url ? '#c9b28f' : '#fff', color: form.external_url ? '#0e1a2b' : '#4A5563', fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>Custom Plasmic Page</button>
               </div>
               {form.external_url && (
@@ -369,6 +369,7 @@ function NewArticleInner() {
                   {categories.filter((cat: any) => !cat.parent_id).map((cat: any) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                 </select>
               </div>
+              <div style={{ marginBottom: '1rem' }}><label style={lbl}>Article Layout</label><select name='layout' value={form.layout} onChange={handleChange} style={inp}><option value='standard'>Standard</option><option value='magazine'>Magazine</option><option value='longform'>Long Form</option></select></div>
               {subcategories.length > 0 && (
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={lbl}>Subcategory (optional)</label>
