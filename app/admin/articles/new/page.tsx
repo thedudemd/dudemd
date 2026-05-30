@@ -285,6 +285,10 @@ function NewArticleInner() {
                   { l: 'Redo', a: () => editor?.chain().focus().redo().run(), act: () => false },
                 ].map(({ l, a, act }) => (
                   <button key={l} onClick={a} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: act() ? '#0e1a2b' : '#fff', color: act() ? '#fff' : '#0e1a2b', cursor: 'pointer' }}>{l}</button>
+                <select onChange={e => editor?.chain().focus().setMark('textStyle', { fontSize: e.target.value }).run()} style={{ padding: '0.25rem 0.4rem', fontSize: '12px', border: '1px solid #ede8df', backgroundColor: '#fff', cursor: 'pointer', marginLeft: '0.25rem' }}>
+                  <option value=''>Size</option>
+                  {['12px','14px','16px','18px','20px','24px','28px','32px','36px'].map(s => <option key={s} value={s}>{s.replace('px','')}</option>)}
+                </select>
                 ))}
               </div>
               <div style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: '500px', padding: '1rem' }}>
