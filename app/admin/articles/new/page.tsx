@@ -218,17 +218,31 @@ function NewArticleInner() {
             <div style={{ padding: '1.25rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
               <label style={lbl}>Choose Article Layout</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '0.5rem' }}>
-                {[
-                  { value: 'standard', label: 'Standard', desc: 'Best for most articles. Clean image, title, and body. Ideal for SEO.' },
-                  { value: 'magazine', label: 'Magazine', desc: 'Bold visual impact. Title overlays a full-screen image. Best for features and trending stories.' },
-                  { value: 'longform', label: 'Long Form', desc: 'Best for deep dives and guides. Dark intro header draws readers in. Strongest for AEO.' },
-                ].map(opt => (
-                  <button key={opt.value} type="button" onClick={() => setForm(f => ({ ...f, layout: opt.value }))} style={{ padding: '0.875rem 0.75rem', border: '2px solid ' + (form.layout === opt.value ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === opt.value ? '#0e1a2b' : '#fff', color: form.layout === opt.value ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
-                    <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>{opt.label}</div>
-                    <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>{opt.desc}</div>
-                  </button>
-                ))}
+                <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'standard' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'standard' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'standard' ? '#0e1a2b' : '#fff', color: form.layout === 'standard' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
+                  <div style={{ height: 55, marginBottom: '0.5rem', background: 'linear-gradient(180deg, #c9b28f 0%, #c9b28f 35%, #f7f4ee 35%)', borderRadius: 2 }} />
+                  <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Standard</div>
+                  <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>Best for most articles. Clean image on top. Ideal for SEO.</div>
+                </button>
+                <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'magazine' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'magazine' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'magazine' ? '#0e1a2b' : '#fff', color: form.layout === 'magazine' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
+                  <div style={{ height: 55, marginBottom: '0.5rem', background: 'linear-gradient(180deg, #4A5563 0%, #0e1a2b 100%)', borderRadius: 2, display: 'flex', alignItems: 'flex-end', padding: '0.4rem' }}>
+                    <div style={{ width: '70%', height: 6, background: '#f7f4ee', borderRadius: 2, opacity: 0.9 }} />
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Magazine</div>
+                  <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>Title overlays a full-screen image. Best for features and trending stories.</div>
+                </button>
+                <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'longform' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'longform' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'longform' ? '#0e1a2b' : '#fff', color: form.layout === 'longform' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
+                  <div style={{ height: 55, marginBottom: '0.5rem', borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ height: '45%', background: '#0e1a2b', display: 'flex', alignItems: 'center', padding: '0 0.4rem' }}>
+                      <div style={{ width: '60%', height: 4, background: '#c9b28f', borderRadius: 2 }} />
+                    </div>
+                    <div style={{ height: '55%', background: '#f7f4ee' }} />
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Long Form</div>
+                  <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>Dark intro header draws readers in. Best for deep dives. Strongest for AEO.</div>
+                </button>
               </div>
+            </div>
+
             </div>
             <div>
               <label style={lbl}>Title</label>
