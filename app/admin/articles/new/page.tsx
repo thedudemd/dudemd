@@ -247,26 +247,27 @@ function NewArticleInner() {
             <div>
               <label style={lbl}>Content</label>
               <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' as const, padding: '0.6rem 0.75rem', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#1B1D21', alignItems: 'center' }}>
-                {/* Text format group */}
                 <button onClick={() => editor?.chain().focus().toggleBold().run()} title="Bold" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('bold') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}><b style={{fontSize:13}}>B</b></button>
                 <button onClick={() => editor?.chain().focus().toggleItalic().run()} title="Italic" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('italic') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}><i style={{fontSize:13}}>I</i></button>
                 <button onClick={() => editor?.chain().focus().toggleUnderline().run()} title="Underline" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('underline') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}><u style={{fontSize:13}}>U</u></button>
                 <div style={{width:1,height:18,backgroundColor:'rgba(255,255,255,0.15)',margin:'0 0.25rem'}}/>
-                {/* Headings */}
-                <button onClick={() => editor?.chain().focus().toggleHeading({level:1}).run()} title="Heading 1" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('heading',{level:1}) ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em' }}>H1</button>
-                <button onClick={() => editor?.chain().focus().toggleHeading({level:2}).run()} title="Heading 2" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('heading',{level:2}) ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em' }}>H2</button>
-                <button onClick={() => editor?.chain().focus().toggleHeading({level:3}).run()} title="Heading 3" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('heading',{level:3}) ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em' }}>H3</button>
+                <button onClick={() => editor?.chain().focus().toggleHeading({level:1}).run()} style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('heading',{level:1}) ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee', fontSize: 11, fontWeight: 700 }}>H1</button>
+                <button onClick={() => editor?.chain().focus().toggleHeading({level:2}).run()} style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('heading',{level:2}) ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee', fontSize: 11, fontWeight: 700 }}>H2</button>
+                <button onClick={() => editor?.chain().focus().toggleHeading({level:3}).run()} style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('heading',{level:3}) ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee', fontSize: 11, fontWeight: 700 }}>H3</button>
                 <div style={{width:1,height:18,backgroundColor:'rgba(255,255,255,0.15)',margin:'0 0.25rem'}}/>
-                {/* Lists */}
-                <button onClick={() => editor?.chain().focus().toggleBulletList().run()} title="Bullet List" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('bulletList') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
-                </button>
-                <button onClick={() => editor?.chain().focus().toggleOrderedList().run()} title="Numbered List" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('orderedList') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><text x="2" y="8" fontSize="7" fill="currentColor" stroke="none">1</text><text x="2" y="14" fontSize="7" fill="currentColor" stroke="none">2</text><text x="2" y="20" fontSize="7" fill="currentColor" stroke="none">3</text></svg>
-                </button>
-                <button onClick={() => editor?.chain().focus().toggleBlockquote().run()} title="Blockquote" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('blockquote') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1zm12 0c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
-                </button>
+                <button onClick={() => editor?.chain().focus().toggleBulletList().run()} title="Bullet List" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('bulletList') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}>• List</button>
+                <button onClick={() => editor?.chain().focus().toggleOrderedList().run()} title="Numbered List" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('orderedList') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}>1. List</button>
+                <button onClick={() => editor?.chain().focus().toggleBlockquote().run()} title="Quote" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('blockquote') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}>" Quote</button>
+                <div style={{width:1,height:18,backgroundColor:'rgba(255,255,255,0.15)',margin:'0 0.25rem'}}/>
+                <button onClick={() => editor?.chain().focus().undo().run()} style={{ padding: '0.3rem 0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: '#f7f4ee' }}>↩</button>
+                <button onClick={() => editor?.chain().focus().redo().run()} style={{ padding: '0.3rem 0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: '#f7f4ee' }}>↪</button>
+                <div style={{flex:1}}/>
+                <span style={{fontSize:10,color:'rgba(247,244,238,0.4)',letterSpacing:'0.08em',textTransform:'uppercase'}}>{form.layout}</span>
+              </div>
+              <div style={{ border: '1px solid #ede8df', minHeight: '500px', padding: form.layout === 'magazine' ? '2rem' : form.layout === 'longform' ? '2.5rem 3rem' : '1.5rem', backgroundColor: form.layout === 'longform' ? '#0e1a2b' : '#fff', color: form.layout === 'longform' ? '#f7f4ee' : '#0e1a2b', fontFamily: form.layout === 'magazine' ? 'Georgia, serif' : 'inherit', lineHeight: 1.8, borderTop: 'none' }}>
+                <EditorContent editor={editor} />
+              </div>
+            </div>
                 <div style={{width:1,height:18,backgroundColor:'rgba(255,255,255,0.15)',margin:'0 0.25rem'}}/>
                 {/* Undo/Redo */}
                 <button onClick={() => editor?.chain().focus().undo().run()} title="Undo" style={{ padding: '0.3rem 0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}>
