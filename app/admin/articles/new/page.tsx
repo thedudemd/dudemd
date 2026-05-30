@@ -370,7 +370,6 @@ function NewArticleInner() {
                   {categories.filter((cat: any) => !cat.parent_id).map((cat: any) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                 </select>
               </div>
-              <div style={{ marginBottom: '1rem' }}><label style={lbl}>Article Layout</label><select name='layout' value={form.layout} onChange={handleChange} style={inp}><option value='standard'>Standard</option><option value='magazine'>Magazine</option><option value='longform'>Long Form</option></select></div>
               {subcategories.length > 0 && (
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={lbl}>Subcategory (optional)</label>
