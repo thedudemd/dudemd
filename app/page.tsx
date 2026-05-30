@@ -22,7 +22,7 @@ async function getCategories() {
   const { data } = await supabase
     .from('categories')
     .select('*')
-    .in('slug',['health','fitness','recovery','lifestyle','mind'])
+    .is('parent_id',null)
     .order('name')
   return data || []
 }
