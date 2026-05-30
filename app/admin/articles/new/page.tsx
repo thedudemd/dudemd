@@ -245,7 +245,8 @@ function NewArticleInner() {
                     <svg viewBox="0 0 80 45" style={{ width: "100%", height: 60, display: "block", marginBottom: "0.5rem" }} dangerouslySetInnerHTML={{ __html: opt.preview }} />
                     <div style={{ fontWeight: 700, fontSize: "12px", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "0.25rem" }}>{opt.label}</div>
                     <div style={{ fontSize: "11px", opacity: 0.75, lineHeight: 1.4 }}>{opt.desc}</div>
-                ))}
+                  </button>
+                )}
               </div>
             </div>
             <div>
