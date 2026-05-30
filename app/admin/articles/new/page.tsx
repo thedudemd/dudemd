@@ -16,6 +16,7 @@ function NewArticleInner() {
   const router = useRouter()
   const [categories, setCategories] = useState<any[]>([])
   const [subcategories, setSubcategories] = useState<any[]>([])
+  const [tagInput, setTagInput] = useState("")
   const [authors, setAuthors] = useState<any[]>([])
   const [saving, setSaving] = useState(false)
   const [autoSaved, setAutoSaved] = useState('')
@@ -25,7 +26,7 @@ function NewArticleInner() {
   const [seoScore, setSeoScore] = useState(0)
   const [aeoScore, setAeoScore] = useState(0)
   const [readabilityScore, setReadabilityScore] = useState(0)
-  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '', layout: 'standard' })
+  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '', layout: 'standard', tags: [] })
   const [canvaDesigns, setCanvaDesigns] = useState<any[]>([])
   const [showCanvaPicker, setShowCanvaPicker] = useState(false)
   const searchParams = useSearchParams()
@@ -156,7 +157,7 @@ function NewArticleInner() {
       const saved = localStorage.getItem(draftKey)
       if (saved) {
         const d = JSON.parse(saved)
-        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'', status: d.status||'draft', social_title: d.social_title||'', social_description: d.social_description||'', facebook_teaser_text: d.facebook_teaser_text||'', external_url: d.external_url||'', subcategory_id: d.subcategory_id||'', layout: d.layout||'standard' })
+        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'', status: d.status||'draft', social_title: d.social_title||'', social_description: d.social_description||'', facebook_teaser_text: d.facebook_teaser_text||'', external_url: d.external_url||'', subcategory_id: d.subcategory_id||'', layout: d.layout||'standard', tags: d.tags||[] })
         if (editor && d.content) editor.commands.setContent(d.content)
         setAutoSaved('Draft restored')
         if (d.category_id) { supabase.from('categories').select('*').eq('parent_id', d.category_id).eq('enabled', true).order('sort_order').then(({data}) => setSubcategories(data||[])) }
@@ -220,7 +221,7 @@ function NewArticleInner() {
             <div style={{ padding: '1.25rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
               <label style={lbl}>Choose Article Layout</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '0.5rem' }}>
-                <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'standard' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'standard' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'standard' ? '#0e1a2b' : '#fff', color: form.layout === 'standard' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
+                <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'standard', tags: [] }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'standard' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'standard' ? '#0e1a2b' : '#fff', color: form.layout === 'standard' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
                   <div style={{ height: 55, marginBottom: '0.5rem', background: 'linear-gradient(180deg, #c9b28f 0%, #c9b28f 35%, #f7f4ee 35%)', borderRadius: 2 }} />
                   <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Standard</div>
                   <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>Best for most articles. Clean image on top. Ideal for SEO.</div>
@@ -375,7 +376,8 @@ function NewArticleInner() {
               <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Settings</p>
               <div style={{ marginBottom: '1rem' }}>
                 <label style={lbl}>Tags</label>
-                <input name="tags" placeholder="Type tag + Enter" style={inp} />
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "0.5rem" }}>{(form.tags||[]).map((t:string) => <span key={t} style={{ fontSize: "11px", backgroundColor: "#0e1a2b", color: "#f7f4ee", padding: "0.25rem 0.6rem", borderRadius: 20, display: "flex", alignItems: "center", gap: "0.35rem" }}>{t}<button type="button" onClick={() => setForm(f => ({...f, tags: f.tags.filter((x:string)=>x!==t)}))} style={{ background: "none", border: "none", color: "#c9b28f", cursor: "pointer", fontSize: 14, lineHeight: 1, padding: 0 }}>×</button></span>)}</div>
+                <input value={tagInput} onChange={e=>setTagInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&tagInput.trim()){e.preventDefault();setForm(f=>({...f,tags:[...(f.tags||[]),tagInput.trim()]}));setTagInput("")}}} placeholder="Type tag + Enter" style={inp} />
               </div>
               <div style={{ marginBottom: '1rem' }}>
                 <label style={lbl}>Category</label>
