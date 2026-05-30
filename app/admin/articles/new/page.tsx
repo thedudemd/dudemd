@@ -234,6 +234,7 @@ function NewArticleInner() {
             <div style={{ padding: '1.25rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
               <label style={lbl}>Choose Article Layout</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '0.5rem' }}>
+                {[
                   { value: 'standard', label: 'Standard', desc: 'Best for most articles. Ideal for SEO.', preview: '<rect x="0" y="0" width="80" height="45" fill="#e8e4de"/><rect x="0" y="0" width="80" height="18" fill="#c9b28f" opacity="0.5"/><rect x="5" y="22" width="50" height="3" fill="#0e1a2b" rx="1"/><rect x="5" y="28" width="70" height="2" fill="#9a9085" rx="1"/>' },
                   { value: 'magazine', label: 'Magazine', desc: 'Bold visual impact. Title on full-screen image. Best for features.', preview: '<rect x="0" y="0" width="80" height="45" fill="#4A5563"/><rect x="5" y="28" width="55" height="4" fill="#f7f4ee" rx="1"/><rect x="5" y="35" width="40" height="2" fill="rgba(247,244,238,0.6)" rx="1"/>' },
                   { value: 'longform', label: 'Long Form', desc: 'Best for deep dives. Dark header draws readers in. Strongest for AEO.', preview: '<rect x="0" y="0" width="80" height="45" fill="#f7f4ee"/><rect x="0" y="0" width="80" height="20" fill="#0e1a2b"/><rect x="5" y="6" width="45" height="3" fill="#c9b28f" rx="1"/><rect x="5" y="25" width="70" height="2" fill="#9a9085" rx="1"/>' },
