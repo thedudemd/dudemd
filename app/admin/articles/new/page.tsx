@@ -242,8 +242,6 @@ function NewArticleInner() {
                 </button>
               </div>
             </div>
-
-            </div>
             <div>
               <label style={lbl}>Title</label>
               <input name="title" value={form.title} onChange={handleTitleChange} placeholder="Article title..." style={{ ...inp, fontSize: '20px', fontWeight: 600 }} />
