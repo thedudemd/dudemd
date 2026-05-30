@@ -163,20 +163,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* CATEGORY RIBBON */}
-      <section style={{ borderBottom: '1px solid #ede8df', padding: '0.85rem 0', backgroundColor: '#f7f4ee', position: 'sticky', top: 0, zIndex: 10 }}>
-        <div className="container-content">
-          <div style={{ display: 'flex', gap: '2rem', overflowX: 'auto', alignItems: 'center', scrollbarWidth: 'none' }}>
-            <Link href="/articles" style={{ flexShrink: 0, fontSize: '11px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none', whiteSpace: 'nowrap' }}>All</Link>
-            <div style={{ width: '1px', height: '14px', backgroundColor: '#ede8df', flexShrink: 0 }} />
-            {categories.map((cat) => (
-              <Link key={cat.slug} href={`/category/${cat.slug}`} style={{ flexShrink: 0, fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#4A5563', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                {cat.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
       {/* LATEST GRID */}
       <section style={{ padding: '3rem 0', borderBottom: '1px solid #ede8df' }}>
