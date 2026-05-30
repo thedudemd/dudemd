@@ -160,6 +160,7 @@ function NewArticleInner() {
         if (editor && d.content) editor.commands.setContent(d.content)
         setAutoSaved('Draft restored')
         if (d.category_id) { supabase.from('categories').select('*').eq('parent_id', d.category_id).eq('enabled', true).order('sort_order').then(({data}) => setSubcategories(data||[])) }
+        if (d.category_id) { supabase.from('categories').select('*').eq('parent_id', d.category_id).eq('enabled', true).order('sort_order').then(({data}) => setSubcategories(data||[])) }
       }
     }
     if (editor) loadDraft()
