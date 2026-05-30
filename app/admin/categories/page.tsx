@@ -35,7 +35,8 @@ export default function CategoriesAdmin() {
     if (editing.id) {
       await supabase.from('categories').update({ name: editing.name, slug: editing.slug, parent_id: editing.parent_id || null, sort_order: editing.sort_order, enabled: editing.enabled, indexable: editing.indexable, description: editing.description, cover_image_url: editing.cover_image_url }).eq('id', editing.id)
     } else {
-      await supabase.from('categories').insert({ name: editing.name, slug: editing.slug, parent_id: editing.parent_id || null, sort_order: editing.sort_order, enabled: editing.enabled, indexable: editing.indexable, description: editing.description, cover_image_url: editing.cover_image_url })
+      const { error: insertErr } = await supabase.from('categories').insert({ name: editing.name, slug: editing.slug, parent_id: editing.parent_id || null, sort_order: editing.sort_order, enabled: editing.enabled, indexable: editing.indexable, description: editing.description, cover_image_url: editing.cover_image_url })
+      if (insertErr) { alert('Error: ' + insertErr.message); setSaving(false); return }
     }
     setEditing(null)
     setSaving(false)
