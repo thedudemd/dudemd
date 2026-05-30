@@ -167,9 +167,18 @@ function NewArticleInner() {
     if (editor) loadDraft()
   }, [editor])
 
-  function handleChange(e: any) {
+  async function handleChange(e: any) {
     const { name, value } = e.target
     setForm(f => ({ ...f, [name]: value }))
+    if (name === 'category_id') {
+      if (value) {
+        const { data } = await supabase.from('categories').select('*').eq('parent_id', value).eq('enabled', true).order('sort_order')
+        setSubcategories(data || [])
+      } else {
+        setSubcategories([])
+      }
+      setForm(f => ({ ...f, category_id: value, subcategory_id: '' }))
+    }
   }
 
   function handleTitleChange(e: any) {
