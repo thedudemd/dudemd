@@ -45,7 +45,7 @@ export default function ArticlesPage() {
 
   useEffect(() => {
     async function load() {
-      const { data, error } = await supabase.from('articles').select('*, authors(name), categories(name)').order('created_at', { ascending: false })
+      const { data, error } = await supabase.from('articles').select('*, authors!articles_author_id_fkey(name), categories!articles_category_id_fkey(name)').order('created_at', { ascending: false })
       console.log('ARTICLES DATA:', data)
       console.log('ARTICLES ERROR:', error)
       setArticles(data || [])
