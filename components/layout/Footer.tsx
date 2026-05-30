@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import { supabaseServer } from '@/lib/supabase/server'
 
-export default function Footer() {
+export default async function Footer() {
+  const { data: categories } = await supabaseServer.from("categories").select("name,slug").is("parent_id",null).eq("enabled",true).order("sort_order").order("name")
   return (
     <footer>
       <div style={{ backgroundColor: '#0e1a2b', padding: '4rem 0 2rem' }}>
@@ -23,8 +25,8 @@ export default function Footer() {
             </div>
             <div>
               <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '1rem' }}>Categories</p>
-              {['Health','Fitness','Recovery','Lifestyle','Mind'].map((item) => (
-                <Link key={item} href={`/category/${item.toLowerCase().replace(' ','-')}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>{item}</Link>
+              {(categories || []).map((cat) => (
+                <Link key={cat.slug} href={`/category/${cat.slug}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>{cat.name}</Link>
               ))}
             </div>
             <div>
