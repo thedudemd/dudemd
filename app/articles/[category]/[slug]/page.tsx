@@ -4,6 +4,9 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 import { notFound } from 'next/navigation'
 import ArticleContent from '@/components/article/ArticleContent'
+import StandardLayout from '@/components/article/layouts/StandardLayout'
+import MagazineLayout from '@/components/article/layouts/MagazineLayout'
+import LongFormLayout from '@/components/article/layouts/LongFormLayout'
 
 export const revalidate = 60
 
@@ -139,9 +142,19 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         }
       `}</style>
 
-      <div style={{ width: '100%', overflow: 'hidden', maxHeight: "380px" }}>
-        <img src={article.cover_image_url} alt={`Cover image for ${article.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-      </div>
+      {article.layout === 'magazine' ? (
+        <MagazineLayout article={article}>
+          <div />
+        </MagazineLayout>
+      ) : article.layout === 'longform' ? (
+        <LongFormLayout article={article}>
+          <div />
+        </LongFormLayout>
+      ) : (
+        <div style={{ width: '100%', overflow: 'hidden', maxHeight: '380px' }}>
+          <img src={article.cover_image_url} alt={`Cover image for ${article.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        </div>
+      )}
 
       <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
         <div className="article-grid" style={{ alignItems: 'start' }}>
