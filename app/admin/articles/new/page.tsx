@@ -215,19 +215,20 @@ function NewArticleInner() {
 
           {/* LEFT COLUMN */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ padding: '1rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
-              <label style={lbl}>Article Type</label>
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                <button type="button" onClick={() => setForm(f => ({ ...f, external_url: '', subcategory_id: '', layout: 'standard' }))} style={{ flex: 1, padding: '0.75rem', border: '1px solid ' + (!form.external_url ? '#0e1a2b' : '#ede8df'), backgroundColor: !form.external_url ? '#0e1a2b' : '#fff', color: !form.external_url ? '#f7f4ee' : '#4A5563', fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>Standard Article</button>
-                <button type="button" onClick={() => setForm(f => ({ ...f, external_url: form.external_url || '/' }))} style={{ flex: 1, padding: '0.75rem', border: '1px solid ' + (form.external_url ? '#c9b28f' : '#ede8df'), backgroundColor: form.external_url ? '#c9b28f' : '#fff', color: form.external_url ? '#0e1a2b' : '#4A5563', fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>Custom Plasmic Page</button>
+            <div style={{ padding: '1.25rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
+              <label style={lbl}>Choose Article Layout</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '0.5rem' }}>
+                {[
+                  { value: 'standard', label: 'Standard', desc: 'Classic layout with header image on top' },
+                  { value: 'magazine', label: 'Magazine', desc: 'Full-bleed hero with title overlaid on image' },
+                  { value: 'longform', label: 'Long Form', desc: 'Dark header with title, image below' },
+                ].map(opt => (
+                  <button key={opt.value} type="button" onClick={() => setForm(f => ({ ...f, layout: opt.value }))} style={{ padding: '0.875rem 0.75rem', border: '2px solid ' + (form.layout === opt.value ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === opt.value ? '#0e1a2b' : '#fff', color: form.layout === opt.value ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
+                    <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>{opt.label}</div>
+                    <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>{opt.desc}</div>
+                  </button>
+                ))}
               </div>
-              {form.external_url && (
-                <div style={{ marginTop: '0.75rem' }}>
-                  <label style={{ ...lbl, fontSize: '10px', marginBottom: '0.3rem' }}>Plasmic Page URL</label>
-                  <input name="external_url" value={form.external_url} onChange={handleChange} placeholder="/p/your-special-page" style={inp} />
-                  <p style={{ fontSize: '11px', color: '#9a9085', marginTop: '0.4rem', margin: 0 }}>Build the page at studio.plasmic.app, then paste the URL here. Editor below will be skipped.</p>
-                </div>
-              )}
             </div>
             <div>
               <label style={lbl}>Title</label>
