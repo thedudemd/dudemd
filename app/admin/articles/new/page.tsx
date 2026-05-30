@@ -219,14 +219,16 @@ function NewArticleInner() {
               <label style={lbl}>Choose Article Layout</label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '0.5rem' }}>
                 {[
-                  { value: 'standard', label: 'Standard', desc: 'Best for most articles. Clean image, title, and body. Ideal for SEO.' },
+                  { value: 'standard', label: 'Standard', desc: 'Best for most articles. Ideal for SEO.', preview: '<rect x="0" y="0" width="80" height="45" fill="#e8e4de"/><rect x="0" y="0" width="80" height="18" fill="#c9b28f" opacity="0.5"/><rect x="5" y="22" width="50" height="3" fill="#0e1a2b" rx="1"/><rect x="5" y="28" width="70" height="2" fill="#9a9085" rx="1"/><rect x="5" y="33" width="60" height="2" fill="#9a9085" rx="1"/><rect x="5" y="38" width="65" height="2" fill="#9a9085" rx="1"/>' },
+                  { value: 'magazine', label: 'Magazine', desc: 'Bold visual impact. Title on full-screen image. Best for features.', preview: '<rect x="0" y="0" width="80" height="45" fill="#4A5563"/><rect x="0" y="0" width="80" height="45" fill="url(#g)" opacity="0.8"/><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="transparent"/><stop offset="100%" stop-color="#0e1a2b"/></linearGradient></defs><rect x="5" y="28" width="55" height="4" fill="#f7f4ee" rx="1"/><rect x="5" y="35" width="40" height="2" fill="rgba(247,244,238,0.6)" rx="1"/>' },
+                  { value: 'longform', label: 'Long Form', desc: 'Best for deep dives. Dark header draws readers in. Strongest for AEO.', preview: '<rect x="0" y="0" width="80" height="45" fill="#f7f4ee"/><rect x="0" y="0" width="80" height="20" fill="#0e1a2b"/><rect x="5" y="6" width="45" height="3" fill="#c9b28f" rx="1"/><rect x="5" y="12" width="60" height="3" fill="#f7f4ee" rx="1"/><rect x="5" y="25" width="70" height="2" fill="#9a9085" rx="1"/><rect x="5" y="30" width="65" height="2" fill="#9a9085" rx="1"/><rect x="5" y="35" width="60" height="2" fill="#9a9085" rx="1"/>' },
                   { value: 'magazine', label: 'Magazine', desc: 'Bold visual impact. Title overlays a full-screen image. Best for features and trending stories.' },
                   { value: 'longform', label: 'Long Form', desc: 'Best for deep dives and guides. Dark intro header draws readers in. Strongest for AEO.' },
                 ].map(opt => (
-                  <button key={opt.value} type="button" onClick={() => setForm(f => ({ ...f, layout: opt.value }))} style={{ padding: '0.875rem 0.75rem', border: '2px solid ' + (form.layout === opt.value ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === opt.value ? '#0e1a2b' : '#fff', color: form.layout === opt.value ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
-                    <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.35rem' }}>{opt.label}</div>
-                    <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>{opt.desc}</div>
-                  </button>
+                  <button key={opt.value} type="button" onClick={() => setForm(f => ({ ...f, layout: opt.value }))} style={{ padding: "0.75rem", border: "2px solid " + (form.layout === opt.value ? "#0e1a2b" : "#ede8df"), backgroundColor: form.layout === opt.value ? "#0e1a2b" : "#fff", color: form.layout === opt.value ? "#f7f4ee" : "#4A5563", cursor: "pointer", textAlign: "left" }}>
+                    <svg viewBox="0 0 80 45" style={{ width: "100%", height: 60, display: "block", marginBottom: "0.5rem" }} dangerouslySetInnerHTML={{ __html: opt.preview }} />
+                    <div style={{ fontWeight: 700, fontSize: "12px", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "0.25rem" }}>{opt.label}</div>
+                    <div style={{ fontSize: "11px", opacity: 0.75, lineHeight: 1.4 }}>{opt.desc}</div>
                 ))}
               </div>
             </div>
@@ -241,30 +243,31 @@ function NewArticleInner() {
             <div>
               <label style={lbl}>Excerpt</label>
               <textarea name="excerpt" value={form.excerpt} onChange={handleChange} rows={2} placeholder="Brief description..." style={{ ...inp, resize: 'vertical' as const }} />
-            </div>
-
             {/* CONTENT EDITOR */}
             <div>
               <label style={lbl}>Content</label>
-              <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' as const, padding: '0.5rem', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#f7f4ee' }}>
-                {[
-                  { l: 'B', a: () => editor?.chain().focus().toggleBold().run(), act: () => !!editor?.isActive('bold') },
-                  { l: 'I', a: () => editor?.chain().focus().toggleItalic().run(), act: () => !!editor?.isActive('italic') },
-                  { l: 'U', a: () => editor?.chain().focus().toggleUnderline().run(), act: () => !!editor?.isActive('underline') },
-                  { l: 'H1', a: () => editor?.chain().focus().toggleHeading({ level: 1 }).run(), act: () => !!editor?.isActive('heading', { level: 1 }) },
-                  { l: 'H2', a: () => editor?.chain().focus().toggleHeading({ level: 2 }).run(), act: () => !!editor?.isActive('heading', { level: 2 }) },
-                  { l: 'H3', a: () => editor?.chain().focus().toggleHeading({ level: 3 }).run(), act: () => !!editor?.isActive('heading', { level: 3 }) },
-                  { l: '• List', a: () => editor?.chain().focus().toggleBulletList().run(), act: () => !!editor?.isActive('bulletList') },
-                  { l: '1. List', a: () => editor?.chain().focus().toggleOrderedList().run(), act: () => !!editor?.isActive('orderedList') },
-                  { l: '" Quote', a: () => editor?.chain().focus().toggleBlockquote().run(), act: () => !!editor?.isActive('blockquote') },
-                  { l: 'Undo', a: () => editor?.chain().focus().undo().run(), act: () => false },
-                  { l: 'Redo', a: () => editor?.chain().focus().redo().run(), act: () => false },
-                ].map(({ l, a, act }) => (
-                  <button key={l} onClick={a} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: act() ? '#0e1a2b' : '#fff', color: act() ? '#fff' : '#0e1a2b', cursor: 'pointer' }}>{l}</button>
-                ))}
+              <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' as const, padding: '0.6rem 0.75rem', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#1B1D21', alignItems: 'center' }}>
+                <button onClick={() => editor?.chain().focus().toggleBold().run()} title="Bold" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('bold') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}><b style={{fontSize:13}}>B</b></button>
+                <button onClick={() => editor?.chain().focus().toggleItalic().run()} title="Italic" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('italic') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}><i style={{fontSize:13}}>I</i></button>
+                <button onClick={() => editor?.chain().focus().toggleUnderline().run()} title="Underline" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('underline') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}><u style={{fontSize:13}}>U</u></button>
+                <div style={{width:1,height:18,backgroundColor:'rgba(255,255,255,0.15)',margin:'0 0.25rem'}}/>
+                <button onClick={() => editor?.chain().focus().toggleHeading({level:1}).run()} style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('heading',{level:1}) ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee', fontSize: 11, fontWeight: 700 }}>H1</button>
+                <button onClick={() => editor?.chain().focus().toggleHeading({level:2}).run()} style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('heading',{level:2}) ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee', fontSize: 11, fontWeight: 700 }}>H2</button>
+                <button onClick={() => editor?.chain().focus().toggleHeading({level:3}).run()} style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('heading',{level:3}) ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee', fontSize: 11, fontWeight: 700 }}>H3</button>
+                <div style={{width:1,height:18,backgroundColor:'rgba(255,255,255,0.15)',margin:'0 0.25rem'}}/>
+                <button onClick={() => editor?.chain().focus().toggleBulletList().run()} title="Bullet List" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('bulletList') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}>• List</button>
+                <button onClick={() => editor?.chain().focus().toggleOrderedList().run()} title="Numbered List" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('orderedList') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}>1. List</button>
+                <button onClick={() => editor?.chain().focus().toggleBlockquote().run()} title="Quote" style={{ padding: '0.3rem 0.5rem', background: editor?.isActive('blockquote') ? '#c9b28f' : 'transparent', border: 'none', cursor: 'pointer', borderRadius: 3, color: '#f7f4ee' }}>" Quote</button>
+                <div style={{width:1,height:18,backgroundColor:'rgba(255,255,255,0.15)',margin:'0 0.25rem'}}/>
+                <button onClick={() => editor?.chain().focus().undo().run()} style={{ padding: '0.3rem 0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: '#f7f4ee' }}>↩</button>
+                <button onClick={() => editor?.chain().focus().redo().run()} style={{ padding: '0.3rem 0.5rem', background: 'transparent', border: 'none', cursor: 'pointer', color: '#f7f4ee' }}>↪</button>
+                <div style={{flex:1}}/>
+                <span style={{fontSize:10,color:'rgba(247,244,238,0.4)',letterSpacing:'0.08em',textTransform:'uppercase'}}>{form.layout}</span>
               </div>
-              <div style={{ border: '1px solid #ede8df', minHeight: '500px', padding: form.layout === 'longform' ? '2.5rem 3rem' : form.layout === 'magazine' ? '2rem' : '1.5rem', backgroundColor: form.layout === 'longform' ? '#0e1a2b' : '#fff', color: form.layout === 'longform' ? '#f7f4ee' : '#0e1a2b', fontFamily: form.layout === 'magazine' ? 'Georgia, serif' : 'inherit', lineHeight: 1.8 }}>
+              <div style={{ border: '1px solid #ede8df', minHeight: '500px', padding: form.layout === 'magazine' ? '2rem' : form.layout === 'longform' ? '2.5rem 3rem' : '1.5rem', backgroundColor: form.layout === 'longform' ? '#0e1a2b' : '#fff', color: form.layout === 'longform' ? '#f7f4ee' : '#0e1a2b', fontFamily: form.layout === 'magazine' ? 'Georgia, serif' : 'inherit', lineHeight: 1.8, borderTop: 'none' }}>
                 <EditorContent editor={editor} />
+              </div>
+            </div>
               </div>
             </div>
 
