@@ -88,8 +88,10 @@ function EditArticleInner({ slug }: { slug: string }) {
 
   async function handleSave(status: string) {
     setSaving(true)
+    const cleanForm = {...form, category_id: form.category_id||null, subcategory_id: form.subcategory_id||null, author_id: form.author_id||null}
+    if (status === "published" && !cleanForm.cover_image_url) { alert("Please add a cover image before publishing."); setSaving(false); return; }
     const { error } = await supabase.from<any>('articles').update({
-      ...form,
+      ...cleanForm,
       content: editor?.getHTML() || '',
       read_time: getReadTime(),
       status,
