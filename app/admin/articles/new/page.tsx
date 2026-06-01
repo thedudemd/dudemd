@@ -271,6 +271,10 @@ function NewArticleInner() {
   function scoreBg(s: number) { return s >= 80 ? '#e8f5ea' : s >= 50 ? '#fef3e2' : '#fdecea' }
 
   async function handleSave(status: string) {
+    if (status === "published" && !form.cover_image_url) {
+      alert("Please add a cover image before publishing.")
+      return
+    }
     setSaving(true)
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) { router.push('/admin/login'); return }
