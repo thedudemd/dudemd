@@ -299,7 +299,7 @@ function NewArticleInner() {
   function handleTitleChange(e: any) {
     const title = e.target.value
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-    setForm(f => ({ ...f, title, slug, meta_title: title, social_title: title }))
+    setForm(f => ({ ...f, title, slug, meta_title: title, social_title: title, meta_description: f.excerpt || f.meta_description, social_description: f.excerpt || f.social_description }))
   }
 
   function getWordCount() { return editor ? editor.getText().split(/\s+/).filter(Boolean).length : 0 }
