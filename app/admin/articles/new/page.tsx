@@ -294,7 +294,7 @@ function NewArticleInner() {
                 ].map(({ l, a, act }) => (
                   <button key={l} onClick={a} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: act() ? '#0e1a2b' : '#fff', color: act() ? '#fff' : '#0e1a2b', cursor: 'pointer' }}>{l}</button>
                 ))}
-                <select onChange={e => { if(e.target.value) editor?.chain().focus().setMark('textStyle', { fontSize: e.target.value }).run() }} style={{ padding: '0.3rem 0.4rem', fontSize: '12px', border: '1px solid #ede8df', backgroundColor: '#fff', cursor: 'pointer' }}><option value=''>Size</option>{['12','14','16','18','20','24','28','32','36'].map(s => <option key={s} value={s+'px'}>{s}</option>)}</select>
+                <select onChange={e => { if(e.target.value) editor?.chain().focus().updateAttributes('textStyle', { fontSize: e.target.value }).run(); else editor?.chain().focus().unsetMark('textStyle').run() }} style={{ padding: '0.3rem 0.4rem', fontSize: '12px', border: '1px solid #ede8df', backgroundColor: '#fff', cursor: 'pointer' }}><option value=''>Size</option>{['12','14','16','18','20','24','28','32','36'].map(s => <option key={s} value={s+'px'}>{s}</option>)}</select>
               </div>
               <div style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: '500px', padding: '1rem' }}>
                 <EditorContent editor={editor} />
