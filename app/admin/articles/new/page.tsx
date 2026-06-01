@@ -40,6 +40,7 @@ function NewArticleInner() {
   const [showCanvaPicker, setShowCanvaPicker] = useState(false)
   const [imgUploading, setImgUploading] = useState(false)
   const imgInputRef = useRef<HTMLInputElement>(null)
+  const suggestTimer = useRef<any>(null)
   const [showImgSearch, setShowImgSearch] = useState(false)
   const [imgSearchQuery, setImgSearchQuery] = useState('')
   const [imgSearchResults, setImgSearchResults] = useState<any[]>([])
@@ -70,6 +71,17 @@ function NewArticleInner() {
       const text = editor.getText()
       const words = text.split(/\s+/).filter(Boolean).length
       calcScores(form.title, text, words)
+      // Auto-suggest after 3 seconds of no typing
+      if (suggestTimer.current) clearTimeout(suggestTimer.current)
+      if (words >= 50) {
+        suggestTimer.current = setTimeout(() => {
+          const stopWords = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','is','was','are','were','be','been','this','that','it','he','she','they','we','you','i','my','your','his','her','our'])
+          const freq: Record<string, number> = {}
+          text.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/).filter(w => w.length > 3 && !stopWords.has(w)).forEach(w => { freq[w] = (freq[w] || 0) + 1 })
+          const topKeyword = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0,1).map(([w]) => w)[0]
+          if (topKeyword) fetchSuggestions(topKeyword)
+        }, 3000)
+      }
     },
   })
 
