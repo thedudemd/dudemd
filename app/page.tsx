@@ -112,7 +112,7 @@ export default async function HomePage() {
                 <Link href={`/articles/${featured.categories?.slug}/${featured.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '1.25rem' }}>
                     <img
-                      src={featured.cover_image_url || 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=900&q=80'}
+                      src={featured.cover_image_url || '/placeholder-cover.jpg'}
                       alt={`${featured.title} — ${featured.categories?.name}`}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}
                     />
@@ -141,7 +141,7 @@ export default async function HomePage() {
                   <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                     <div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '0.75rem' }}>
                       <img
-                        src={a.cover_image_url || 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80'}
+                        src={a.cover_image_url || '/placeholder-cover.jpg'}
                         alt={`${a.title} — ${a.categories?.name}`}
                         style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                       />
@@ -178,7 +178,7 @@ export default async function HomePage() {
                 <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
                     <img
-                      src={a.cover_image_url || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80'}
+                      src={a.cover_image_url || '/placeholder-cover.jpg'}
                       alt={`${a.title} — ${a.categories?.name}`}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                     />
