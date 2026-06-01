@@ -284,6 +284,10 @@ function NewArticleInner() {
 
   async function handleChange(e: any) {
     const { name, value } = e.target
+    if (name === 'excerpt') {
+      setForm(f => ({ ...f, excerpt: value, meta_description: value, social_description: value }))
+      return
+    }
     setForm(f => ({ ...f, [name]: value }))
     if (name === 'category_id') {
       if (value) {
