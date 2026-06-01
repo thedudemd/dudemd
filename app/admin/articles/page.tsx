@@ -120,7 +120,7 @@ export default function ArticlesPage() {
               </div>
               <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                 <Link href={`/admin/articles/${a.slug}`} style={{ fontSize: '12px', fontWeight: 600, color: '#0e1a2b', textDecoration: 'none' }}>Edit</Link>
-                <a href={`/articles/${a.slug}`} target="_blank" style={{ fontSize: '12px', fontWeight: 600, color: '#c9b28f', textDecoration: 'none' }}>View</a>
+                <a href={`/articles/${a.categories?.slug || a.category_id}/${a.slug}`} target="_blank" style={{ fontSize: '12px', fontWeight: 600, color: '#c9b28f', textDecoration: 'none' }}>View</a>
                 <button onClick={() => { setDeleteId(a.id); setDeleteInput('') }} style={{ fontSize: '12px', fontWeight: 600, color: '#c0392b', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Delete</button>
               </div>
             </div>
