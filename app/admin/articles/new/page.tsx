@@ -18,7 +18,6 @@ import Subscript from '@tiptap/extension-subscript'
 import Superscript from '@tiptap/extension-superscript'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import CharacterCount from '@tiptap/extension-character-count'
-import { FontSize } from '@/lib/tiptap/FontSize'
 
 function NewArticleInner() {
   const router = useRouter()
@@ -45,7 +44,7 @@ function NewArticleInner() {
       LinkExtension.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: 'Write your article here...' }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      TextStyle, Color, Highlight.configure({ multicolor: true }), Subscript, Superscript, HorizontalRule, CharacterCount, FontSize,
+      TextStyle, Color, Highlight.configure({ multicolor: true }), Subscript, Superscript, HorizontalRule, CharacterCount,
     ],
     content: '',
     onUpdate: ({ editor }) => {
