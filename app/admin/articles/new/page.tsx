@@ -39,6 +39,14 @@ function NewArticleInner() {
   const [showCanvaPicker, setShowCanvaPicker] = useState(false)
   const [imgUploading, setImgUploading] = useState(false)
   const imgInputRef = useRef<HTMLInputElement>(null)
+  const [showImgSearch, setShowImgSearch] = useState(false)
+  const [imgSearchQuery, setImgSearchQuery] = useState('')
+  const [imgSearchResults, setImgSearchResults] = useState<any[]>([])
+  const [imgSearchLoading, setImgSearchLoading] = useState(false)
+  const [selectedImg, setSelectedImg] = useState<any>(null)
+  const [imgAlt, setImgAlt] = useState('')
+  const [imgCaption, setImgCaption] = useState('')
+  const [imgTitle, setImgTitle] = useState('')
   const searchParams = useSearchParams()
 
   const editor = useEditor({
@@ -157,6 +165,42 @@ function NewArticleInner() {
       alert('Upload failed')
     }
     setImgUploading(false)
+  }
+
+  async function searchUnsplash(q: string) {
+    if (q.trim().length < 2) return
+    setImgSearchLoading(true)
+    try {
+      const res = await fetch('/api/unsplash?query=' + encodeURIComponent(q))
+      const data = await res.json()
+      setImgSearchResults(data.results || [])
+    } catch(e) {}
+    setImgSearchLoading(false)
+  }
+
+  function selectUnsplashImage(photo: any) {
+    setSelectedImg(photo)
+    const desc = photo.description || photo.alt_description || ''
+    const articleKeyword = form.title ? form.title.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ').slice(0,4).join(' ') : ''
+    setImgAlt(desc || articleKeyword || photo.photographer)
+    setImgTitle(desc || articleKeyword)
+    setImgCaption('Photo by ' + photo.photographer + ' on Unsplash')
+  }
+
+  async function insertUnsplashImage() {
+    await fetch('/api/unsplash?action=download&downloadUrl=' + encodeURIComponent(selectedImg.download_url))
+    editor.chain().focus().setImage({
+      src: selectedImg.url,
+      alt: imgAlt,
+      title: imgTitle,
+    }).run()
+    if (imgCaption) {
+      editor.chain().focus().insertContent('<p><em>' + imgCaption + '</em></p>').run()
+    }
+    setShowImgSearch(false)
+    setSelectedImg(null)
+    setImgSearchResults([])
+    setImgSearchQuery('')
   }
 
   async function fetchSuggestions(kw: string) {
@@ -342,6 +386,7 @@ function NewArticleInner() {
                 <select onChange={e => { if(e.target.value) (editor?.chain().focus() as any).setFontSize(e.target.value).run(); else (editor?.chain().focus() as any).unsetFontSize().run() }} style={{ padding: '0.3rem 0.4rem', fontSize: '12px', border: '1px solid #ede8df', backgroundColor: '#fff', cursor: 'pointer' }}><option value=''>Size</option>{['12','14','16','18','20','24','28','32','36'].map(s => <option key={s} value={s+'px'}>{s}</option>)}</select>
                 <input ref={imgInputRef} type='file' accept='image/jpeg,image/png,image/webp,image/gif' style={{ display: 'none' }} onChange={handleImageUpload} />
                 <button type='button' onClick={() => imgInputRef.current?.click()} disabled={imgUploading} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', cursor: 'pointer' }}>{imgUploading ? 'Uploading...' : '📷 Image'}</button>
+                <button type='button' onClick={() => setShowImgSearch(true)} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #0e1a2b', backgroundColor: '#0e1a2b', color: '#f7f4ee', cursor: 'pointer' }}>🔍 Search Images</button>
               </div>
               <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: '500px', padding: '1rem' }}>
                 <EditorContent editor={editor} />
@@ -497,6 +542,57 @@ function NewArticleInner() {
         </div>
       </div>
     </div>
+
+    {/* UNSPLASH IMAGE SEARCH MODAL */}
+    {showImgSearch && (
+      <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+        <div style={{ backgroundColor: '#fff', width: '100%', maxWidth: '860px', maxHeight: '90vh', overflowY: 'auto', padding: '2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <p style={{ fontSize: '16px', fontWeight: 700, color: '#0e1a2b', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Search Free Images</p>
+            <button type='button' onClick={() => { setShowImgSearch(false); setSelectedImg(null); setImgSearchResults([]); }} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#4A5563' }}>✕</button>
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+            <input type='text' placeholder='Search images... (e.g. fitness, mental health)' value={imgSearchQuery} onChange={e => setImgSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && searchUnsplash(imgSearchQuery)} style={{ flex: 1, padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', outline: 'none' }} />
+            <button type='button' onClick={() => searchUnsplash(imgSearchQuery)} disabled={imgSearchLoading} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>{imgSearchLoading ? 'Searching...' : 'Search'}</button>
+          </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              {imgSearchResults.map((photo: any) => (
+                <div key={photo.id} onClick={() => selectUnsplashImage(photo)} style={{ cursor: 'pointer', border: '3px solid transparent', overflow: 'hidden' }}>
+                  <img src={photo.thumb} alt={photo.alt_description} style={{ width: '100%', height: '140px', objectFit: 'cover', display: 'block' }} />
+                  <div style={{ padding: '0.4rem', fontSize: '10px', color: '#4A5563', backgroundColor: '#f7f4ee' }}>by {photo.photographer}</div>
+                </div>
+              ))}
+            </div>
+          )}
+          {selectedImg && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              <div>
+                <img src={selectedImg.thumb} alt={selectedImg.alt_description} style={{ width: '100%', height: '200px', objectFit: 'cover', display: 'block', marginBottom: '0.5rem' }} />
+                <p style={{ fontSize: '11px', color: '#4A5563', margin: 0 }}>Photo by <a href={selectedImg.photographer_url} target='_blank' rel='noopener noreferrer' style={{ color: '#0e1a2b' }}>{selectedImg.photographer}</a> on <a href={selectedImg.unsplash_url} target='_blank' rel='noopener noreferrer' style={{ color: '#0e1a2b' }}>Unsplash</a></p>
+                <button type='button' onClick={() => setSelectedImg(null)} style={{ marginTop: '0.75rem', fontSize: '11px', color: '#4A5563', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>← Back to results</button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <p style={{ fontSize: '11px', fontWeight: 700, color: '#0e1a2b', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Image SEO</p>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', display: 'block', marginBottom: '0.35rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Alt Text</label>
+                  <input type='text' value={imgAlt} onChange={e => setImgAlt(e.target.value)} style={{ width: '100%', padding: '0.6rem', border: '1px solid #ede8df', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', display: 'block', marginBottom: '0.35rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Title Attribute</label>
+                  <input type='text' value={imgTitle} onChange={e => setImgTitle(e.target.value)} style={{ width: '100%', padding: '0.6rem', border: '1px solid #ede8df', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', display: 'block', marginBottom: '0.35rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Caption</label>
+                  <input type='text' value={imgCaption} onChange={e => setImgCaption(e.target.value)} style={{ width: '100%', padding: '0.6rem', border: '1px solid #ede8df', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }} />
+                </div>
+                <button type='button' onClick={insertUnsplashImage} style={{ padding: '0.875rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', marginTop: 'auto' }}>Insert Image</button>
+              </div>
+            </div>
+          )}
+          <p style={{ fontSize: '10px', color: '#4A5563', marginTop: '1.5rem', borderTop: '1px solid #ede8df', paddingTop: '1rem' }}>Photos provided by <a href='https://unsplash.com?utm_source=dudemd&utm_medium=referral' target='_blank' rel='noopener noreferrer' style={{ color: '#0e1a2b' }}>Unsplash</a>. Attribution required per license.</p>
+        </div>
+      </div>
+    )}
   )
 }
 
