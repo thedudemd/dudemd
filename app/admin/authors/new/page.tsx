@@ -9,6 +9,7 @@ function AuthorFormInner() {
   const searchParams = useSearchParams()
   const editId = searchParams.get('id')
   const [saving, setSaving] = useState(false)
+  const [avatarUploading, setAvatarUploading] = useState(false)
   const [form, setForm] = useState({
     name: '', slug: '', title: '', bio: '', avatar_url: '',
     twitter: '', instagram: '', linkedin: '', website: '', meta_description: ''
@@ -51,6 +52,21 @@ function AuthorFormInner() {
   const lbl: any = { display: 'block', fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#4A5563', marginBottom: '0.5rem' }
   const section: any = { backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem', marginBottom: '1.5rem' }
 
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/upload-image', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (data.url) setForm(f => ({ ...f, avatar_url: data.url }))
+      else alert('Upload failed: ' + (data.error || 'Unknown error'))
+    } catch (err) { alert('Upload failed') }
+    setAvatarUploading(false)
+  }
+
   return (
     <div style={{ padding: '2rem', backgroundColor: '#f7f4ee', minHeight: '100vh' }}>
       <div style={{ maxWidth: '700px', margin: '0 auto' }}>
@@ -78,7 +94,13 @@ function AuthorFormInner() {
             </div>
             <div>
               <label style={lbl}>Avatar URL</label>
-              <input style={inp} placeholder="https://..." value={form.avatar_url} onChange={e => setForm({...form, avatar_url: e.target.value})} />
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input style={{ ...inp, flex: 1 }} placeholder="https://..." value={form.avatar_url} onChange={e => setForm({...form, avatar_url: e.target.value})} />
+                <label style={{ padding: '0.75rem 1rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }}>
+                  {avatarUploading ? 'Uploading...' : '📷 Upload'}
+                  <input type='file' accept='image/jpeg,image/png,image/webp' style={{ display: 'none' }} onChange={handleAvatarUpload} disabled={avatarUploading} />
+                </label>
+              </div>
               {form.avatar_url && <img src={form.avatar_url} alt="preview" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', marginTop: '0.75rem' }} />}
             </div>
           </div>
