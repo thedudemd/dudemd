@@ -358,9 +358,9 @@ function NewArticleInner() {
                     { l: '" Quote', a: () => editor?.chain().focus().toggleBlockquote().run(), act: () => !!editor?.isActive('blockquote') },
                     { l: 'Undo', a: () => editor?.chain().focus().undo().run(), act: () => false },
                     { l: 'Redo', a: () => editor?.chain().focus().redo().run(), act: () => false },
-                  { l: '⬅ Float Left', a: () => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-right','float-none'); img.classList.add('float-left'); } }, act: () => false },
-                  { l: 'Float Right ➡', a: () => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-left','float-none'); img.classList.add('float-right'); } }, act: () => false },
-                  { l: '⊡ No Float', a: () => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-left','float-right'); img.classList.add('float-none'); } }, act: () => false },
+                  { l: '⬅ Img', a: () => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-right','float-none'); img.classList.add('float-left'); } }, act: () => false },
+                  { l: 'Img ➡', a: () => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-left','float-none'); img.classList.add('float-right'); } }, act: () => false },
+                  { l: '⊡ Img', a: () => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-left','float-right'); img.classList.add('float-none'); } }, act: () => false },
                   ].map(({ l, a, act }) => (
                     <button key={l} onClick={a} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: act() ? '#0e1a2b' : '#fff', color: act() ? '#fff' : '#0e1a2b', cursor: 'pointer' }}>{l}</button>
                   ))}
