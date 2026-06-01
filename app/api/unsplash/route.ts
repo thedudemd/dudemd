@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const query = searchParams.get('query')
+  const page = searchParams.get('page') || '1'
   const action = searchParams.get('action')
   const downloadUrl = searchParams.get('downloadUrl')
 

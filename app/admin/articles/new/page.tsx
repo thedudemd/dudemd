@@ -44,6 +44,8 @@ function NewArticleInner() {
   const [imgSearchQuery, setImgSearchQuery] = useState('')
   const [imgSearchResults, setImgSearchResults] = useState<any[]>([])
   const [imgSearchLoading, setImgSearchLoading] = useState(false)
+  const [imgSearchPage, setImgSearchPage] = useState(1)
+  const [imgSearchHasMore, setImgSearchHasMore] = useState(false)
   const [selectedImg, setSelectedImg] = useState<any>(null)
   const [imgAlt, setImgAlt] = useState('')
   const [imgCaption, setImgCaption] = useState('')
@@ -159,13 +161,19 @@ function NewArticleInner() {
     setImgUploading(false)
   }
 
-  async function searchUnsplash(q: string) {
+  async function searchUnsplash(q: string, page = 1) {
     if (q.trim().length < 2) return
     setImgSearchLoading(true)
     try {
-      const res = await fetch('/api/unsplash?query=' + encodeURIComponent(q))
+      const res = await fetch('/api/unsplash?query=' + encodeURIComponent(q) + '&page=' + page)
       const data = await res.json()
-      setImgSearchResults(data.results || [])
+      if (page === 1) {
+        setImgSearchResults(data.results || [])
+      } else {
+        setImgSearchResults(prev => [...prev, ...(data.results || [])])
+      }
+      setImgSearchHasMore((data.results || []).length === 30)
+      setImgSearchPage(page)
     } catch(e) {}
     setImgSearchLoading(false)
   }
@@ -566,7 +574,8 @@ function NewArticleInner() {
               <button type='button' onClick={() => searchUnsplash(imgSearchQuery)} disabled={imgSearchLoading} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>{imgSearchLoading ? 'Searching...' : 'Search'}</button>
             </div>
             {!selectedImg && imgSearchResults.length > 0 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
                 {imgSearchResults.map((photo: any) => (
                   <div key={photo.id} onClick={() => selectUnsplashImage(photo)} style={{ cursor: 'pointer', border: '3px solid transparent', overflow: 'hidden' }}>
                     <img src={photo.thumb} alt={photo.alt_description} style={{ width: '100%', height: '140px', objectFit: 'cover', display: 'block' }} />
@@ -574,6 +583,10 @@ function NewArticleInner() {
                   </div>
                 ))}
               </div>
+              {imgSearchHasMore && (
+                <button type='button' onClick={() => searchUnsplash(imgSearchQuery, imgSearchPage + 1)} disabled={imgSearchLoading} style={{ width: '100%', padding: '0.75rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df', color: '#0e1a2b', fontWeight: 700, fontSize: '12px', cursor: 'pointer', marginBottom: '1rem' }}>{imgSearchLoading ? 'Loading...' : 'Load More'}</button>
+              )}
+              </>
             )}
             {selectedImg && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
