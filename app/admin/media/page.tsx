@@ -68,7 +68,7 @@ export default function MediaPage() {
 
   function copyUrl(file: any) {
     navigator.clipboard.writeText(getPublicUrl(file))
-    setCopied(name)
+    setCopied(file.name)
     setTimeout(() => setCopied(''), 2000)
   }
 
