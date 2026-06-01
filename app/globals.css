@@ -46,3 +46,19 @@ body {
     display: flex !important;
   }
 }
+
+.ProseMirror img.float-left {
+  float: left;
+  margin: 0 1.5rem 1rem 0;
+  max-width: 50%;
+}
+.ProseMirror img.float-right {
+  float: right;
+  margin: 0 0 1rem 1.5rem;
+  max-width: 50%;
+}
+.ProseMirror img.float-none {
+  float: none;
+  margin: 1rem auto;
+  display: block;
+}
