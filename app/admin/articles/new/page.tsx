@@ -47,6 +47,7 @@ function NewArticleInner() {
   const [imgAlt, setImgAlt] = useState('')
   const [imgCaption, setImgCaption] = useState('')
   const [imgTitle, setImgTitle] = useState('')
+  const [fullscreen, setFullscreen] = useState(false)
   const searchParams = useSearchParams()
 
   const editor = useEditor({
@@ -296,11 +297,12 @@ function NewArticleInner() {
               {autoSaved && <span style={{ fontSize: '11px', color: 'rgba(247,244,238,0.4)', fontStyle: 'italic' }}>{autoSaved}</span>}
               <button onClick={() => handleSave('draft')} disabled={saving} style={{ fontSize: '12px', fontWeight: 700, color: '#f7f4ee', backgroundColor: 'transparent', border: '1px solid rgba(247,244,238,0.3)', padding: '0.5rem 1rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Save Draft</button>
               <button onClick={() => handleSave('published')} disabled={saving} style={{ fontSize: '12px', fontWeight: 700, color: '#0e1a2b', backgroundColor: '#c9b28f', border: 'none', padding: '0.5rem 1rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{saving ? 'Publishing...' : 'Publish'}</button>
+              <button onClick={() => setFullscreen(f => for path in files:)} style={{ fontSize: '12px', fontWeight: 700, color: '#f7f4ee', backgroundColor: 'transparent', border: '1px solid rgba(247,244,238,0.3)', padding: '0.5rem 1rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{fullscreen ? '⊠ Exit' : '⛶ Focus'}</button>
             </div>
           </div>
         </header>
         <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem', alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: fullscreen ? '1fr' : '1fr 300px', gap: '2rem', alignItems: 'start' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div style={{ padding: '1.25rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
                 <label style={lbl}>Choose Article Layout</label>
@@ -367,7 +369,7 @@ function NewArticleInner() {
                   <button type='button' onClick={() => imgInputRef.current?.click()} disabled={imgUploading} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', cursor: 'pointer' }}>{imgUploading ? 'Uploading...' : '📷 Image'}</button>
                   <button type='button' onClick={() => setShowImgSearch(true)} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #0e1a2b', backgroundColor: '#0e1a2b', color: '#f7f4ee', cursor: 'pointer' }}>🔍 Search Images</button>
                 </div>
-                <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: '500px', padding: '1rem' }}>
+                <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: fullscreen ? 'calc(100vh - 200px)' : '500px', padding: '1rem' }}>
                   <EditorContent editor={editor} />
                 </div>
               </div>
@@ -421,7 +423,7 @@ function NewArticleInner() {
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '1rem' }}>
+            <div style={{ display: fullscreen ? 'none' : 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '1rem' }}>
               <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
                 <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Article Scores</p>
                 {[{ label: 'SEO', score: seoScore }, { label: 'AEO', score: aeoScore }, { label: 'Readability', score: readabilityScore }].map(({ label, score }) => (
