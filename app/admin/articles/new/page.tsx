@@ -56,7 +56,7 @@ function NewArticleInner() {
       LinkExtension.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: 'Write your article here...' }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
-      TextStyle, Color, Highlight.configure({ multicolor: true }), Subscript, Superscript, HorizontalRule, CharacterCount, FontSize,
+      TextStyle, Color, Highlight.configure({ multicolor: true }), Subscript, Superscript, CharacterCount, FontSize,
     ],
     content: '',
     onUpdate: ({ editor }) => {
