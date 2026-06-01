@@ -19,6 +19,7 @@ import Superscript from '@tiptap/extension-superscript'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import CharacterCount from '@tiptap/extension-character-count'
 import { FontSize } from '@/lib/tiptap/FontSize'
+import { ResizableImage } from '@/lib/tiptap/ResizableImage'
 
 function NewArticleInner() {
   const router = useRouter()
@@ -56,7 +57,7 @@ function NewArticleInner() {
 
   const editor = useEditor({
     extensions: [
-      StarterKit, Underline, TiptapImage,
+      StarterKit, Underline, ResizableImage,
       LinkExtension.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: 'Write your article here...' }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
