@@ -66,7 +66,7 @@ export default function MediaPage() {
     return data.publicUrl
   }
 
-  function copyUrl(name: string) {
+  function copyUrl(file: any) {
     navigator.clipboard.writeText(getPublicUrl(file))
     setCopied(name)
     setTimeout(() => setCopied(''), 2000)
@@ -108,7 +108,7 @@ export default function MediaPage() {
                   <div style={{ padding: '0.75rem' }}>
                     <p style={{ fontSize: '11px', color: '#4A5563', marginBottom: '0.5rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => copyUrl(file.name)} style={{ flex: 1, padding: '0.4rem', fontSize: '11px', fontWeight: 700, backgroundColor: copied === file.name ? '#2d7a3a' : '#0e1a2b', color: '#f7f4ee', border: 'none', cursor: 'pointer', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{copied === file.name ? 'Copied!' : 'Copy URL'}</button>
+                      <button onClick={() => copyUrl(file)} style={{ flex: 1, padding: '0.4rem', fontSize: '11px', fontWeight: 700, backgroundColor: copied === file.name ? '#2d7a3a' : '#0e1a2b', color: '#f7f4ee', border: 'none', cursor: 'pointer', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{copied === file.name ? 'Copied!' : 'Copy URL'}</button>
                       <button onClick={() => handleDelete(file.name)} style={{ padding: '0.4rem 0.6rem', fontSize: '11px', fontWeight: 700, backgroundColor: '#fff', color: '#c0392b', border: '1px solid #c0392b', cursor: 'pointer' }}>✕</button>
                     </div>
                   </div>
