@@ -170,7 +170,7 @@ function EditArticleInner({ slug }: { slug: string }) {
                 </div>
                 <input value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag(tagInput) } }} placeholder="Type tag + Enter" style={{ ...inp, fontSize: '13px' }} />
               </div>
-              <div style={{ marginBottom: '1rem' }}><label style={lbl}>Category</label><select name="category_id" value={form.category_id} onChange={handleChange} style={inp}><option value="">Select...</option>{categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
+              <div style={{ marginBottom: '1rem' }}><label style={lbl}>Category</label><select name="category_id" value={form.category_id} onChange={handleChange} style={inp}><option value="">Select...</option>{categories.filter((cat) => !cat.parent_id).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></div>
               <div style={{ marginBottom: '1rem' }}><label style={lbl}>Author</label><select name="author_id" value={form.author_id} onChange={handleChange} style={inp}><option value="">Select...</option>{authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}</select></div>
               <div>
                 <label style={lbl}>Cover Image URL</label>
