@@ -184,7 +184,7 @@ function NewArticleInner() {
     const articleKeyword = form.title ? form.title.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ').slice(0,4).join(' ') : ''
     setImgAlt(desc || articleKeyword || photo.photographer)
     setImgTitle(desc || articleKeyword)
-    setImgCaption('Photo by ' + photo.photographer + ' on Unsplash')
+    setImgCaption('')
   }
 
   async function insertUnsplashImage() {
