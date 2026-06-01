@@ -553,11 +553,11 @@ function NewArticleInner() {
             <button type='button' onClick={() => { setShowImgSearch(false); setSelectedImg(null); setImgSearchResults([]); }} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#4A5563' }}>✕</button>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-            <input type='text' placeholder='Search images... (e.g. fitness, mental health)' value={imgSearchQuery} onChange={e => setImgSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && searchUnsplash(imgSearchQuery)} style={{ flex: 1, padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', outline: 'none' }} />
+            <input type='text' placeholder='Search images...' value={imgSearchQuery} onChange={e => setImgSearchQuery(e.target.value)} onKeyDown={e => e.key === 'Enter' && searchUnsplash(imgSearchQuery)} style={{ flex: 1, padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', outline: 'none' }} />
             <button type='button' onClick={() => searchUnsplash(imgSearchQuery)} disabled={imgSearchLoading} style={{ padding: '0.75rem 1.5rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>{imgSearchLoading ? 'Searching...' : 'Search'}</button>
           </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1.5rem' }}>
-              {imgSearchResults.map((photo: any) => (
+              {imgSearchResults.map((photo) => (
                 <div key={photo.id} onClick={() => selectUnsplashImage(photo)} style={{ cursor: 'pointer', border: '3px solid transparent', overflow: 'hidden' }}>
                   <img src={photo.thumb} alt={photo.alt_description} style={{ width: '100%', height: '140px', objectFit: 'cover', display: 'block' }} />
                   <div style={{ padding: '0.4rem', fontSize: '10px', color: '#4A5563', backgroundColor: '#f7f4ee' }}>by {photo.photographer}</div>
@@ -590,7 +590,7 @@ function NewArticleInner() {
               </div>
             </div>
           )}
-          <p style={{ fontSize: '10px', color: '#4A5563', marginTop: '1.5rem', borderTop: '1px solid #ede8df', paddingTop: '1rem' }}>Photos provided by <a href='https://unsplash.com?utm_source=dudemd&utm_medium=referral' target='_blank' rel='noopener noreferrer' style={{ color: '#0e1a2b' }}>Unsplash</a>. Attribution required per license.</p>
+          <p style={{ fontSize: '10px', color: '#4A5563', marginTop: '1.5rem', borderTop: '1px solid #ede8df', paddingTop: '1rem' }}>Photos by <a href='https://unsplash.com?utm_source=dudemd&utm_medium=referral' target='_blank' rel='noopener noreferrer' style={{ color: '#0e1a2b' }}>Unsplash</a></p>
         </div>
       </div>
     )}
