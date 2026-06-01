@@ -35,7 +35,7 @@ function NewArticleInner() {
   const [seoScore, setSeoScore] = useState(0)
   const [aeoScore, setAeoScore] = useState(0)
   const [readabilityScore, setReadabilityScore] = useState(0)
-  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '', layout: 'standard', tags: [] as string[] })
+  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '', layout: 'standard', tags: [] as string[], show_hero: true })
   const [canvaDesigns, setCanvaDesigns] = useState<any[]>([])
   const [showCanvaPicker, setShowCanvaPicker] = useState(false)
   const [imgUploading, setImgUploading] = useState(false)
@@ -548,6 +548,7 @@ function NewArticleInner() {
                   <label style={lbl}>Cover Image URL</label>
                   <input name="cover_image_url" value={form.cover_image_url} onChange={handleChange} placeholder="https://..." style={inp} />
                   {form.cover_image_url && <img src={form.cover_image_url} alt="preview" style={{ width: '100%', height: '120px', objectFit: 'cover', marginTop: '0.5rem' }} />}
+                  <button type='button' onClick={() => setForm(f => ({...f, show_hero: !f.show_hero}))} style={{ width: '100%', marginTop: '0.5rem', padding: '0.5rem', border: '1px solid ' + (form.show_hero ? '#2d7a3a' : '#e8e4de'), backgroundColor: form.show_hero ? '#e8f5ea' : '#fff', color: form.show_hero ? '#2d7a3a' : '#9a9085', fontWeight: 700, fontSize: '11px', cursor: 'pointer', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{form.show_hero ? '✓ Show as Hero Image' : 'Hide Hero Image'}</button>
                   <a href="/api/canva/auth" style={{ display: 'block', marginTop: '0.75rem', padding: '0.6rem 1rem', backgroundColor: '#7B2FBE', color: '#fff', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, textDecoration: 'none', textAlign: 'center' as const }}>🎨 Design in Canva</a>
                   {showCanvaPicker && canvaDesigns.length > 0 && (
                     <div style={{ marginTop: '0.75rem', border: '1px solid #7B2FBE', padding: '1rem', backgroundColor: '#faf5ff' }}>
