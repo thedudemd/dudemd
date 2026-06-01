@@ -5,6 +5,27 @@
 :root {
   --font-body: 'Inter', system-ui, sans-serif;
   --font-display: 'Playfair Display', Georgia, serif;
+
+  /* Brand Colors */
+  --color-navy: #0e1a2b;
+  --color-cream: #f7f4ee;
+  --color-gold: #c9b28f;
+  --color-slate: #4A5563;
+  --color-charcoal: #1B1D21;
+  --color-border: #ede8df;
+  --color-bg: #f7f4ee;
+  --color-text: #0e1a2b;
+}
+
+[data-theme="dark"] {
+  --color-navy: #f7f4ee;
+  --color-cream: #0e1a2b;
+  --color-gold: #c9b28f;
+  --color-slate: #c9b9a0;
+  --color-charcoal: #f0ede8;
+  --color-border: #1e2d3d;
+  --color-bg: #0a1520;
+  --color-text: #f7f4ee;
 }
 
 * {
