@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   if (!query) return NextResponse.json({ results: [] })
 
   const res = await fetch(
-    `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=30&orientation=landscape`,
+    `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=30&page=${page}&orientation=landscape`,
     { headers: { Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}` } }
   )
 
