@@ -274,7 +274,8 @@ function NewArticleInner() {
     setSaving(true)
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) { router.push('/admin/login'); return }
-    const { error } = await supabase.from('articles').insert({ ...form, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null })
+    const cleanForm = { ...form, category_id: form.category_id || null, subcategory_id: form.subcategory_id || null, author_id: form.author_id || null }
+    const { error } = await supabase.from('articles').insert({ ...cleanForm, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null })
     if (error) { alert('Error: ' + error.message); setSaving(false) }
     else { localStorage.removeItem('draft_' + session.user.id); router.push('/admin') }
   }
