@@ -176,8 +176,8 @@ function NewArticleInner() {
   async function insertUnsplashImage() {
     if (!selectedImg || !editor) return
     await fetch('/api/unsplash?action=download&downloadUrl=' + encodeURIComponent(selectedImg.download_url))
-    editor.chain().focus().setImage({ src: selectedImg.url, alt: imgAlt, title: imgTitle }).run()
-    if (imgCaption) { editor.chain().focus().insertContent('<p><em>' + imgCaption + '</em></p>').run() }
+    const imgHtml = '<img src="' + selectedImg.url + '" alt="' + imgAlt + '" title="' + imgTitle + '" />' + (imgCaption ? '<p><em>' + imgCaption + '</em></p>' : '')
+    editor.chain().focus().insertContent(imgHtml).run()
     setShowImgSearch(false)
     setSelectedImg(null)
     setImgSearchResults([])
