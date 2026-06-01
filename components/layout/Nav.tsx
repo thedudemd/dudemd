@@ -26,7 +26,7 @@ export default function Nav() {
     async function loadNav() {
       try {
         // Load parent categories
-        const catsRes = await fetch(`${SUPABASE_URL}/rest/v1/categories?select=*&parent_id=is.null&enabled=eq.true&order=sort_order.asc,name.asc`, {
+        const catsRes = await fetch(`${SUPABASE_URL}/rest/v1/categories?select=*&parent_id=is.null&enabled=eq.true&show_in_nav=eq.true&order=sort_order.asc,name.asc`, {
           headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
         })
         const cats = await catsRes.json()
