@@ -5,7 +5,7 @@ export default async function Footer() {
   const { data: categories } = await supabaseServer.from("categories").select("name,slug").is("parent_id",null).eq("enabled",true).order("sort_order").order("name")
   return (
     <footer>
-      <div style={{ backgroundColor: '#0e1a2b', padding: '4rem 0 2rem' }}>
+      <div style={{ backgroundColor: 'var(--color-navy)', padding: '4rem 0 2rem' }}>
         <div className="container-content">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
             <div style={{ gridColumn: 'span 2' }}>
@@ -24,19 +24,19 @@ export default async function Footer() {
               </div>
             </div>
             <div>
-              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '1rem' }}>Categories</p>
+              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '1rem' }}>Categories</p>
               {(categories || []).map((cat) => (
                 <Link key={cat.slug} href={`/category/${cat.slug}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>{cat.name}</Link>
               ))}
             </div>
             <div>
-              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '1rem' }}>Company</p>
+              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '1rem' }}>Company</p>
               {['Our Story','Editorial Policy','Contact','Advertise','Newsletter'].map((item) => (
                 <Link key={item} href={`/${item.toLowerCase().replace(' ','-')}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>{item}</Link>
               ))}
             </div>
             <div>
-              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '1rem' }}>Legal</p>
+              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '1rem' }}>Legal</p>
               {['Privacy Policy','Terms of Use','Cookie Policy'].map((item) => (
                 <Link key={item} href={`/${item.toLowerCase().replace(/ /g,'-')}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>{item}</Link>
               ))}
@@ -44,7 +44,7 @@ export default async function Footer() {
           </div>
 
           <div style={{ textAlign: 'center', padding: '2rem 0', borderTop: '1px solid rgba(247,244,238,0.1)', borderBottom: '1px solid rgba(247,244,238,0.1)', marginBottom: '1.5rem' }}>
-            <p style={{ margin: 0, fontSize: '16px', color: '#f7f4ee' }}>
+            <p style={{ margin: 0, fontSize: '16px', color: 'var(--color-cream)' }}>
               <span style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', fontSize: '13px' }}>FOUNDED IN </span>
               <span style={{ fontFamily: 'Georgia, serif', fontSize: '24px', fontWeight: 400, fontStyle: 'italic' }}>Seattle, </span>
               <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: '20px' }}>with love </span>
