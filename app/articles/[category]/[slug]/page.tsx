@@ -151,11 +151,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <div />
         </LongFormLayout>
       ) : (
-        {article.show_hero !== false && article.cover_image_url && (
-        <div style={{ width: '100%', overflow: 'hidden' }}>
-          <img src={article.cover_image_url} alt={`Cover image for ${article.title}`} style={{ width: '100%', height: 'auto', maxHeight: '520px', objectFit: 'cover', objectPosition: 'center center', display: 'block' }} />
-        </div>
-        )}
+        {article.show_hero !== false && article.cover_image_url && (<div style={{ width: '100%', overflow: 'hidden' }}><img src={article.cover_image_url} alt={`Cover image for ${article.title}`} style={{ width: '100%', height: 'auto', maxHeight: '520px', objectFit: 'cover', objectPosition: 'center center', display: 'block' }} /></div>)}
       )}
 
       <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
