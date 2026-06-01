@@ -23,8 +23,17 @@ export default function MediaPage() {
 
   async function loadFiles() {
     setLoading(true)
-    const { data } = await supabase.storage.from('media').list('article-images', { limit: 200, sortBy: { column: 'created_at', order: 'desc' } })
-    setFiles(data || [])
+    // Load files from all folders
+    const folders = ['', 'article-images', 'avatars', 'pages']
+    let allFiles: any[] = []
+    for (const folder of folders) {
+      const { data } = await supabase.storage.from('media').list(folder, { limit: 200, sortBy: { column: 'created_at', order: 'desc' } })
+      if (data) {
+        const filesOnly = data.filter(f => f.id) // filter out folders
+        allFiles = [...allFiles, ...filesOnly.map(f => ({ ...f, folder }))]
+      }
+    }
+    setFiles(allFiles)
     setLoading(false)
   }
 
@@ -46,17 +55,19 @@ export default function MediaPage() {
 
   async function handleDelete(name: string) {
     if (!confirm('Delete this image?')) return
-    await supabase.storage.from('media').remove([`article-images/${name}`])
+    const path = files.find(f => f.name === name)?.folder ? `${files.find(f => f.name === name).folder}/${name}` : name
+    await supabase.storage.from('media').remove([path])
     setFiles(files.filter(f => f.name !== name))
   }
 
-  function getPublicUrl(name: string) {
-    const { data } = supabase.storage.from('media').getPublicUrl(`article-images/${name}`)
+  function getPublicUrl(file: any) {
+    const path = file.folder ? `${file.folder}/${file.name}` : file.name
+    const { data } = supabase.storage.from('media').getPublicUrl(path)
     return data.publicUrl
   }
 
   function copyUrl(name: string) {
-    navigator.clipboard.writeText(getPublicUrl(name))
+    navigator.clipboard.writeText(getPublicUrl(file))
     setCopied(name)
     setTimeout(() => setCopied(''), 2000)
   }
@@ -92,7 +103,7 @@ export default function MediaPage() {
               {files.map(file => (
                 <div key={file.name} style={{ backgroundColor: '#fff', border: '1px solid #ede8df', overflow: 'hidden' }}>
                   <div style={{ height: '160px', overflow: 'hidden', backgroundColor: '#f0ede8' }}>
-                    <img src={getPublicUrl(file.name)} alt={file.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <img src={getPublicUrl(file)} alt={file.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </div>
                   <div style={{ padding: '0.75rem' }}>
                     <p style={{ fontSize: '11px', color: '#4A5563', marginBottom: '0.5rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.name}</p>
