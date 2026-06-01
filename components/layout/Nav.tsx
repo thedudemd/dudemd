@@ -192,7 +192,7 @@ export default function Nav() {
         <div className="container-content">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 0' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
-              <img src="/dude-md.svg" alt="DudeMD — Modern Men's Wellness" style={{ height: '48px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
+              <img src="/dude-md.svg" alt="DudeMD — Modern Men's Wellness" style={{ height: '64px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
             </Link>
 
             <nav style={{ display: 'none', gap: '2rem', position: 'relative' }} className="desktop-nav">
