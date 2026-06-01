@@ -147,15 +147,15 @@ export default function Nav() {
           {profile?.avatar_url ? (
             <img src={profile.avatar_url} alt={firstName} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
           ) : (
-            <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: '#c9b28f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: '#0e1a2b' }}>{firstName.charAt(0)}</span>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-navy)' }}>{firstName.charAt(0)}</span>
             </div>
           )}
         </button>
         {userOpen && (
-          <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '0.5rem', backgroundColor: '#fff', border: '1px solid #ede8df', borderRadius: '4px', minWidth: '160px', zIndex: 50, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+          <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '0.5rem', backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: '4px', minWidth: '160px', zIndex: 50, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
             <Link href="/account" onClick={() => setUserOpen(false)}
-              style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#0e1a2b', padding: '0.6rem 1.25rem', textDecoration: 'none', borderBottom: '1px solid #ede8df' }}>
+              style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--color-navy)', padding: '0.6rem 1.25rem', textDecoration: 'none', borderBottom: '1px solid var(--color-border)' }}>
               My Account
             </Link>
             <div onMouseDown={(e) => { e.preventDefault(); handleSignOut() }}
@@ -175,20 +175,20 @@ export default function Nav() {
       <style>{`
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
         .container-content { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
-        .icon-btn { background: none; border: none; cursor: pointer; color: #f7f4ee; padding: 0.25rem; display: flex; align-items: center; }
+        .icon-btn { background: none; border: none; cursor: pointer; color: var(--color-cream); padding: 0.25rem; display: flex; align-items: center; }
         .hero-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
         @media (min-width: 900px) { .hero-grid { grid-template-columns: 2fr 1fr; gap: 3rem; } }
         .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
-        .drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 100%; max-width: 22rem; background: #0e1a2b; z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
+        .drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 100%; max-width: 22rem; background: var(--color-navy); z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
         .drawer.open { transform: translateX(0); }
         .drawer-item { border-bottom: 1px solid rgba(255,255,255,0.1); }
         .drawer-cat-header { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.5rem; cursor: pointer; }
         .drawer-sub-link { display: block; padding: 0.5rem 1.5rem 0.5rem 2.5rem; font-size: 12px; color: rgba(247,244,238,0.7); text-decoration: none; letter-spacing: 0.04em; }
-        .nav-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 1px solid #ede8df; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 30; padding: 2rem 0; }
+        .nav-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 1px solid var(--color-border); box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 30; padding: 2rem 0; }
         .nav-dropdown-grid { display: grid; grid-template-columns: 200px 1fr; gap: 3rem; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
       `}</style>
 
-      <header style={{ backgroundColor: '#0e1a2b', position: 'sticky', top: 0, zIndex: 20 }}>
+      <header style={{ backgroundColor: 'var(--color-navy)', position: 'sticky', top: 0, zIndex: 20 }}>
         <div className="container-content">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 0' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
@@ -198,7 +198,7 @@ export default function Nav() {
             <nav style={{ display: 'none', gap: '2rem', position: 'relative' }} className="desktop-nav">
               {navItems.map((item) => (
                 <div key={item.label} onMouseEnter={() => setActiveDropdown(item.label)} onMouseLeave={() => setActiveDropdown(null)} style={{ position: 'relative' }}>
-                  <Link href={item.href} style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#f7f4ee', textDecoration: 'none' }}>
+                  <Link href={item.href} style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-cream)', textDecoration: 'none' }}>
                     {item.label}
                   </Link>
                 </div>
@@ -212,11 +212,11 @@ export default function Nav() {
                   <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                 </svg>
               </button>
-              <button onClick={() => setDrawerOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: '#f7f4ee', padding: '0.25rem 0' }}>
+              <button onClick={() => setDrawerOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-cream)', padding: '0.25rem 0' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div style={{ width: '20px', height: '2px', backgroundColor: '#f7f4ee' }} />
-                  <div style={{ width: '20px', height: '2px', backgroundColor: '#f7f4ee' }} />
-                  <div style={{ width: '20px', height: '2px', backgroundColor: '#f7f4ee' }} />
+                  <div style={{ width: '20px', height: '2px', backgroundColor: 'var(--color-cream)' }} />
+                  <div style={{ width: '20px', height: '2px', backgroundColor: 'var(--color-cream)' }} />
+                  <div style={{ width: '20px', height: '2px', backgroundColor: 'var(--color-cream)' }} />
                 </div>
                 <span style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Menu</span>
               </button>
@@ -224,31 +224,31 @@ export default function Nav() {
           </div>
 
           {searchOpen && (
-            <div style={{ backgroundColor: '#0e1a2b', borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1rem 0' }}>
+            <div style={{ backgroundColor: 'var(--color-navy)', borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1rem 0' }}>
               <div className="container-content">
                 <form onSubmit={handleSearch} style={{ display: 'flex', maxWidth: '40rem', margin: '0 auto' }}>
                   <input autoFocus type="text" placeholder="Search DudeMD..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-                    style={{ flex: 1, padding: '0.85rem 1rem', backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', borderRight: 'none', color: '#f7f4ee', outline: 'none', fontSize: '15px' }} />
-                  <button type="submit" style={{ padding: '0.85rem 1.5rem', backgroundColor: '#c9b28f', color: '#0e1a2b', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>Search</button>
+                    style={{ flex: 1, padding: '0.85rem 1rem', backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', borderRight: 'none', color: 'var(--color-cream)', outline: 'none', fontSize: '15px' }} />
+                  <button type="submit" style={{ padding: '0.85rem 1.5rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>Search</button>
                 </form>
               </div>
             </div>
           )}
         </div>
       {/* GOLD BAR - below navy header */}
-      <div style={{ backgroundColor: '#c9b28f', padding: '0.4rem 0' }}>
+      <div style={{ backgroundColor: 'var(--color-gold)', padding: '0.4rem 0' }}>
         <div className="container-content">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
             {session && profile ? (
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0e1a2b' }}>Welcome, <strong>{profile.full_name?.split(' ')[0]}</strong></span>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-navy)' }}>Welcome, <strong>{profile.full_name?.split(' ')[0]}</strong></span>
             ) : (
               <span />
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              {!session && <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Sign In</Link>}
+              {!session && <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Sign In</Link>}
               {!session && <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>}
-              {!session && <Link href="/newsletter" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>Subscribe</Link>}
-              {session && <Link href="/account" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#0e1a2b', textDecoration: 'none' }}>My Account</Link>}
+              {!session && <Link href="/newsletter" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Subscribe</Link>}
+              {session && <Link href="/account" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>My Account</Link>}
             </div>
           </div>
         </div>
@@ -262,7 +262,7 @@ export default function Nav() {
           <Link href="/" onClick={() => setDrawerOpen(false)} style={{ textDecoration: 'none' }}>
             <img src="/dude-md.svg" alt="DudeMD" style={{ height: '44px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
           </Link>
-          <button onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#f7f4ee', fontSize: '24px', lineHeight: 1, padding: '0.25rem' }}>×</button>
+          <button onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-cream)', fontSize: '24px', lineHeight: 1, padding: '0.25rem' }}>×</button>
         </div>
 
         <div style={{ padding: '0.5rem 0' }}>
@@ -271,10 +271,10 @@ export default function Nav() {
               <div className="drawer-cat-header"
                 onClick={() => setDrawerExpanded(drawerExpanded === item.label ? null : item.label)}>
                 <Link href={item.href} onClick={() => setDrawerOpen(false)}
-                  style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#f7f4ee', textDecoration: 'none' }}>
+                  style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-cream)', textDecoration: 'none' }}>
                   {item.label}
                 </Link>
-                <span style={{ color: '#c9b28f', fontSize: '20px', lineHeight: 1 }}>{drawerExpanded === item.label ? '−' : '+'}</span>
+                <span style={{ color: 'var(--color-gold)', fontSize: '20px', lineHeight: 1 }}>{drawerExpanded === item.label ? '−' : '+'}</span>
               </div>
               {drawerExpanded === item.label && (
                 <div style={{ paddingBottom: '0.75rem' }}>
@@ -304,13 +304,13 @@ export default function Nav() {
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {session === undefined ? null : session === null ? (
             <Link href="/signin" onClick={() => setDrawerOpen(false)}
-              style={{ display: 'block', padding: '0.75rem', textAlign: 'center', border: '1px solid rgba(247,244,238,0.3)', color: '#f7f4ee', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
+              style={{ display: 'block', padding: '0.75rem', textAlign: 'center', border: '1px solid rgba(247,244,238,0.3)', color: 'var(--color-cream)', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
               Sign In
             </Link>
           ) : (
             <>
               <Link href="/account" onClick={() => setDrawerOpen(false)}
-                style={{ display: 'block', padding: '0.75rem', textAlign: 'center', border: '1px solid rgba(247,244,238,0.3)', color: '#f7f4ee', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
+                style={{ display: 'block', padding: '0.75rem', textAlign: 'center', border: '1px solid rgba(247,244,238,0.3)', color: 'var(--color-cream)', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
                 My Account
               </Link>
               <button onClick={() => { handleSignOut(); setDrawerOpen(false) }}
@@ -320,7 +320,7 @@ export default function Nav() {
             </>
           )}
           <Link href="/newsletter" onClick={() => setDrawerOpen(false)}
-            style={{ display: 'block', padding: '0.75rem', textAlign: 'center', backgroundColor: '#c9b28f', color: '#0e1a2b', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
+            style={{ display: 'block', padding: '0.75rem', textAlign: 'center', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
             Subscribe
           </Link>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', paddingTop: '0.5rem' }}>
