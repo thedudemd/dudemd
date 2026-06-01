@@ -151,8 +151,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <div />
         </LongFormLayout>
       ) : (
-        <div style={{ width: '100%', overflow: 'hidden', maxHeight: '380px' }}>
-          <img src={article.cover_image_url} alt={`Cover image for ${article.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <div style={{ width: '100%', overflow: 'hidden' }}>
+          <img src={article.cover_image_url} alt={`Cover image for ${article.title}`} style={{ width: '100%', height: 'auto', maxHeight: '520px', objectFit: 'cover', objectPosition: 'center center', display: 'block' }} />
         </div>
       )}
 
