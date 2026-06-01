@@ -49,6 +49,7 @@ function NewArticleInner() {
   const [imgTitle, setImgTitle] = useState('')
   const [fullscreen, setFullscreen] = useState(false)
   function toggleFullscreen() {
+    if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen()
       setFullscreen(true)
     } else {
