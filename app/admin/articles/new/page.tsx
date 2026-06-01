@@ -11,6 +11,13 @@ import LinkExtension from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
+import TextStyle from '@tiptap/extension-text-style'
+import Color from '@tiptap/extension-color'
+import Highlight from '@tiptap/extension-highlight'
+import Subscript from '@tiptap/extension-subscript'
+import Superscript from '@tiptap/extension-superscript'
+import HorizontalRule from '@tiptap/extension-horizontal-rule'
+import CharacterCount from '@tiptap/extension-character-count'
 
 function NewArticleInner() {
   const router = useRouter()
@@ -37,6 +44,7 @@ function NewArticleInner() {
       LinkExtension.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: 'Write your article here...' }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      TextStyle, Color, Highlight.configure({ multicolor: true }), Subscript, Superscript, HorizontalRule, CharacterCount,
     ],
     content: '',
     onUpdate: ({ editor }) => {
