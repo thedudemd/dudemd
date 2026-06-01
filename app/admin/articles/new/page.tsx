@@ -311,8 +311,8 @@ function NewArticleInner() {
           </div>
         </header>
         <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem', alignItems: 'start' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: fullscreen ? '1fr' : '1fr 300px', gap: '2rem', alignItems: 'start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: fullscreen ? '0' : '1.5rem' }}>
               <div style={{ padding: '1.25rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
                 <label style={lbl}>Choose Article Layout</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '0.5rem' }}>
@@ -378,7 +378,7 @@ function NewArticleInner() {
                   <button type='button' onClick={() => imgInputRef.current?.click()} disabled={imgUploading} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', cursor: 'pointer' }}>{imgUploading ? 'Uploading...' : '📷 Image'}</button>
                   <button type='button' onClick={() => setShowImgSearch(true)} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #0e1a2b', backgroundColor: '#0e1a2b', color: '#f7f4ee', cursor: 'pointer' }}>🔍 Search Images</button>
                 </div>
-                <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: '500px', padding: '1rem' }}>
+                <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: fullscreen ? 'calc(100vh - 160px)' : '500px', padding: '1rem' }}>
                   <EditorContent editor={editor} />
                 </div>
               </div>
@@ -432,7 +432,7 @@ function NewArticleInner() {
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '1rem' }}>
+            <div style={{ display: fullscreen ? 'none' : 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '1rem' }}>
               <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
                 <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Article Scores</p>
                 {[{ label: 'SEO', score: seoScore }, { label: 'AEO', score: aeoScore }, { label: 'Readability', score: readabilityScore }].map(({ label, score }) => (
