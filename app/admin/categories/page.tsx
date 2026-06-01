@@ -26,16 +26,16 @@ export default function CategoriesAdmin() {
   const getSubs = (parentId: string) => cats.filter(c => c.parent_id === parentId)
 
   function newItem(parentId = null) {
-    setEditing({ name: '', slug: '', parent_id: parentId, sort_order: 0, enabled: true, indexable: true, description: '', cover_image_url: '' })
+    setEditing({ name: '', slug: '', parent_id: parentId, sort_order: 0, enabled: true, indexable: true, description: '', cover_image_url: '', show_in_nav: false })
   }
 
   async function save() {
     if (!editing.name || !editing.slug) return alert('Name and slug required')
     setSaving(true)
     if (editing.id) {
-      await supabase.from('categories').update({ name: editing.name, slug: editing.slug, parent_id: editing.parent_id || null, sort_order: editing.sort_order, enabled: editing.enabled, indexable: editing.indexable, description: editing.description, cover_image_url: editing.cover_image_url }).eq('id', editing.id)
+      await supabase.from('categories').update({ name: editing.name, slug: editing.slug, parent_id: editing.parent_id || null, sort_order: editing.sort_order, enabled: editing.enabled, indexable: editing.indexable, description: editing.description, cover_image_url: editing.cover_image_url, show_in_nav: editing.show_in_nav }).eq('id', editing.id)
     } else {
-      const { error: insertErr } = await supabase.from('categories').insert({ name: editing.name, slug: editing.slug, parent_id: editing.parent_id || null, sort_order: editing.sort_order, enabled: editing.enabled, indexable: editing.indexable, description: editing.description, cover_image_url: editing.cover_image_url })
+      const { error: insertErr } = await supabase.from('categories').insert({ name: editing.name, slug: editing.slug, parent_id: editing.parent_id || null, sort_order: editing.sort_order, enabled: editing.enabled, indexable: editing.indexable, description: editing.description, cover_image_url: editing.cover_image_url, show_in_nav: editing.show_in_nav })
       if (insertErr) { alert('Error: ' + insertErr.message); setSaving(false); return }
     }
     setEditing(null)
@@ -112,6 +112,7 @@ export default function CategoriesAdmin() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>
                 <div><label style={lbl}>Status</label>
                   <button type="button" onClick={() => setEditing({ ...editing, enabled: !editing.enabled })} style={{ width: '100%', padding: '0.65rem', border: '1px solid ' + (editing.enabled ? '#2d7a3a' : '#e8e4de'), backgroundColor: editing.enabled ? '#e8f5ea' : '#fff', color: editing.enabled ? '#2d7a3a' : '#9a9085', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>{editing.enabled ? '✓ Active' : 'Disabled'}</button>
+                  <button type="button" onClick={() => setEditing({ ...editing, show_in_nav: !editing.show_in_nav })} style={{ width: '100%', padding: '0.65rem', border: '1px solid ' + (editing.show_in_nav ? '#0e1a2b' : '#e8e4de'), backgroundColor: editing.show_in_nav ? '#0e1a2b' : '#fff', color: editing.show_in_nav ? '#f7f4ee' : '#9a9085', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>{editing.show_in_nav ? '✓ Show in Nav' : 'Hidden from Nav'}</button>
                 </div>
                 <div><label style={lbl}>Search Engines</label>
                   <button type="button" onClick={() => setEditing({ ...editing, indexable: !editing.indexable })} style={{ width: '100%', padding: '0.65rem', border: '1px solid ' + (editing.indexable ? '#2d7a3a' : '#a32d2d'), backgroundColor: editing.indexable ? '#e8f5ea' : '#fdecea', color: editing.indexable ? '#2d7a3a' : '#a32d2d', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>{editing.indexable ? '✓ Indexed' : '✗ noindex'}</button>
