@@ -137,6 +137,28 @@ function NewArticleInner() {
     if (imgInputRef.current) imgInputRef.current.value = ''
   }
 
+  async function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    const file = e.dataTransfer.files?.[0]
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    e.preventDefault()
+    e.stopPropagation()
+    setImgUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/upload-image', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (data.url) {
+        editor.chain().focus().setImage({ src: data.url }).run()
+      } else {
+        alert('Upload failed: ' + (data.error || 'Unknown error'))
+      }
+    } catch (err) {
+      alert('Upload failed')
+    }
+    setImgUploading(false)
+  }
+
   async function fetchSuggestions(kw: string) {
     if (kw.trim().length < 3) return
     setSuggestLoading(true)
@@ -321,7 +343,7 @@ function NewArticleInner() {
                 <input ref={imgInputRef} type='file' accept='image/jpeg,image/png,image/webp,image/gif' style={{ display: 'none' }} onChange={handleImageUpload} />
                 <button type='button' onClick={() => imgInputRef.current?.click()} disabled={imgUploading} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', cursor: 'pointer' }}>{imgUploading ? 'Uploading...' : '📷 Image'}</button>
               </div>
-              <div style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: '500px', padding: '1rem' }}>
+              <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: '500px', padding: '1rem' }}>
                 <EditorContent editor={editor} />
               </div>
             </div>
