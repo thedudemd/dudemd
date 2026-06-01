@@ -86,7 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9224150605844856" crossOrigin="anonymous"></script>
           <meta name='facebook-domain-verification' content='at3t423mnp96egxz0gammrzkx46nie' />
         </head>
-      <body style={{ backgroundColor: '#f7f4ee', color: '#0e1a2b' }}>
+      <body style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
         <script dangerouslySetInnerHTML={{ __html: `
           !function(f,b,e,v,n,t,s)
           {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
