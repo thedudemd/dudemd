@@ -180,10 +180,10 @@ function NewArticleInner() {
 
   function selectUnsplashImage(photo: any) {
     setSelectedImg(photo)
-    const desc = photo.description || photo.alt_description || ''
-    const articleKeyword = form.title ? form.title.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ').slice(0,4).join(' ') : ''
-    setImgAlt(desc || articleKeyword || photo.photographer)
-    setImgTitle(desc || articleKeyword)
+    const articleKeyword = form.title ? form.title.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(' ').slice(0,6).join(' ') : ''
+    const fallback = photo.alt_description || photo.photographer
+    setImgAlt(articleKeyword || fallback)
+    setImgTitle(articleKeyword || fallback)
     setImgCaption('')
   }
 
@@ -566,7 +566,7 @@ function NewArticleInner() {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
           <div style={{ backgroundColor: '#fff', width: '100%', maxWidth: '860px', maxHeight: '90vh', overflowY: 'auto', padding: '2rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <p style={{ fontSize: '16px', fontWeight: 700, color: '#0e1a2b', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Search Free Images</p>
+              <p style={{ fontSize: '16px', fontWeight: 700, color: '#0e1a2b', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>Search Images</p>
               <button type='button' onClick={() => { setShowImgSearch(false); setSelectedImg(null); setImgSearchResults([]); }} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#4A5563' }}>✕</button>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
