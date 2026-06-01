@@ -47,6 +47,10 @@ function NewArticleInner() {
   const [imgAlt, setImgAlt] = useState('')
   const [imgCaption, setImgCaption] = useState('')
   const [imgTitle, setImgTitle] = useState('')
+  const [showAddCat, setShowAddCat] = useState(false)
+  const [newCatName, setNewCatName] = useState('')
+  const [newCatParent, setNewCatParent] = useState('')
+  const [addingCat, setAddingCat] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const searchParams = useSearchParams()
 
@@ -183,6 +187,30 @@ function NewArticleInner() {
     setSelectedImg(null)
     setImgSearchResults([])
     setImgSearchQuery('')
+  }
+
+  async function handleAddCategory() {
+    if (!newCatName.trim()) return
+    setAddingCat(true)
+    const { data, error } = await supabase.from('categories').insert({
+      name: newCatName.trim(),
+      slug: newCatName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      parent_id: newCatParent || null,
+      enabled: true,
+      sort_order: 0
+    }).select().single()
+    if (error) { alert('Error: ' + error.message) }
+    else {
+      if (newCatParent) {
+        setSubcategories(s => [...s, data])
+      } else {
+        setCategories(cats => [...cats, data])
+      }
+      setNewCatName('')
+      setNewCatParent('')
+      setShowAddCat(false)
+    }
+    setAddingCat(false)
   }
 
   async function fetchSuggestions(kw: string) {
@@ -461,7 +489,20 @@ function NewArticleInner() {
                   <input value={tagInput} onChange={e=>setTagInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&tagInput.trim()){e.preventDefault();setForm(f=>({...f,tags:[...(f.tags||[]),tagInput.trim()]}));setTagInput('')}}} placeholder="Type tag + Enter" style={inp} />
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={lbl}>Category</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#4A5563' }}>Category</span>
+                    <button type='button' onClick={() => setShowAddCat(s => !s)} style={{ fontSize: '11px', color: '#c9b28f', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>+ Add</button>
+                  </div>
+                  {showAddCat && (
+                    <div style={{ backgroundColor: '#f7f4ee', border: '1px solid #ede8df', padding: '0.75rem', marginBottom: '0.75rem' }}>
+                      <input type='text' placeholder='Category name' value={newCatName} onChange={e => setNewCatName(e.target.value)} style={{ ...inp, marginBottom: '0.5rem', fontSize: '13px' }} />
+                      <select value={newCatParent} onChange={e => setNewCatParent(e.target.value)} style={{ ...inp, marginBottom: '0.5rem', fontSize: '13px' }}>
+                        <option value=''>Parent category (leave blank for top-level)</option>
+                        {categories.filter(cat => !cat.parent_id).map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                      </select>
+                      <button type='button' onClick={handleAddCategory} disabled={addingCat} style={{ width: '100%', padding: '0.5rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>{addingCat ? 'Adding...' : 'Add Category'}</button>
+                    </div>
+                  )}
                   <select name="category_id" value={form.category_id} onChange={handleChange} style={inp}>
                     <option value="">Select...</option>
                     {categories.filter((cat: any) => !cat.parent_id).map((cat: any) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
