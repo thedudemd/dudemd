@@ -6,50 +6,10 @@ import { usePathname, useRouter } from 'next/navigation'
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
 
-const NAV_ITEMS = [
-  {
-    label: 'Health', href: '/category/health',
-    subs: ['Testosterone', 'Heart Health', 'Sleep', 'Gut Health', 'Mental Health'],
-    articles: [
-      { slug: 'the-testosterone-guide', title: 'The Complete Testosterone Guide for Men Over 30', image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&q=80' },
-      { slug: 'stress-cortisol', title: 'Chronic Stress Is Wrecking Your Hormones', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=300&q=80' },
-    ]
-  },
-  {
-    label: 'Fitness', href: '/category/fitness',
-    subs: ['Strength Training', 'Cardio', 'Nutrition', 'Supplements', 'Workout Gear'],
-    articles: [
-      { slug: 'strength-40s', title: "Strength Training in Your 40s: What Changes and What Doesn't", image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300&q=80' },
-      { slug: 'protein-guide', title: 'How Much Protein Do You Actually Need?', image: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=300&q=80' },
-    ]
-  },
-  {
-    label: 'Recovery', href: '/category/recovery',
-    subs: ['Sleep', 'Cold Exposure', 'Mobility', 'Stress Management'],
-    articles: [
-      { slug: 'sleep-recovery', title: 'The 7-Day Sleep Reset That Actually Works', image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=300&q=80' },
-      { slug: 'cold-exposure', title: 'Cold Exposure: Separating the Hype From the Science', image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=300&q=80' },
-    ]
-  },
-  {
-    label: 'Lifestyle', href: '/category/lifestyle',
-    subs: ['Grooming', 'Style', 'Skincare', 'Fashion', 'Home & Living'],
-    articles: [
-      { slug: 'grooming-routine', title: "A No-Nonsense Grooming Routine for Men Who Don't Have Time", image: 'https://images.unsplash.com/photo-1621607512022-6aecc4fed814?w=300&q=80' },
-      { slug: 'gear-essentials', title: 'The 10 Gear Essentials Every Man Should Own', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&q=80' },
-    ]
-  },
-  {
-    label: 'Mind', href: '/category/mind',
-    subs: ['Mental Health', 'Mindset', 'Purpose', 'Relationships', 'Emotional Wellness'],
-    articles: [
-      { slug: 'stress-cortisol', title: 'Chronic Stress Is Wrecking Your Hormones', image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=300&q=80' },
-      { slug: 'sleep-recovery', title: 'The 7-Day Sleep Reset That Actually Works', image: 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=300&q=80' },
-    ]
-  },
-]
+// Categories loaded dynamically from Supabase
 
 export default function Nav() {
+  const [navItems, setNavItems] = useState<any[]>([])
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [drawerExpanded, setDrawerExpanded] = useState<string | null>(null)
@@ -61,6 +21,46 @@ export default function Nav() {
   const [session, setSession] = useState<any>(undefined)
   const userRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+
+  useEffect(() => {
+    async function loadNav() {
+      try {
+        // Load parent categories
+        const catsRes = await fetch(`${SUPABASE_URL}/rest/v1/categories?select=*&parent_id=is.null&enabled=eq.true&order=sort_order.asc,name.asc`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        })
+        const cats = await catsRes.json()
+        if (!Array.isArray(cats)) return
+
+        const items = await Promise.all(cats.map(async (cat: any) => {
+          // Load subcategories
+          const subsRes = await fetch(`${SUPABASE_URL}/rest/v1/categories?select=name,slug&parent_id=eq.${cat.id}&enabled=eq.true&order=sort_order.asc,name.asc`, {
+            headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+          })
+          const subs = await subsRes.json()
+
+          // Load 2 recent published articles for this category
+          const artsRes = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=slug,title,cover_image_url&category_id=eq.${cat.id}&published=eq.true&order=published_at.desc&limit=2`, {
+            headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+          })
+          const arts = await artsRes.json()
+
+          return {
+            label: cat.name,
+            href: `/category/${cat.slug}`,
+            subs: Array.isArray(subs) ? subs.map((s: any) => s.name) : [],
+            articles: Array.isArray(arts) ? arts.map((a: any) => ({
+              slug: a.slug,
+              title: a.title,
+              image: a.cover_image_url || ''
+            })) : []
+          }
+        }))
+        setNavItems(items)
+      } catch(e) {}
+    }
+    loadNav()
+  }, [])
   const router = useRouter()
 
   useEffect(() => {
@@ -196,7 +196,7 @@ export default function Nav() {
             </Link>
 
             <nav style={{ display: 'none', gap: '2rem', position: 'relative' }} className="desktop-nav">
-              {NAV_ITEMS.map((item) => (
+              {navItems.map((item) => (
                 <div key={item.label} onMouseEnter={() => setActiveDropdown(item.label)} onMouseLeave={() => setActiveDropdown(null)} style={{ position: 'relative' }}>
                   <Link href={item.href} style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#f7f4ee', textDecoration: 'none' }}>
                     {item.label}
@@ -266,7 +266,7 @@ export default function Nav() {
         </div>
 
         <div style={{ padding: '0.5rem 0' }}>
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <div key={item.label} className="drawer-item">
               <div className="drawer-cat-header"
                 onClick={() => setDrawerExpanded(drawerExpanded === item.label ? null : item.label)}>
