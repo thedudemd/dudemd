@@ -82,6 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
+          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
           <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9224150605844856" crossOrigin="anonymous"></script>
           <meta name='facebook-domain-verification' content='at3t423mnp96egxz0gammrzkx46nie' />
         </head>
