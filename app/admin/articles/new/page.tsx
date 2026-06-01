@@ -304,7 +304,7 @@ function NewArticleInner() {
         <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: fullscreen ? '1fr' : '1fr 300px', gap: '2rem', alignItems: 'start' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ padding: '1.25rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
+              <div style={{ display: fullscreen ? 'none' : 'block', padding: '1.25rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
                 <label style={lbl}>Choose Article Layout</label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '0.5rem' }}>
                   <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'standard' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'standard' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'standard' ? '#0e1a2b' : '#fff', color: form.layout === 'standard' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
@@ -331,15 +331,15 @@ function NewArticleInner() {
                   </button>
                 </div>
               </div>
-              <div>
+              <div style={{ display: fullscreen ? 'none' : 'block' }}>
                 <label style={lbl}>Title</label>
                 <input name="title" value={form.title} onChange={handleTitleChange} placeholder="Article title..." style={{ ...inp, fontSize: '20px', fontWeight: 600 }} />
               </div>
-              <div>
+              <div style={{ display: fullscreen ? 'none' : 'block' }}>
                 <label style={lbl}>Slug</label>
                 <input name="slug" value={form.slug} onChange={handleChange} style={inp} />
               </div>
-              <div>
+              <div style={{ display: fullscreen ? 'none' : 'block' }}>
                 <label style={lbl}>Excerpt</label>
                 <textarea name="excerpt" value={form.excerpt} onChange={handleChange} rows={2} placeholder="Brief description..." style={{ ...inp, resize: 'vertical' as const }} />
               </div>
@@ -373,7 +373,7 @@ function NewArticleInner() {
                   <EditorContent editor={editor} />
                 </div>
               </div>
-              <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
+              <div style={{ display: fullscreen ? 'none' : 'block', backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
                 <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>AI Article Suggestions</p>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <input type="text" placeholder="Enter keyword..." value={suggestKeyword} onChange={(e) => setSuggestKeyword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && fetchSuggestions(suggestKeyword)} style={{ ...inp, flex: 1 }} />
