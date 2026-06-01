@@ -396,7 +396,7 @@ function NewArticleInner() {
                   </div>
                 )}
               </div>
-              <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
+              <div style={{ display: fullscreen ? 'none' : 'block', backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
                 <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>SEO Settings</p>
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={lbl}>Meta Title ({form.meta_title.length}/60)</label>
@@ -407,7 +407,7 @@ function NewArticleInner() {
                   <textarea name="meta_description" value={form.meta_description} onChange={handleChange} rows={3} style={{ ...inp, resize: 'vertical' as const }} />
                 </div>
               </div>
-              <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
+              <div style={{ display: fullscreen ? 'none' : 'block', backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
                 <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Facebook &amp; Social</p>
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={lbl}>Social Title</label>
