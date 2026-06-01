@@ -35,27 +35,30 @@ export const ResizableImage = Node.create({
       img.style.cssText = 'display:block;width:' + (node.attrs.width || '100%') + ';max-width:100%;height:auto;'
 
       const handle = document.createElement('div')
-      handle.style.cssText = 'position:absolute;bottom:4px;right:4px;width:14px;height:14px;background:#0e1a2b;cursor:se-resize;border:2px solid #c9b28f;border-radius:2px;'
-
-      let startX = 0
-      let startWidth = 0
+      handle.style.cssText = 'position:absolute;bottom:4px;right:4px;width:16px;height:16px;background:#0e1a2b;cursor:se-resize;border:2px solid #c9b28f;border-radius:2px;z-index:10;'
 
       handle.addEventListener('mousedown', (e) => {
         e.preventDefault()
-        startX = e.clientX
-        startWidth = img.offsetWidth
+        e.stopPropagation()
+        
+        const startX = e.clientX
+        const startWidth = img.offsetWidth
+        const parentWidth = wrapper.parentElement ? wrapper.parentElement.offsetWidth : 800
+        let isDragging = true
 
         const onMouseMove = (e) => {
+          if (!isDragging) return
           const diff = e.clientX - startX
-          const newWidth = Math.max(50, startWidth + diff)
-          const parentWidth = wrapper.parentElement ? wrapper.parentElement.offsetWidth : 800
-          const pct = Math.round((newWidth / parentWidth) * 100)
-          img.style.width = pct + '%'
+          const newWidth = Math.max(50, Math.min(startWidth + diff, parentWidth))
+          img.style.width = newWidth + 'px'
         }
 
-        const onMouseUp = () => {
-          const parentWidth = wrapper.parentElement ? wrapper.parentElement.offsetWidth : 800
-          const pct = Math.round((img.offsetWidth / parentWidth) * 100)
+        const onMouseUp = (e) => {
+          if (!isDragging) return
+          isDragging = false
+          const finalWidth = img.offsetWidth
+          const pct = Math.round((finalWidth / parentWidth) * 100)
+          img.style.width = pct + '%'
           updateAttributes({ width: pct + '%' })
           document.removeEventListener('mousemove', onMouseMove)
           document.removeEventListener('mouseup', onMouseUp)
