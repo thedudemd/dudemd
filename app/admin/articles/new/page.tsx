@@ -302,6 +302,7 @@ function NewArticleInner() {
   const lbl: any = { display: 'block', fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#4A5563', marginBottom: '0.5rem' }
 
   return (
+    <>
     <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee' }}>
       <header style={{ backgroundColor: '#0e1a2b', padding: '1rem 0' }}>
         <div className="container-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -593,6 +594,7 @@ function NewArticleInner() {
         </div>
       </div>
     )}
+    </>
   )
 }
 
