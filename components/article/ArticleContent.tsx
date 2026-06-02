@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
 
@@ -7,7 +7,7 @@ export default function ArticleContent({ article, slug, category, relatedArticle
   const [copied, setCopied] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
-  const [session, setSession] = useState<any>(null)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   const url = `https://www.dudemd.com/articles/${category}/${slug}`
   const encoded = encodeURIComponent(url)
   const encodedTitle = encodeURIComponent(article.title)
@@ -20,7 +20,6 @@ export default function ArticleContent({ article, slug, category, relatedArticle
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
       if (session && article.id) {
         supabase.from('saved_articles').select('id').eq('user_id', session.user.id).eq('article_id', article.id).single()
           .then(({ data }) => { if (data) setSaved(true) })
@@ -30,7 +29,7 @@ export default function ArticleContent({ article, slug, category, relatedArticle
 
   async function handleSave() {
     const { data: { session } } = await supabase.auth.getSession()
-    if (!session) { window.location.href = '/signin?message=login_to_save'; return }
+    if (!session) { setShowLoginPrompt(true); return }
     setSaveLoading(true)
     if (saved) {
       await supabase.from('saved_articles').delete().eq('user_id', session.user.id).eq('article_id', article.id)
@@ -66,6 +65,27 @@ export default function ArticleContent({ article, slug, category, relatedArticle
     window.addEventListener('beforeunload', onExit)
     return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('beforeunload', onExit) }
   }, [slug, category])
+
+  function LoginPromptModal() {
+    if (!showLoginPrompt) return null
+    return (
+      <div onClick={() => setShowLoginPrompt(false)} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(14,26,43,0.7)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+        <div onClick={e => e.stopPropagation()} style={{ backgroundColor: 'var(--color-cream)', maxWidth: '400px', width: '100%', padding: '2.5rem 2rem', position: 'relative' }}>
+          <button onClick={() => setShowLoginPrompt(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-slate)', fontSize: '20px', lineHeight: 1, padding: 0 }}>×</button>
+          <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '1rem' }}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.5rem' }}>Save to Your Reading List</h3>
+            <p style={{ fontSize: '14px', color: 'var(--color-slate)', lineHeight: 1.6, margin: 0 }}>Create a free account to bookmark articles, track your reading history, and get personalized recommendations.</p>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <a href="/join" style={{ display: 'block', textAlign: 'center', padding: '0.875rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>Join Free</a>
+            <a href="/signin" style={{ display: 'block', textAlign: 'center', padding: '0.875rem', backgroundColor: 'transparent', color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', border: '1px solid var(--color-navy)' }}>Sign In</a>
+          </div>
+          <p style={{ fontSize: '11px', color: '#9a9085', textAlign: 'center', marginTop: '1rem', marginBottom: 0 }}>No credit card required. Free forever.</p>
+        </div>
+      </div>
+    )
+  }
 
   function RelatedArticles() {
     if (!relatedArticles.length) return null
@@ -124,6 +144,7 @@ export default function ArticleContent({ article, slug, category, relatedArticle
 
   return (
     <>
+      <LoginPromptModal />
       <ShareBar />
       <div style={{ fontSize: '16px', color: 'var(--color-charcoal)', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: article.content || '' }} />
       {article.faq_items && article.faq_items.length > 0 && (
