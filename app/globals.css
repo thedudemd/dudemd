@@ -17,6 +17,11 @@
   --color-text: #0e1a2b;
 }
 
+[data-theme="dark"] footer,
+[data-theme="dark"] header {
+  background-color: #050e18 !important;
+}
+
 [data-theme="dark"] {
   --color-navy: #f7f4ee;
   --color-cream: #0e1a2b;
