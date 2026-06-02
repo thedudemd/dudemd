@@ -224,7 +224,7 @@ export default function Nav() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <UserSection />
               <button className="icon-btn" onClick={toggleDarkMode} title={darkMode ? 'Light Mode' : 'Dark Mode'} style={{ fontSize: '16px', padding: '0.25rem', background: 'none', border: 'none', opacity: 0.8, outline: 'none' }}>
-                {darkMode ? '☀️' : '🌙'}
+                {darkMode ? '◑' : '◐'}
               </button>
               <button className="icon-btn" onClick={() => setSearchOpen(!searchOpen)}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
