@@ -210,7 +210,7 @@ export default function Nav() {
         <div className="container-content">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 0' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
-              <img src="/dude-md.svg" alt="DudeMD — Modern Men's Wellness" style={{ height: '64px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(72%) sepia(35%) saturate(400%) hue-rotate(2deg) brightness(98%) contrast(85%)' }} />
+              <img src="/dude-md.svg" alt="DudeMD — Modern Men's Wellness" style={{ height: '64px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(76%) sepia(20%) saturate(600%) hue-rotate(350deg) brightness(95%) contrast(88%)' }} />
             </Link>
 
             <nav style={{ display: 'flex', gap: '2rem', position: 'relative' }} className="desktop-nav">
@@ -278,7 +278,7 @@ export default function Nav() {
       <div className={`drawer${drawerOpen ? ' open' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <Link href="/" onClick={() => setDrawerOpen(false)} style={{ textDecoration: 'none' }}>
-            <img src="/dude-md.svg" alt="DudeMD" style={{ height: '44px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(72%) sepia(35%) saturate(400%) hue-rotate(2deg) brightness(98%) contrast(85%)' }} />
+            <img src="/dude-md.svg" alt="DudeMD" style={{ height: '44px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(76%) sepia(20%) saturate(600%) hue-rotate(350deg) brightness(95%) contrast(88%)' }} />
           </Link>
           <button onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-cream)', fontSize: '24px', lineHeight: 1, padding: '0.25rem' }}>×</button>
         </div>
