@@ -15,14 +15,6 @@ function GoogleIcon() {
   )
 }
 
-function AppleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" style={{width:20,height:20,flexShrink:0,fill:'var(--color-cream)'}} xmlns="http://www.w3.org/2000/svg">
-      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-    </svg>
-  )
-}
-
 function FacebookIcon() {
   return (
     <svg viewBox="0 0 24 24" style={{width:20,height:20,flexShrink:0,fill:'#fff'}} xmlns="http://www.w3.org/2000/svg">
@@ -52,19 +44,18 @@ export default function SignInPage() {
     try { setLoading('google'); setError(null); await signInWithGoogle() }
     catch (err) { console.error("Google auth error:", err); setError('Google sign-in failed.'); setLoading(null) }
   }
-  async function handleApple() {
-    try { setLoading('apple'); setError(null); await signInWithApple() }
-    catch { setError('Apple sign-in not yet available.'); setLoading(null) }
-  }
   async function handleFacebook() {
     try { setLoading('facebook'); setError(null); await signInWithFacebook() }
     catch { setError('Facebook sign-in not yet available.'); setLoading(null) }
   }
   async function handleForgotPassword() {
-    if (!email) { setError("Enter your email first"); return }
-    setResetLoading(true);setError(null)
-    await supabase.auth.resetPasswordForEmail(email,{redirectTo:"https://www.dudemd.com/auth/reset-password"})
-    setResetSent(true);setResetLoading(false);setTimeout(()=>setResetSent(false),5000)
+    if (!email) { setError('Enter your email first'); return }
+    setResetLoading(true)
+    setError(null)
+    await supabase.auth.resetPasswordForEmail(email, { redirectTo: 'https://www.dudemd.com/auth/reset-password' })
+    setResetSent(true)
+    setResetLoading(false)
+    setTimeout(() => setResetSent(false), 5000)
   }
   async function handleEmailPassword(e: React.FormEvent) {
     e.preventDefault()
@@ -96,14 +87,13 @@ export default function SignInPage() {
         <div className="signin-left">
           <div style={{display:'flex',flexDirection:'column',gap:18,maxWidth:'320px',width:'100%',margin:'0 auto'}}>
             <h1 style={{fontSize:26,fontWeight:700,color:'var(--color-navy)',margin:0,textAlign:'center'}}>Sign in</h1>
-
             <div style={{height:1,background:'#d1cfc9'}}/>
             {error && <div style={{background:'#fdecea',color:'#a32d2d',border:'1px solid #f09595',borderRadius:8,padding:'10px 14px',fontSize:13}}>{error}</div>}
+            {resetSent && <div style={{background:'#e8f5ea',color:'#2d7a3a',border:'1px solid #2d7a3a',borderRadius:8,padding:'10px 14px',fontSize:13}}>Reset email sent — check your inbox</div>}
             <div style={{display:'flex',flexDirection:'column',gap:9}}>
               <button onClick={handleGoogle} disabled={loading!==null} style={{...btn,background:'#fff',border:'1px solid #d1cfc9',color:'var(--color-charcoal)'}}>
                 <GoogleIcon/>{loading==='google'?'Connecting…':'Continue with Google'}
               </button>
-
               <button onClick={handleFacebook} disabled={loading!==null} style={{...btn,background:'#1877F2',color:'#fff'}}>
                 <FacebookIcon/>{loading==='facebook'?'Connecting…':'Continue with Facebook'}
               </button>
@@ -116,8 +106,14 @@ export default function SignInPage() {
             <div style={{display:'flex',flexDirection:'column',gap:8}}>
               <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'var(--color-slate)'}}>Email address</label>
               <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'var(--color-navy)',outline:'none',width:'100%',boxSizing:'border-box'}}/>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'var(--color-slate)'}}>Password</label><button type='button' onClick={handleForgotPassword} disabled={resetLoading} style={{background:'none',border:'none',fontSize:11,color:'var(--color-gold)',cursor:'pointer',fontWeight:600,padding:0}}>{resetLoading?'Sending...':'Forgot password?'}</button></div>
-              <div style={{position:"relative"}}><input type={showPassword?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Your password" onKeyDown={e=>e.key==='Enter'&&handleEmailPassword(e)} style={{padding:'11px 40px 11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'var(--color-navy)',outline:'none',width:'100%',boxSizing:'border-box'}}/><button type="button" onClick={()=>setShowPassword(s=>!s)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:16,padding:0}}>{showPassword?"🙈":"👁"}</button></div>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'var(--color-slate)'}}>Password</label>
+                <button type="button" onClick={handleForgotPassword} disabled={resetLoading} style={{background:'none',border:'none',fontSize:11,color:resetSent?'#2d7a3a':'var(--color-gold)',cursor:'pointer',fontWeight:600,padding:0}}>{resetLoading?'Sending...':resetSent?'✓ Email sent!':'Forgot password?'}</button>
+              </div>
+              <div style={{position:'relative'}}>
+                <input type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Your password" onKeyDown={e=>e.key==='Enter'&&handleEmailPassword(e)} style={{padding:'11px 40px 11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'var(--color-navy)',outline:'none',width:'100%',boxSizing:'border-box'}}/>
+                <button type="button" onClick={()=>setShowPassword(s=>!s)} style={{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',fontSize:16,padding:0}}>{showPassword?'🙈':'👁'}</button>
+              </div>
               <button onClick={handleEmailPassword} disabled={loading!==null||!email||!password} style={{...btn,background:'var(--color-navy)',color:'var(--color-cream)',fontWeight:600,opacity:(!email||!password||loading!==null)?0.5:1}}>
                 {loading==='magic'?'Signing in…':'Sign In'}
               </button>
