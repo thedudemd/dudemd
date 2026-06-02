@@ -13,3 +13,12 @@ export const supabase = createClient(
     }
   }
 )
+
+// Clear stale sessions that can't be refreshed
+if (typeof window !== 'undefined') {
+  supabase.auth.getSession().then(({ data: { session }, error }) => {
+    if (error || (!session && localStorage.getItem('dudemd-auth'))) {
+      localStorage.removeItem('dudemd-auth')
+    }
+  })
+}
