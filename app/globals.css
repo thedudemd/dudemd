@@ -17,16 +17,11 @@
   --color-text: #0e1a2b;
 }
 
-[data-theme="dark"] {
-  --color-navy: #f0ede8;
-  --color-cream: #0e1a2b;
-  --color-gold: #c9b28f;
-  --color-slate: #8a9ab0;
-  --color-charcoal: #f0ede8;
-  --color-border: #1e2d3d;
-  --color-bg: #0a1520;
-  --color-text: #f0ede8;
-}
-[data-theme="dark"] nav { --color-navy: #0e1a2b; --color-cream: #f7f4ee; }
-[data-theme="dark"] footer { --color-navy: #0e1a2b; --color-cream: #f7f4ee; }
 [data-theme="dark"] body { background-color: #0a1520 !important; }
+[data-theme="dark"] .container-content { background-color: #0a1520 !important; }
+[data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6 { color: #f0ede8 !important; }
+[data-theme="dark"] p { color: #d4cfc8 !important; }
+[data-theme="dark"] li { color: #d4cfc8 !important; }
+[data-theme="dark"] blockquote { color: #d4cfc8 !important; }
+[data-theme="dark"] article { background-color: #0e1a2b !important; }
+[data-theme="dark"] .article-grid { background-color: #0a1520 !important; }
