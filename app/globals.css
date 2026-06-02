@@ -27,3 +27,24 @@
 [data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] h4,[data-theme="dark"] h5,[data-theme="dark"] h6 { color: #f0ede8 !important; }
 [data-theme="dark"] p,[data-theme="dark"] li,[data-theme="dark"] blockquote { color: #d4cfc8 !important; }
 .icon-btn:focus,.icon-btn:focus-visible { outline: none !important; box-shadow: none !important; }
+
+/* Dark mode content boxes */
+[data-theme="dark"] .container-content {
+  background-color: #0a1520 !important;
+}
+
+[data-theme="dark"] [style*="backgroundColor: 'var(--color-cream)'"],
+[data-theme="dark"] [style*="background-color: var(--color-cream)"] {
+  background-color: #0e1a2b !important;
+}
+
+/* Force all white/cream backgrounds dark */
+[data-theme="dark"] [style*="'#f7f4ee'"],
+[data-theme="dark"] [style*="\"#f7f4ee\""] {
+  background-color: #0e1a2b !important;
+}
+
+/* Newsletter text */
+[data-theme="dark"] [style*="color: var(--color-navy)"] {
+  color: #f0ede8 !important;
+}
