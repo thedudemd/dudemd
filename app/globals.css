@@ -180,3 +180,10 @@ body {
 [data-theme="dark"] article {
   background-color: #0a1520 !important;
 }
+
+/* Remove focus outline from nav buttons */
+.icon-btn:focus,
+.icon-btn:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
