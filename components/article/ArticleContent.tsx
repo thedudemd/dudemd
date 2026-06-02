@@ -1,9 +1,13 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase/client'
 
 export default function ArticleContent({ article, slug, category, relatedArticles = [] }: { article: any, slug: string, category: string, relatedArticles?: any[] }) {
   const [copied, setCopied] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [saveLoading, setSaveLoading] = useState(false)
+  const [session, setSession] = useState<any>(null)
   const url = `https://www.dudemd.com/articles/${category}/${slug}`
   const encoded = encodeURIComponent(url)
   const encodedTitle = encodeURIComponent(article.title)
@@ -12,6 +16,30 @@ export default function ArticleContent({ article, slug, category, relatedArticle
     navigator.clipboard.writeText(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      if (session && article.id) {
+        supabase.from('saved_articles').select('id').eq('user_id', session.user.id).eq('article_id', article.id).single()
+          .then(({ data }) => { if (data) setSaved(true) })
+      }
+    })
+  }, [article.id])
+
+  async function handleSave() {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { window.location.href = '/signin?message=login_to_save'; return }
+    setSaveLoading(true)
+    if (saved) {
+      await supabase.from('saved_articles').delete().eq('user_id', session.user.id).eq('article_id', article.id)
+      setSaved(false)
+    } else {
+      await supabase.from('saved_articles').insert({ user_id: session.user.id, article_id: article.id })
+      setSaved(true)
+    }
+    setSaveLoading(false)
   }
 
   useEffect(() => {
@@ -74,6 +102,14 @@ export default function ArticleContent({ article, slug, category, relatedArticle
       </div>
     )
   }
+  function SaveButton() {
+    return (
+      <button onClick={handleSave} disabled={saveLoading} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.25rem', backgroundColor: saved ? 'var(--color-navy)' : 'transparent', color: saved ? 'var(--color-cream)' : 'var(--color-navy)', border: '1px solid var(--color-navy)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.2s' }}>
+        {saved ? '★ Saved' : '☆ Save for Later'}
+      </button>
+    )
+  }
+
   function ShareButtons() {
     return (
       <div style={{ padding: '1rem', backgroundColor: 'var(--color-cream)', border: '1px solid var(--color-border)', marginTop: '1.5rem', marginBottom: '1.5rem' }}>
@@ -103,6 +139,7 @@ export default function ArticleContent({ article, slug, category, relatedArticle
 
   return (
     <>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}><SaveButton /></div>
       <ShareButtons />
       <div style={{ fontSize: '16px', color: 'var(--color-charcoal)', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: article.content || '' }} />
       {article.faq_items && article.faq_items.length > 0 && (
