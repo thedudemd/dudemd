@@ -102,7 +102,7 @@ export default async function HomePage() {
 
 
       {/* HERO — FEATURED + TWO SECONDARY */}
-      <section style={{ padding: '2.5rem 0 0', borderBottom: '1px solid #ede8df' }}>
+      <section style={{ padding: '2.5rem 0 0', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container-content">
           <div className="hero-grid">
 
@@ -121,13 +121,13 @@ export default async function HomePage() {
                 </Link>
                 <div style={{ paddingBottom: '2rem' }}>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.75rem' }}>
-                    <Link href={`/category/${featured.categories?.slug}`} style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#f7f4ee', backgroundColor: '#c9b28f', padding: '0.2rem 0.6rem', textDecoration: 'none' }}>{featured.categories?.name}</Link>
+                    <Link href={`/category/${featured.categories?.slug}`} style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-cream)', backgroundColor: 'var(--color-gold)', padding: '0.2rem 0.6rem', textDecoration: 'none' }}>{featured.categories?.name}</Link>
                     <span style={{ fontSize: '11px', color: '#9a9085' }}>{featured.read_time}</span>
                   </div>
-                  <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.6rem, 2.8vw, 2.2rem)', lineHeight: 1.15, color: '#0e1a2b', marginBottom: '0.75rem' }}>
+                  <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.6rem, 2.8vw, 2.2rem)', lineHeight: 1.15, color: 'var(--color-navy)', marginBottom: '0.75rem' }}>
                     <Link href={`/articles/${featured.categories?.slug}/${featured.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{featured.title}</Link>
                   </h2>
-                  <p style={{ fontSize: '15px', color: '#4A5563', lineHeight: 1.65, marginBottom: '0.75rem' }}>{featured.excerpt}</p>
+                  <p style={{ fontSize: '15px', color: 'var(--color-slate)', lineHeight: 1.65, marginBottom: '0.75rem' }}>{featured.excerpt}</p>
                   <p style={{ fontSize: '12px', color: '#9a9085' }}>By {featured.authors?.name}</p>
                 </div>
               </div>
@@ -135,9 +135,9 @@ export default async function HomePage() {
 
             {/* SECONDARY TWO STACK */}
             <div className="hero-picks">
-              <p style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#9a9085', paddingBottom: '0.75rem', borderBottom: '2px solid #0e1a2b', marginBottom: '1.25rem' }}>Editor&apos;s Picks</p>
+              <p style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#9a9085', paddingBottom: '0.75rem', borderBottom: '2px solid var(--color-navy)', marginBottom: '1.25rem' }}>Editor&apos;s Picks</p>
               {secondary.map((a, i) => (
-                <div key={a.slug} style={{ paddingBottom: '1.5rem', marginBottom: '1.5rem', borderBottom: i < secondary.length - 1 ? '1px solid #ede8df' : 'none' }}>
+                <div key={a.slug} style={{ paddingBottom: '1.5rem', marginBottom: '1.5rem', borderBottom: i < secondary.length - 1 ? '1px solid var(--color-border)' : 'none' }}>
                   <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                     <div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '0.75rem' }}>
                       <img
@@ -148,10 +148,10 @@ export default async function HomePage() {
                     </div>
                   </Link>
                   <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.4rem' }}>
-                    <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f' }}>{a.categories?.name}</span>
+                    <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{a.categories?.name}</span>
                     <span style={{ fontSize: '10px', color: '#9a9085' }}>{a.read_time}</span>
                   </div>
-                  <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1.3, color: '#0e1a2b' }}>
+                  <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1.3, color: 'var(--color-navy)' }}>
                     <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
                   </h3>
                   <p style={{ fontSize: '12px', color: '#9a9085', marginTop: '0.35rem' }}>By {a.authors?.name}</p>
@@ -166,11 +166,11 @@ export default async function HomePage() {
       
 
       {/* LATEST GRID */}
-      <section style={{ padding: '3rem 0', borderBottom: '1px solid #ede8df' }}>
+      <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container-content">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2rem', borderBottom: '2px solid #0e1a2b', paddingBottom: '0.75rem' }}>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', color: '#0e1a2b', letterSpacing: '-0.01em' }}>Latest</h2>
-            <Link href="/articles" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#c9b28f', textDecoration: 'none' }}>All Articles →</Link>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2rem', borderBottom: '2px solid var(--color-navy)', paddingBottom: '0.75rem' }}>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-navy)', letterSpacing: '-0.01em' }}>Latest</h2>
+            <Link href="/articles" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>All Articles →</Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2.5rem' }}>
             {(latest.length > 0 ? latest : articles).map((a) => (
@@ -185,13 +185,13 @@ export default async function HomePage() {
                   </div>
                 </Link>
                 <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <Link href={`/category/${a.categories?.slug}`} style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', textDecoration: 'none' }}>{a.categories?.name}</Link>
+                  <Link href={`/category/${a.categories?.slug}`} style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>{a.categories?.name}</Link>
                   <span style={{ fontSize: '10px', color: '#9a9085' }}>{a.read_time}</span>
                 </div>
-                <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.3, color: '#0e1a2b', marginBottom: '0.5rem' }}>
+                <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.3, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>
                   <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
                 </h3>
-                <p style={{ fontSize: '13px', color: '#4A5563', lineHeight: 1.55, marginBottom: '0.4rem' }}>{a.excerpt}</p>
+                <p style={{ fontSize: '13px', color: 'var(--color-slate)', lineHeight: 1.55, marginBottom: '0.4rem' }}>{a.excerpt}</p>
                 <p style={{ fontSize: '11px', color: '#9a9085' }}>By {a.authors?.name}</p>
               </article>
             ))}
@@ -200,7 +200,7 @@ export default async function HomePage() {
       </section>
 
       {/* WELLNESS MISSION BAND */}
-      <section style={{ backgroundColor: '#0e1a2b', padding: '3rem 0' }}>
+      <section style={{ backgroundColor: 'var(--color-navy)', padding: '3rem 0' }}>
         <div className="container-content">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', textAlign: 'center' }}>
             {[
@@ -210,7 +210,7 @@ export default async function HomePage() {
               { label: 'Life', desc: 'Relationships, purpose, growth' },
             ].map((p) => (
               <div key={p.label}>
-                <p style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '0.4rem' }}>{p.label}</p>
+                <p style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.4rem' }}>{p.label}</p>
                 <p style={{ fontSize: '13px', color: 'rgba(247,244,238,0.55)', lineHeight: 1.5 }}>{p.desc}</p>
               </div>
             ))}
@@ -219,17 +219,17 @@ export default async function HomePage() {
       </section>
 
       {/* NEWSLETTER */}
-      <section style={{ backgroundColor: '#f7f4ee', padding: '4rem 0', borderTop: '1px solid #ede8df' }}>
+      <section style={{ backgroundColor: 'var(--color-cream)', padding: '4rem 0', borderTop: '1px solid var(--color-border)' }}>
         <div className="container-content">
           <div style={{ maxWidth: '28rem', margin: '0 auto', textAlign: 'center' }}>
-            <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c9b28f', display: 'block', marginBottom: '0.75rem' }}>Free Newsletter</span>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', color: '#0e1a2b', marginBottom: '0.6rem', lineHeight: 1.2 }}>
+            <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--color-gold)', display: 'block', marginBottom: '0.75rem' }}>Free Newsletter</span>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.4rem, 3vw, 1.9rem)', color: 'var(--color-navy)', marginBottom: '0.6rem', lineHeight: 1.2 }}>
               Men&apos;s wellness that doesn&apos;t waste your time.
             </h2>
             <p style={{ fontSize: '14px', color: '#9a9085', marginBottom: '1.75rem', lineHeight: 1.6 }}>Evidence-based. Experience-tested. One email per week.</p>
             <div style={{ display: 'flex', maxWidth: '24rem', margin: '0 auto' }}>
-              <input type="email" placeholder="your@email.com" style={{ flex: 1, padding: '0.85rem 1rem', backgroundColor: '#fff', border: '1px solid #ded9d0', borderRight: 'none', color: '#0e1a2b', outline: 'none', fontSize: '14px' }} />
-              <button style={{ padding: '0.85rem 1.25rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontWeight: 700, fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>Join Free</button>
+              <input type="email" placeholder="your@email.com" style={{ flex: 1, padding: '0.85rem 1rem', backgroundColor: '#fff', border: '1px solid #ded9d0', borderRight: 'none', color: 'var(--color-navy)', outline: 'none', fontSize: '14px' }} />
+              <button style={{ padding: '0.85rem 1.25rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>Join Free</button>
             </div>
           </div>
         </div>

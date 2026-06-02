@@ -15,7 +15,7 @@ export default function TrendingOnFacebookBlock({
 }: TrendingOnFacebookBlockProps) {
   return (
     <div style={{
-      backgroundColor: '#0e1a2b',
+      backgroundColor: 'var(--color-navy)',
       padding: '2rem',
       borderRadius: '8px',
       margin: '3rem 0'
@@ -32,7 +32,7 @@ export default function TrendingOnFacebookBlock({
         <h3 style={{
           fontSize: '1.25rem',
           fontWeight: 700,
-          color: '#f7f4ee',
+          color: 'var(--color-cream)',
           margin: 0
         }}>
           {title}
@@ -63,7 +63,7 @@ export default function TrendingOnFacebookBlock({
             <h4 style={{
               fontSize: '1rem',
               fontWeight: 600,
-              color: '#f7f4ee',
+              color: 'var(--color-cream)',
               marginBottom: '0.5rem',
               lineHeight: 1.4
             }}>

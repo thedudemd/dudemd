@@ -57,11 +57,11 @@ function NewsletterInner() {
     display: active ? 'block' : 'none'
   })
 
-  const inp: any = { width: '100%', padding: '1rem', border: '1px solid #ded9d0', backgroundColor: '#f7f4ee', color: '#0e1a2b', outline: 'none', fontSize: '16px', boxSizing: 'border-box' }
-  const btn: any = { width: '100%', padding: '1rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontWeight: 700, fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', marginTop: '0.75rem' }
+  const inp: any = { width: '100%', padding: '1rem', border: '1px solid #ded9d0', backgroundColor: 'var(--color-cream)', color: 'var(--color-navy)', outline: 'none', fontSize: '16px', boxSizing: 'border-box' }
+  const btn: any = { width: '100%', padding: '1rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '14px', letterSpacing: '0.1em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', marginTop: '0.75rem' }
 
   return (
-    <main style={{ backgroundColor: '#f7f4ee', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+    <main style={{ backgroundColor: 'var(--color-cream)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
       <style>{`
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes checkDraw { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
@@ -79,13 +79,13 @@ function NewsletterInner() {
         {/* STEP 0 - EMAIL */}
         {step === 0 && (
           <div className="fade-up">
-            <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.75rem', textAlign: 'center' }}>
+            <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.75rem', textAlign: 'center' }}>
               Men's Wellness That Doesn't Waste Your Time
             </h1>
-            <p style={{ fontSize: '16px', color: '#4A5563', lineHeight: 1.65, marginBottom: '2rem', textAlign: 'center' }}>
+            <p style={{ fontSize: '16px', color: 'var(--color-slate)', lineHeight: 1.65, marginBottom: '2rem', textAlign: 'center' }}>
               One email per week. Evidence-based. No fluff.
             </p>
-            <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid #ede8df' }}>
+            <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid var(--color-border)' }}>
               <form onSubmit={handleEmail} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} required style={inp} autoFocus />
                 <button type="submit" disabled={status === 'loading'} style={btn}>{status === 'loading' ? 'Checking...' : 'Get Started'}</button>
@@ -99,12 +99,12 @@ function NewsletterInner() {
         {/* STEP 1 - FIRST NAME */}
         {step === 1 && (
           <div className="fade-up">
-            <p style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', textAlign: 'center', marginBottom: '1rem' }}>Step 1 of 2</p>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.5rem', textAlign: 'center' }}>
+            <p style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', textAlign: 'center', marginBottom: '1rem' }}>Step 1 of 2</p>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.5rem', textAlign: 'center' }}>
               What should we call you?
             </h2>
-            <p style={{ fontSize: '15px', color: '#4A5563', textAlign: 'center', marginBottom: '2rem' }}>We'll use this to personalize your experience.</p>
-            <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid #ede8df' }}>
+            <p style={{ fontSize: '15px', color: 'var(--color-slate)', textAlign: 'center', marginBottom: '2rem' }}>We'll use this to personalize your experience.</p>
+            <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid var(--color-border)' }}>
               <form onSubmit={e => { e.preventDefault(); if (firstName.trim()) setStep(2) }} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <input type="text" placeholder="First name" value={firstName} onChange={e => setFirstName(e.target.value)} required style={inp} autoFocus />
                 <button type="submit" style={btn}>Continue →</button>
@@ -116,12 +116,12 @@ function NewsletterInner() {
         {/* STEP 2 - PASSWORD */}
         {step === 2 && (
           <div className="fade-up">
-            <p style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', textAlign: 'center', marginBottom: '1rem' }}>Step 2 of 2</p>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.5rem', textAlign: 'center' }}>
+            <p style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', textAlign: 'center', marginBottom: '1rem' }}>Step 2 of 2</p>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.5rem', textAlign: 'center' }}>
               Hey {firstName}, create a password
             </h2>
-            <p style={{ fontSize: '15px', color: '#4A5563', textAlign: 'center', marginBottom: '2rem' }}>This saves your preferences and reading history.</p>
-            <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid #ede8df' }}>
+            <p style={{ fontSize: '15px', color: 'var(--color-slate)', textAlign: 'center', marginBottom: '2rem' }}>This saves your preferences and reading history.</p>
+            <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid var(--color-border)' }}>
               <form onSubmit={handleAccount} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <input type="password" placeholder="Create a password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} style={inp} autoFocus />
                 <button type="submit" disabled={status === 'loading'} style={btn}>{status === 'loading' ? 'Creating Account...' : 'Create My Account'}</button>
@@ -135,26 +135,26 @@ function NewsletterInner() {
         {/* STEP 4 - EXISTING USER */}
         {step === 4 && (
           <div className="fade-up" style={{ textAlign: 'center' }}>
-            <div style={{ width: 80, height: 80, borderRadius: '50%', backgroundColor: '#ede8df', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0e1a2b" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <div style={{ width: 80, height: 80, borderRadius: '50%', backgroundColor: 'var(--color-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-navy)" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.75rem' }}>You're already a member.</h2>
-            <p style={{ fontSize: '1rem', color: '#4A5563', marginBottom: '2rem' }}>Sign in to access your DudeMD account.</p>
-            <Link href="/signin" style={{ display: 'inline-block', padding: '0.85rem 2rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', textDecoration: 'none', fontWeight: 700, fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Sign In</Link>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.75rem' }}>You're already a member.</h2>
+            <p style={{ fontSize: '1rem', color: 'var(--color-slate)', marginBottom: '2rem' }}>Sign in to access your DudeMD account.</p>
+            <Link href="/signin" style={{ display: 'inline-block', padding: '0.85rem 2rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', textDecoration: 'none', fontWeight: 700, fontSize: '13px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Sign In</Link>
           </div>
         )}
 
         {/* STEP 5 - SUCCESS */}
         {step === 5 && (
           <div className="fade-up" style={{ textAlign: 'center', padding: '2rem 0' }}>
-            <div className="success-circle" style={{ width: 80, height: 80, borderRadius: '50%', backgroundColor: '#c9b28f', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+            <div className="success-circle" style={{ width: 80, height: 80, borderRadius: '50%', backgroundColor: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                <polyline className="success-check" points="4,12 9,17 20,6" stroke="#0e1a2b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <polyline className="success-check" points="4,12 9,17 20,6" stroke="var(--color-navy)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.75rem' }}>Welcome, {firstName}.</h2>
-            <p style={{ fontSize: '1rem', color: '#4A5563' }}>You're now part of the DudeMD community.</p>
-            <p style={{ fontSize: '0.85rem', color: '#c9b28f', marginTop: '0.5rem' }}>Taking you back now...</p>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.75rem' }}>Welcome, {firstName}.</h2>
+            <p style={{ fontSize: '1rem', color: 'var(--color-slate)' }}>You're now part of the DudeMD community.</p>
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-gold)', marginTop: '0.5rem' }}>Taking you back now...</p>
           </div>
         )}
       </div>

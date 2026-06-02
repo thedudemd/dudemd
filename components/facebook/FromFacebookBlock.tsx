@@ -8,10 +8,10 @@ interface FromFacebookBlockProps {
 export default function FromFacebookBlock({ postUrl, context }: FromFacebookBlockProps) {
   return (
     <div style={{ 
-      backgroundColor: '#f7f4ee', 
+      backgroundColor: 'var(--color-cream)', 
       padding: '2rem', 
       borderRadius: '8px',
-      border: '1px solid #ede8df',
+      border: '1px solid var(--color-border)',
       margin: '2rem 0'
     }}>
       <div style={{ 
@@ -37,7 +37,7 @@ export default function FromFacebookBlock({ postUrl, context }: FromFacebookBloc
       {context && (
         <p style={{ 
           fontSize: '14px', 
-          color: '#4A5563', 
+          color: 'var(--color-slate)', 
           lineHeight: 1.6,
           marginBottom: '1rem'
         }}>

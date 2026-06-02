@@ -74,25 +74,25 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   return (
     <main>
       {/* CATEGORY HEADER */}
-      <div style={{ backgroundColor: '#0e1a2b', padding: '3rem 0' }}>
+      <div style={{ backgroundColor: 'var(--color-navy)', padding: '3rem 0' }}>
         <div className="container-content">
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
             <Link href="/" style={{ fontSize: '12px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none' }}>Home</Link>
             <span style={{ fontSize: '12px', color: 'rgba(247,244,238,0.4)' }}>›</span>
-            <span style={{ fontSize: '12px', color: '#c9b28f' }}>{category.name}</span>
+            <span style={{ fontSize: '12px', color: 'var(--color-gold)' }}>{category.name}</span>
           </div>
-          <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(2rem, 5vw, 3rem)', color: '#f7f4ee', marginBottom: '0.75rem' }}>{category.name}</h1>
+          <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(2rem, 5vw, 3rem)', color: 'var(--color-cream)', marginBottom: '0.75rem' }}>{category.name}</h1>
           <p style={{ fontSize: '15px', color: 'rgba(247,244,238,0.6)', margin: 0 }}>Modern Men's Wellness for Real Life.</p>
         </div>
       </div>
 
       {/* CATEGORY NAV */}
-      <div style={{ borderBottom: '1px solid #ede8df', backgroundColor: '#f7f4ee', padding: '1rem 0' }}>
+      <div style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-cream)', padding: '1rem 0' }}>
         <div className="container-content">
           <div style={{ display: 'flex', gap: '2rem', overflowX: 'auto', paddingBottom: '2px' }}>
             {allCategories.map((cat) => (
               <Link key={cat.slug} href={`/category/${cat.slug}`}
-                style={{ flexShrink: 0, fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', whiteSpace: 'nowrap', paddingBottom: '4px', color: cat.slug === slug ? '#0e1a2b' : '#9a9085', borderBottom: cat.slug === slug ? '2px solid #c9b28f' : '2px solid transparent' }}>
+                style={{ flexShrink: 0, fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', whiteSpace: 'nowrap', paddingBottom: '4px', color: cat.slug === slug ? 'var(--color-navy)' : '#9a9085', borderBottom: cat.slug === slug ? '2px solid var(--color-gold)' : '2px solid transparent' }}>
                 {cat.name}
               </Link>
             ))}
@@ -115,13 +115,13 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     </div>
                   </Link>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c9b28f' }}>{a.categories?.name}</span>
+                    <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{a.categories?.name}</span>
                     <span style={{ fontSize: '11px', color: '#9a9085' }}>{a.read_time}</span>
                   </div>
-                  <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', lineHeight: 1.3, color: '#0e1a2b', marginBottom: '0.5rem' }}>
+                  <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', lineHeight: 1.3, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>
                     <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
                   </h2>
-                  <p style={{ fontSize: '13px', color: '#4A5563', lineHeight: 1.55, marginBottom: '0.5rem' }}>{a.excerpt}</p>
+                  <p style={{ fontSize: '13px', color: 'var(--color-slate)', lineHeight: 1.55, marginBottom: '0.5rem' }}>{a.excerpt}</p>
                   <p style={{ fontSize: '12px', color: '#9a9085' }}>{a.authors?.name}</p>
                 </article>
               ))}
@@ -131,15 +131,15 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       </section>
 
       {/* NEWSLETTER */}
-      <section style={{ backgroundColor: '#0e1a2b', padding: '4rem 0' }}>
+      <section style={{ backgroundColor: 'var(--color-navy)', padding: '4rem 0' }}>
         <div className="container-content">
           <div style={{ maxWidth: '30rem', margin: '0 auto', textAlign: 'center' }}>
-            <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', display: 'block', marginBottom: '1rem' }}>Free Newsletter</span>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.5rem, 3vw, 2rem)', color: '#f7f4ee', marginBottom: '0.75rem', lineHeight: 1.2 }}>Men&apos;s health that doesn&apos;t waste your time.</h2>
+            <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', display: 'block', marginBottom: '1rem' }}>Free Newsletter</span>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.5rem, 3vw, 2rem)', color: 'var(--color-cream)', marginBottom: '0.75rem', lineHeight: 1.2 }}>Men&apos;s health that doesn&apos;t waste your time.</h2>
             <p style={{ fontSize: '14px', color: '#9a9085', marginBottom: '2rem', lineHeight: 1.6 }}>Evidence-based, experience-tested. One email per week.</p>
             <div style={{ display: 'flex', maxWidth: '26rem', margin: '0 auto' }}>
-              <input type="email" placeholder="your@email.com" style={{ flex: 1, padding: '0.85rem 1rem', backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRight: 'none', color: '#f7f4ee', outline: 'none', fontSize: '14px' }} />
-              <button style={{ padding: '0.85rem 1.5rem', backgroundColor: '#c9b28f', color: '#0e1a2b', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>Join Free</button>
+              <input type="email" placeholder="your@email.com" style={{ flex: 1, padding: '0.85rem 1rem', backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRight: 'none', color: 'var(--color-cream)', outline: 'none', fontSize: '14px' }} />
+              <button style={{ padding: '0.85rem 1.5rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>Join Free</button>
             </div>
           </div>
         </div>

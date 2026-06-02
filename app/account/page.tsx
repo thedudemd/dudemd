@@ -143,33 +143,33 @@ export default function AccountPage() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f7f4ee' }}>
-      <div style={{ width: 32, height: 32, border: '3px solid #c9b28f', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-cream)' }}>
+      <div style={{ width: 32, height: 32, border: '3px solid var(--color-gold)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
     </div>
   )
 
   const firstName = fullName?.split(' ')[0] || 'Member'
-  const inp: any = { width: '100%', padding: '0.85rem', border: '1px solid #ede8df', fontSize: '15px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit', color: '#0e1a2b' }
+  const inp: any = { width: '100%', padding: '0.85rem', border: '1px solid var(--color-border)', fontSize: '15px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit', color: 'var(--color-navy)' }
   const sectionTitle: any = { fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1.25rem' }
-  const card: any = { backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem', marginBottom: '1.5rem' }
+  const card: any = { backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.5rem', marginBottom: '1.5rem' }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-cream)' }}>
       <div style={{ maxWidth: '560px', margin: '0 auto', padding: '3rem 1.5rem' }}>
 
         {/* AVATAR + NAME HEADER */}
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <div style={{ position: 'relative', display: 'inline-block', marginBottom: '1rem' }}>
             {avatarUrl ? (
-              <img src={avatarUrl} alt={firstName} style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: '3px solid #c9b28f' }} />
+              <img src={avatarUrl} alt={firstName} style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--color-gold)' }} />
             ) : (
-              <div style={{ width: 90, height: 90, borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 700, color: '#c9b28f' }}>
+              <div style={{ width: 90, height: 90, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 700, color: 'var(--color-gold)' }}>
                 {firstName.charAt(0).toUpperCase()}
               </div>
             )}
           </div>
-          <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.25rem' }}>{fullName || firstName}</h1>
+          <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.25rem' }}>{fullName || firstName}</h1>
           <p style={{ fontSize: '13px', color: '#9a9085', margin: 0 }}>{profile?.email}</p>
         </div>
 
@@ -178,26 +178,26 @@ export default function AccountPage() {
           <p style={sectionTitle}>Edit Profile</p>
           <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#4A5563', marginBottom: '0.4rem' }}>Full Name</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>Full Name</label>
               <input style={inp} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#4A5563', marginBottom: '0.75rem' }}>Profile Picture</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.75rem' }}>Profile Picture</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt="preview" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid #c9b28f', flexShrink: 0 }} />
+                  <img src={avatarUrl} alt="preview" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)', flexShrink: 0 }} />
                 ) : (
-                  <div style={{ width: 52, height: 52, borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontSize: 20, fontWeight: 700, color: '#c9b28f' }}>{firstName.charAt(0)}</span>
+                  <div style={{ width: 52, height: 52, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0)}</span>
                   </div>
                 )}
-                <label style={{ padding: '0.6rem 1.25rem', border: '1px solid #0e1a2b', backgroundColor: '#fff', color: '#0e1a2b', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
+                <label style={{ padding: '0.6rem 1.25rem', border: '1px solid var(--color-navy)', backgroundColor: '#fff', color: 'var(--color-navy)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
                   {uploading ? 'Uploading...' : 'Upload Photo'}
                   <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} disabled={uploading} />
                 </label>
               </div>
             </div>
-            <button type="submit" disabled={saving} style={{ padding: '0.875rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', marginTop: '0.5rem' }}>
+            <button type="submit" disabled={saving} style={{ padding: '0.875rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', marginTop: '0.5rem' }}>
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
             {saved && <p style={{ fontSize: '13px', color: '#2d7a3a', textAlign: 'center', margin: 0 }}>✓ Profile updated successfully.</p>}
@@ -210,7 +210,7 @@ export default function AccountPage() {
           {profile?.newsletter_subscribed !== false ? (
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <p style={{ fontSize: '14px', fontWeight: 600, color: '#0e1a2b', margin: '0 0 0.25rem' }}>You're subscribed ✓</p>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-navy)', margin: '0 0 0.25rem' }}>You're subscribed ✓</p>
                 <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>Weekly men's wellness delivered to your inbox.</p>
               </div>
               <button onClick={handleUnsubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid #a32d2d', backgroundColor: '#fff', color: '#a32d2d', fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', flexShrink: 0 }}>
@@ -223,7 +223,7 @@ export default function AccountPage() {
                 <p style={{ fontSize: '14px', fontWeight: 600, color: '#9a9085', margin: '0 0 0.25rem' }}>Not subscribed</p>
                 <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>Want weekly men's wellness in your inbox?</p>
               </div>
-              <button onClick={handleResubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid #0e1a2b', backgroundColor: '#0e1a2b', color: '#f7f4ee', fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', flexShrink: 0 }}>
+              <button onClick={handleResubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-navy)', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer', flexShrink: 0 }}>
                 Subscribe
               </button>
             </div>
@@ -231,7 +231,7 @@ export default function AccountPage() {
         </div>
 
         {/* SIGN OUT */}
-        <button onClick={handleSignOut} style={{ width: '100%', padding: '0.875rem', backgroundColor: 'transparent', border: '1px solid #0e1a2b', color: '#0e1a2b', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: '1rem' }}>
+        <button onClick={handleSignOut} style={{ width: '100%', padding: '0.875rem', backgroundColor: 'transparent', border: '1px solid var(--color-navy)', color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: '1rem' }}>
           Sign Out
         </button>
 
@@ -243,11 +243,11 @@ export default function AccountPage() {
         ) : (
           <div style={{ ...card, border: '1px solid #a32d2d' }}>
             <p style={{ fontSize: '14px', fontWeight: 700, color: '#a32d2d', marginBottom: '0.5rem' }}>⚠️ Delete Account</p>
-            <p style={{ fontSize: '13px', color: '#4A5563', marginBottom: '1.25rem', lineHeight: 1.6 }}>This permanently deletes your account and removes you from our newsletter. This cannot be undone.</p>
-            <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.5rem' }}>Type DELETE to confirm:</p>
+            <p style={{ fontSize: '13px', color: 'var(--color-slate)', marginBottom: '1.25rem', lineHeight: 1.6 }}>This permanently deletes your account and removes you from our newsletter. This cannot be undone.</p>
+            <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>Type DELETE to confirm:</p>
             <input style={{ ...inp, border: '1px solid #a32d2d', marginBottom: '1rem' }} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} placeholder="DELETE" />
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button onClick={() => { setShowDelete(false); setDeleteInput('') }} style={{ flex: 1, padding: '0.75rem', border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => { setShowDelete(false); setDeleteInput('') }} style={{ flex: 1, padding: '0.75rem', border: '1px solid var(--color-border)', backgroundColor: '#fff', color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
               <button onClick={handleDeleteAccount} disabled={deleteInput !== 'DELETE' || deleting} style={{ flex: 1, padding: '0.75rem', backgroundColor: deleteInput === 'DELETE' ? '#a32d2d' : '#f0ede8', color: deleteInput === 'DELETE' ? '#fff' : '#9a9085', border: 'none', fontWeight: 700, fontSize: '13px', cursor: deleteInput === 'DELETE' ? 'pointer' : 'not-allowed' }}>
                 {deleting ? 'Deleting...' : 'Delete Forever'}
               </button>

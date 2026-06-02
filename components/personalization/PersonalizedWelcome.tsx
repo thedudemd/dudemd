@@ -55,16 +55,16 @@ export default function PersonalizedWelcome() {
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
 
   return (
-    <div style={{ backgroundColor: '#0e1a2b', borderBottom: '1px solid rgba(201,178,143,0.2)', padding: '0.75rem 0' }}>
+    <div style={{ backgroundColor: 'var(--color-navy)', borderBottom: '1px solid rgba(201,178,143,0.2)', padding: '0.75rem 0' }}>
       <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
 
-          <span style={{ fontSize: '13px', color: '#f7f4ee' }}>
-            {greeting}, <strong style={{ color: '#c9b28f' }}>{firstName}</strong>. Welcome back to DudeMD.
+          <span style={{ fontSize: '13px', color: 'var(--color-cream)' }}>
+            {greeting}, <strong style={{ color: 'var(--color-gold)' }}>{firstName}</strong>. Welcome back to DudeMD.
           </span>
         </div>
         {topCategory && (
-          <Link href={`/category/${topCategory}`} style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c9b28f', textDecoration: 'none' }}>
+          <Link href={`/category/${topCategory}`} style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>
             Your Top: {topCategory} →
           </Link>
         )}
