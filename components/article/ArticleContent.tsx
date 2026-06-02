@@ -19,23 +19,23 @@ export default function ArticleContent({ article, slug, category, relatedArticle
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && article.id) {
-        supabase.from('saved_articles').select('id').eq('user_id', session.user.id).eq('article_id', article.id).single()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user && article.id) {
+        supabase.from('saved_articles').select('id').eq('user_id', user.id).eq('article_id', article.id).single()
           .then(({ data }) => { if (data) setSaved(true) })
       }
     })
   }, [article.id])
 
   async function handleSave() {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) { setShowLoginPrompt(true); return }
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setShowLoginPrompt(true); return }
     setSaveLoading(true)
     if (saved) {
-      await supabase.from('saved_articles').delete().eq('user_id', session.user.id).eq('article_id', article.id)
+      await supabase.from('saved_articles').delete().eq('user_id', user.id).eq('article_id', article.id)
       setSaved(false)
     } else {
-      await supabase.from('saved_articles').insert({ user_id: session.user.id, article_id: article.id })
+      await supabase.from('saved_articles').insert({ user_id: user.id, article_id: article.id })
       setSaved(true)
     }
     setSaveLoading(false)
