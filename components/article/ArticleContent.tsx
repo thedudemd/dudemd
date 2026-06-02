@@ -19,7 +19,8 @@ export default function ArticleContent({ article, slug, category, relatedArticle
   }
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const user = session?.user
       if (user && article.id) {
         supabase.from('saved_articles').select('id').eq('user_id', user.id).eq('article_id', article.id).single()
           .then(({ data }) => { if (data) setSaved(true) })
@@ -28,7 +29,8 @@ export default function ArticleContent({ article, slug, category, relatedArticle
   }, [article.id])
 
   async function handleSave() {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session } } = await supabase.auth.getSession()
+    const user = session?.user
     if (!user) { setShowLoginPrompt(true); return }
     setSaveLoading(true)
     if (saved) {
