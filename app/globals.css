@@ -187,3 +187,10 @@ body {
   outline: none !important;
   box-shadow: none !important;
 }
+
+/* Keep gold session bar in both modes */
+[data-theme="dark"] .session-bar,
+[data-theme="dark"] [style*="var(--color-gold)"] {
+  background-color: #c9b28f !important;
+  color: #0e1a2b !important;
+}
