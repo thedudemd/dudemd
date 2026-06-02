@@ -202,6 +202,8 @@ export default function Nav() {
         .drawer-sub-link { display: block; padding: 0.5rem 1.5rem 0.5rem 2.5rem; font-size: 12px; color: rgba(247,244,238,0.7); text-decoration: none; letter-spacing: 0.04em; }
         .nav-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 1px solid var(--color-border); box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 30; padding: 2rem 0; }
         .nav-dropdown-grid { display: grid; grid-template-columns: 200px 1fr; gap: 3rem; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .desktop-nav { display: none !important; }
+        @media (min-width: 900px) { .desktop-nav { display: flex !important; } }
       `}</style>
 
       <header style={{ backgroundColor: 'var(--color-navy)', position: 'sticky', top: 0, zIndex: 20 }}>
