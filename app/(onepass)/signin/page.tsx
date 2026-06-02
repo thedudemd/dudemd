@@ -122,7 +122,7 @@ export default function SignInPage() {
               By signing in you agree to our <a href="/terms-of-use" style={{color:'var(--color-navy)'}}>Terms</a> and <a href="/privacy-policy" style={{color:'var(--color-navy)'}}>Privacy Policy</a>.
             </p>
             <p style={{fontSize:12,color:'var(--color-slate)',textAlign:'center',margin:0}}>
-              Don't have an account? <a href="/newsletter" style={{color:'var(--color-gold)',fontWeight:600}}>Sign up free</a>
+              Don't have an account? <a href="/join" style={{color:'var(--color-gold)',fontWeight:600}}>Sign up free</a>
             </p>
             <p style={{fontSize:10,color:'var(--color-slate)',textAlign:'center',margin:0}}>© {new Date().getFullYear()} DudeMD. A Rise Media Network publication.</p>
           </div>

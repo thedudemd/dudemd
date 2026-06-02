@@ -57,7 +57,7 @@ export default function SignIn() {
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Your password" style={inp} onKeyDown={e => e.key === 'Enter' && handleEmail()} />
           </div>
           <button onClick={handleEmail} disabled={loading} style={{ width: '100%', padding: '0.875rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>{loading ? 'Signing in...' : 'Sign In'}</button>
-          <p style={{ fontSize: '13px', color: 'var(--color-slate)', textAlign: 'center', marginTop: '1.25rem' }}>Don't have an account? <Link href="/newsletter" style={{ color: 'var(--color-gold)', fontWeight: 600 }}>Subscribe free</Link></p>
+          <p style={{ fontSize: '13px', color: 'var(--color-slate)', textAlign: 'center', marginTop: '1.25rem' }}>Don't have an account? <Link href="/join" style={{ color: 'var(--color-gold)', fontWeight: 600 }}>Subscribe free</Link></p>
           <p style={{ fontSize: '12px', color: '#9a9085', textAlign: 'center', marginTop: '0.75rem' }}>By signing in you agree to our <Link href="/terms-of-use" style={{ color: 'var(--color-gold)' }}>Terms</Link> and <Link href="/privacy-policy" style={{ color: 'var(--color-gold)' }}>Privacy Policy</Link></p>
         </div>
       </div>

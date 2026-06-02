@@ -266,7 +266,7 @@ export default function Nav() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
               {!session && <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Sign In</Link>}
               {!session && <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>}
-              {!session && <Link href="/newsletter" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Subscribe</Link>}
+              {!session && <Link href="/join" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Subscribe</Link>}
               {session && <Link href="/account" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>My Account</Link>}
             </div>
           </div>
@@ -338,7 +338,7 @@ export default function Nav() {
               </button>
             </>
           )}
-          <Link href="/newsletter" onClick={() => setDrawerOpen(false)}
+          <Link href="/join" onClick={() => setDrawerOpen(false)}
             style={{ display: 'block', padding: '0.75rem', textAlign: 'center', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontSize: '13px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
             Subscribe
           </Link>
