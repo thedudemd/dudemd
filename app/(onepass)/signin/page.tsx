@@ -33,6 +33,7 @@ function FacebookIcon() {
 export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -105,9 +106,9 @@ export default function SignInPage() {
             </div>
             <div style={{display:'flex',flexDirection:'column',gap:8}}>
               <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'var(--color-slate)'}}>Email address</label>
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'var(--color-navy)',outline:'none',width:'100%',padding:"11px 40px 11px 14px",boxSizing:"border-box"}}/><button type="button" onClick={()=>setShowPassword(s=>!s)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:16,padding:0}}>{showPassword?"🙈":"👁"}</button></div>
+              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'var(--color-navy)',outline:'none',width:'100%',boxSizing:'border-box'}}/>
               <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'var(--color-slate)'}}>Password</label>
-              <div style={{position:"relative"}}><input type={showPassword?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Your password" onKeyDown={e=>e.key==='Enter'&&handleEmailPassword(e)} style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'var(--color-navy)',outline:'none',width:'100%',boxSizing:'border-box'}}/>
+              <div style={{position:"relative"}}><input type={showPassword?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Your password" onKeyDown={e=>e.key==='Enter'&&handleEmailPassword(e)} style={{padding:'11px 40px 11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'var(--color-navy)',outline:'none',width:'100%',boxSizing:'border-box'}}/><button type="button" onClick={()=>setShowPassword(s=>!s)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:16,padding:0}}>{showPassword?"🙈":"👁"}</button></div>
               <button onClick={handleEmailPassword} disabled={loading!==null||!email||!password} style={{...btn,background:'var(--color-navy)',color:'var(--color-cream)',fontWeight:600,opacity:(!email||!password||loading!==null)?0.5:1}}>
                 {loading==='magic'?'Signing in…':'Sign In'}
               </button>
