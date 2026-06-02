@@ -211,7 +211,7 @@ export default function Nav() {
               <img src="/dude-md.svg" alt="DudeMD — Modern Men's Wellness" style={{ height: '64px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
             </Link>
 
-            <nav style={{ display: 'none', gap: '2rem', position: 'relative' }} className="desktop-nav">
+            <nav style={{ display: 'flex', gap: '2rem', position: 'relative' }} className="desktop-nav">
               {navItems.map((item) => (
                 <div key={item.label} onMouseEnter={() => setActiveDropdown(item.label)} onMouseLeave={() => setActiveDropdown(null)} style={{ position: 'relative' }}>
                   <Link href={item.href} style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-cream)', textDecoration: 'none' }}>
