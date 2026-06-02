@@ -162,32 +162,32 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <span style={{ fontSize: '12px', color: '#9a9085' }}>›</span>
               <Link href={`/category/${article.categories?.slug}`} style={{ fontSize: '12px', color: '#9a9085', textDecoration: 'none' }}>{article.categories?.name}</Link>
               <span style={{ fontSize: '12px', color: '#9a9085' }}>›</span>
-              <span style={{ fontSize: '12px', color: '#4A5563' }}>{article.title}</span>
+              <span style={{ fontSize: '12px', color: 'var(--color-slate)' }}>{article.title}</span>
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f' }}>{article.categories?.name}</span>
+              <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{article.categories?.name}</span>
               <span style={{ fontSize: '12px', color: '#9a9085' }}>{article.read_time}</span>
             </div>
 
-            <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', lineHeight: 1.15, color: '#0e1a2b', marginBottom: '1.25rem' }}>
+            <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', lineHeight: 1.15, color: 'var(--color-navy)', marginBottom: '1.25rem' }}>
               {article.title}
             </h1>
 
-            <p style={{ fontSize: '18px', color: '#4A5563', lineHeight: 1.65, marginBottom: '1.5rem', fontStyle: 'italic', borderLeft: '3px solid #c9b28f', paddingLeft: '1rem' }}>
+            <p style={{ fontSize: '18px', color: 'var(--color-slate)', lineHeight: 1.65, marginBottom: '1.5rem', fontStyle: 'italic', borderLeft: '3px solid var(--color-gold)', paddingLeft: '1rem' }}>
               {article.excerpt}
             </p>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid #ede8df', marginBottom: '2rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#0e1a2b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--color-border)', marginBottom: '2rem' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {article.authors?.avatar_url ? (
                     <img src={article.authors.avatar_url} alt={article.authors.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                   ) : (
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: '#c9b28f' }}>{article.authors?.name?.charAt(0)}</span>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-gold)' }}>{article.authors?.name?.charAt(0)}</span>
                   )}
               </div>
               <div>
-                <p style={{ fontSize: '14px', fontWeight: 600, color: '#0e1a2b', margin: 0 }}>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-navy)', margin: 0 }}>
                   {article.authors?.slug ? (
                     <Link href={`/authors/${article.authors.slug}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{article.authors.name}</Link>
                   ) : article.authors?.name}
@@ -201,22 +201,22 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </article>
 
           <aside className="article-sidebar">
-            <div style={{ backgroundColor: '#0e1a2b', padding: '1.5rem', marginBottom: '2rem' }}>
-              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '0.5rem' }}>Free Newsletter</p>
-              <p style={{ fontSize: '16px', fontWeight: 700, color: '#f7f4ee', lineHeight: 1.3, marginBottom: '1rem' }}>Men&apos;s health that doesn&apos;t waste your time.</p>
-              <input type="email" placeholder="your@email.com" style={{ width: '100%', padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: '#f7f4ee', outline: 'none', fontSize: '14px', marginBottom: '0.5rem', boxSizing: 'border-box' }} />
-              <button style={{ width: '100%', padding: '0.75rem', backgroundColor: '#c9b28f', color: '#0e1a2b', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>Join Free</button>
+            <div style={{ backgroundColor: 'var(--color-navy)', padding: '1.5rem', marginBottom: '2rem' }}>
+              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.5rem' }}>Free Newsletter</p>
+              <p style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-cream)', lineHeight: 1.3, marginBottom: '1rem' }}>Men&apos;s health that doesn&apos;t waste your time.</p>
+              <input type="email" placeholder="your@email.com" style={{ width: '100%', padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-cream)', outline: 'none', fontSize: '14px', marginBottom: '0.5rem', boxSizing: 'border-box' }} />
+              <button style={{ width: '100%', padding: '0.75rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>Join Free</button>
             </div>
 
             {related.length > 0 && (
               <div>
-                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', borderBottom: '1px solid #ede8df', paddingBottom: '0.5rem', marginBottom: '1.25rem' }}>Related Articles</p>
+                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1.25rem' }}>Related Articles</p>
                 {related.map((a) => (
                   <Link key={a.slug} href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ display: 'flex', gap: '0.75rem', textDecoration: 'none', marginBottom: '1.25rem', alignItems: 'start' }}>
                     <img src={a.cover_image_url} alt={`${a.title} thumbnail`} style={{ width: '72px', height: '54px', objectFit: 'cover', flexShrink: 0 }} />
                     <div>
-                      <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c9b28f', marginBottom: '0.25rem' }}>{a.categories?.name}</p>
-                      <p style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', lineHeight: 1.3, margin: 0 }}>{a.title}</p>
+                      <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.25rem' }}>{a.categories?.name}</p>
+                      <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', lineHeight: 1.3, margin: 0 }}>{a.title}</p>
                     </div>
                   </Link>
                 ))}
@@ -227,17 +227,17 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       </div>
 
       {related.length > 0 && (
-        <section style={{ borderTop: '1px solid #ede8df', padding: '3rem 0', backgroundColor: '#f7f4ee' }}>
+        <section style={{ borderTop: '1px solid var(--color-border)', padding: '3rem 0', backgroundColor: 'var(--color-cream)' }}>
           <div className="container-content">
-            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.25rem', color: '#0e1a2b', marginBottom: '2rem' }}>More to Read</h2>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.25rem', color: 'var(--color-navy)', marginBottom: '2rem' }}>More to Read</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '2rem' }}>
               {related.map((a) => (
                 <article key={a.slug}>
                   <Link href={`/articles/${a.categories?.slug}/${a.slug}`}>
                     <img src={a.cover_image_url} alt={`${a.title} thumbnail`} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block', marginBottom: '1rem' }} />
                   </Link>
-                  <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c9b28f' }}>{a.categories?.name}</span>
-                  <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1.3, color: '#0e1a2b', marginTop: '0.4rem' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{a.categories?.name}</span>
+                  <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1.3, color: 'var(--color-navy)', marginTop: '0.4rem' }}>
                     <Link href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
                   </h3>
                 </article>
