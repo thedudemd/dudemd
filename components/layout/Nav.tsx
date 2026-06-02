@@ -19,8 +19,24 @@ export default function Nav() {
   const [userOpen, setUserOpen] = useState(false)
   const [profile, setProfile] = useState<{full_name?: string, avatar_url?: string} | null>(null)
   const [session, setSession] = useState<any>(undefined)
+  const [darkMode, setDarkMode] = useState(false)
   const userRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
+
+  useEffect(() => {
+    const saved = localStorage.getItem('dudemd-theme')
+    if (saved === 'dark') {
+      setDarkMode(true)
+      document.documentElement.setAttribute('data-theme', 'dark')
+    }
+  }, [])
+
+  function toggleDarkMode() {
+    const next = !darkMode
+    setDarkMode(next)
+    document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light')
+    localStorage.setItem('dudemd-theme', next ? 'dark' : 'light')
+  }
 
   useEffect(() => {
     async function loadNav() {
@@ -207,6 +223,9 @@ export default function Nav() {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <UserSection />
+              <button className="icon-btn" onClick={toggleDarkMode} title={darkMode ? 'Light Mode' : 'Dark Mode'} style={{ fontSize: '18px', padding: '0.25rem 0.4rem' }}>
+                {darkMode ? '☀️' : '🌙'}
+              </button>
               <button className="icon-btn" onClick={() => setSearchOpen(!searchOpen)}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
