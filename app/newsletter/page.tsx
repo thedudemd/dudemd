@@ -9,6 +9,7 @@ function NewsletterInner() {
   const [email, setEmail] = useState('')
   const [firstName, setFirstName] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [status, setStatus] = useState('idle')
   const searchParams = useSearchParams()
   const router = useRouter()
