@@ -1,6 +1,3 @@
-Now paste this exact content into the TextEdit window:
-
-```
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -59,6 +56,3 @@ export default function ResetPasswordPage() {
     </main>
   )
 }
-```
-
-Save with **Cmd+S** then tell me.
