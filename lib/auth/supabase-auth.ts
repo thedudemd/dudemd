@@ -29,7 +29,7 @@ export async function signInWithFacebook() {
   const supabase = createClient()
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'facebook',
-    options: { redirectTo: 'https://www.dudemd.com/auth/callback' },
+    options: { redirectTo: 'https://www.dudemd.com/auth/callback', scopes: 'email,public_profile' },
   })
   if (error) throw error
 }
