@@ -72,18 +72,18 @@ function NewsletterInner() {
       `}</style>
 
       <div style={{ width: '100%', maxWidth: '480px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
           <Link href="/" style={{ fontSize: '12px', color: '#9a9085', textDecoration: 'none' }}>← Back to DudeMD</Link>
         </div>
 
         {/* STEP 0 - EMAIL */}
         {step === 0 && (
           <div className="fade-up">
-            <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.75rem', textAlign: 'center' }}>
-              Men's Wellness That Doesn't Waste Your Time
+            <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.75rem, 5vw, 2.5rem)', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.5rem', textAlign: 'center' }}>
+              Join The Community
             </h1>
-            <p style={{ fontSize: '16px', color: 'var(--color-slate)', lineHeight: 1.65, marginBottom: '2rem', textAlign: 'center' }}>
-              One email per week. Evidence-based. No fluff.
+            <p style={{ fontSize: '15px', color: 'var(--color-slate)', lineHeight: 1.65, marginBottom: '1.5rem', textAlign: 'center' }}>
+              Modern Men's Wellness for Real Life.
             </p>
             <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid var(--color-border)' }}>
               <form onSubmit={handleEmail} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -91,7 +91,10 @@ function NewsletterInner() {
                 <button type="submit" disabled={status === 'loading'} style={btn}>{status === 'loading' ? 'Checking...' : 'Get Started'}</button>
                 {status === 'error' && <p style={{ fontSize: '13px', color: '#a32d2d', textAlign: 'center' }}>Something went wrong. Try again.</p>}
               </form>
-              <p style={{ fontSize: '12px', color: '#9a9085', marginTop: '1rem', textAlign: 'center' }}>Unsubscribe anytime. No spam, ever.</p>
+              <p style={{ fontSize: '11px', color: '#9a9085', marginTop: '1.25rem', textAlign: 'center', lineHeight: 1.6 }}>
+                🔒 Your information is secured. We never sell your data or spam you.<br/>
+                <a href="/privacy-policy" style={{ color: 'var(--color-navy)', textDecoration: 'underline' }}>Privacy Policy</a> &amp; <a href="/terms-of-use" style={{ color: 'var(--color-navy)', textDecoration: 'underline' }}>Terms of Service</a>
+              </p>
             </div>
           </div>
         )}
