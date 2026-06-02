@@ -121,12 +121,12 @@ function NewsletterInner() {
           <div className="fade-up">
             <p style={{ fontSize: '13px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', textAlign: 'center', marginBottom: '1rem' }}>Step 2 of 2</p>
             <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.5rem', textAlign: 'center' }}>
-              Hey {firstName}, create a password
+              Hey {firstName}, almost done
             </h2>
-            <p style={{ fontSize: '15px', color: 'var(--color-slate)', textAlign: 'center', marginBottom: '2rem' }}>This saves your preferences and reading history.</p>
+            
             <div style={{ backgroundColor: '#fff', padding: '2rem', border: '1px solid var(--color-border)' }}>
               <form onSubmit={handleAccount} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <input type="password" placeholder="Create a password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} style={inp} autoFocus />
+                <div style={{position:"relative"}}><input type={showPassword?"text":"password"} placeholder="Min 8 chars, 1 capital, 1 number, 1 symbol" value={password} onChange={e => setPassword(e.target.value)} style={{...inp, paddingRight:"3rem"}} autoFocus /><button type="button" onClick={()=>setShowPassword(s=>!s)} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:18,padding:0,color:"var(--color-slate)"}}>{showPassword?"🙈":"👁"}</button></div>
                 <button type="submit" disabled={status === 'loading'} style={btn}>{status === 'loading' ? 'Creating Account...' : 'Create My Account'}</button>
                 {status === 'error' && <p style={{ fontSize: '13px', color: '#a32d2d', textAlign: 'center' }}>Something went wrong. Try again.</p>}
               </form>
