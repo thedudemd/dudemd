@@ -131,7 +131,7 @@ function NewsletterInner() {
                 <button type="submit" disabled={status === 'loading'} style={btn}>{status === 'loading' ? 'Creating Account...' : 'Create My Account'}</button>
                 {status === 'error' && <p style={{ fontSize: '13px', color: '#a32d2d', textAlign: 'center' }}>Something went wrong. Try again.</p>}
               </form>
-              <button onClick={() => { window.location.href = from }} style={{ display: 'block', width: '100%', marginTop: '0.75rem', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', color: '#9a9085', fontSize: '12px', cursor: 'pointer', textAlign: 'center' }}>Skip for now</button>
+              
             </div>
           </div>
         )}
