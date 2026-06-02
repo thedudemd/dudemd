@@ -64,7 +64,7 @@ export default function SignInPage() {
     if (!email) { setError("Enter your email first"); return }
     setResetLoading(true);setError(null)
     await supabase.auth.resetPasswordForEmail(email,{redirectTo:"https://www.dudemd.com/auth/reset-password"})
-    setResetSent(true);setResetLoading(false)
+    setResetSent(true);setResetLoading(false);setTimeout(()=>setResetSent(false),5000)
   }
   async function handleEmailPassword(e: React.FormEvent) {
     e.preventDefault()
