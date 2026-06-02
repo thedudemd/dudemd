@@ -29,7 +29,7 @@ export default function ArticleContent({ article, slug, category, relatedArticle
 
   async function handleSave() {
     const { data: { session } } = await supabase.auth.getSession()
-    if (!session) { setShowLoginPrompt(true); return }
+    console.log("session:", session); if (!session) { setShowLoginPrompt(true); return }
     setSaveLoading(true)
     if (saved) {
       await supabase.from('saved_articles').delete().eq('user_id', session.user.id).eq('article_id', article.id)
