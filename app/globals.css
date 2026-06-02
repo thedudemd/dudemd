@@ -17,20 +17,85 @@
   --color-text: #0e1a2b;
 }
 
-[data-theme="dark"] footer,
-[data-theme="dark"] header {
-  background-color: #050e18 !important;
-}
-
 [data-theme="dark"] {
-  --color-navy: #f7f4ee;
-  --color-cream: #0e1a2b;
+  --color-navy: #0e1a2b;
+  --color-cream: #f7f4ee;
   --color-gold: #c9b28f;
-  --color-slate: #c9b9a0;
-  --color-charcoal: #f0ede8;
+  --color-slate: #8a95a0;
+  --color-charcoal: #1B1D21;
   --color-border: #1e2d3d;
   --color-bg: #0a1520;
-  --color-text: #f7f4ee;
+  --color-text: #f0ede8;
+}
+
+/* Dark mode body and content areas */
+[data-theme="dark"] body {
+  background-color: #0a1520;
+  color: #f0ede8;
+}
+
+/* Keep nav dark in both modes */
+[data-theme="dark"] nav,
+[data-theme="dark"] header {
+  background-color: #0e1a2b !important;
+}
+
+/* Keep footer dark in both modes */
+[data-theme="dark"] footer {
+  background-color: #0e1a2b !important;
+}
+[data-theme="dark"] footer p,
+[data-theme="dark"] footer a,
+[data-theme="dark"] footer span {
+  color: #f7f4ee !important;
+}
+[data-theme="dark"] footer .footer-label {
+  color: #c9b28f !important;
+}
+
+/* Main content areas */
+[data-theme="dark"] main,
+[data-theme="dark"] article,
+[data-theme="dark"] .container-content {
+  background-color: #0a1520;
+  color: #f0ede8;
+}
+
+/* Cards and boxes */
+[data-theme="dark"] [style*="background-color: var(--color-cream)"],
+[data-theme="dark"] [style*="backgroundColor: var(--color-cream)"] {
+  background-color: #0e1a2b !important;
+}
+
+/* Text */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] a {
+  color: #f0ede8;
+}
+
+/* Keep gold accents */
+[data-theme="dark"] .gold,
+[data-theme="dark"] [style*="color: var(--color-gold)"] {
+  color: #c9b28f !important;
+}
+
+/* Borders */
+[data-theme="dark"] [style*="border"] {
+  border-color: #1e2d3d !important;
+}
+
+/* Inputs */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background-color: #0e1a2b !important;
+  color: #f0ede8 !important;
+  border-color: #1e2d3d !important;
 }
 
 * {
