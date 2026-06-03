@@ -1,7 +1,30 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase/client'
+
+const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
+
+function getAuthFromCookie() {
+  try {
+    const jar: Record<string, string> = {}
+    document.cookie.split(';').forEach(c => {
+      const eq = c.indexOf('=')
+      jar[c.substring(0, eq).trim()] = c.substring(eq + 1).trim()
+    })
+    let raw = ''
+    if (jar['sb-bicljoujevywrkzjeaoy-auth-token']) {
+      raw = jar['sb-bicljoujevywrkzjeaoy-auth-token'].replace('base64-', '')
+    } else {
+      const p0 = jar['sb-bicljoujevywrkzjeaoy-auth-token.0'] || ''
+      const p1 = jar['sb-bicljoujevywrkzjeaoy-auth-token.1'] || ''
+      raw = p0.replace('base64-', '') + decodeURIComponent(p1)
+    }
+    const parsed = JSON.parse(atob(raw))
+    return { uid: parsed.user?.id, token: parsed.access_token }
+  } catch {}
+  return null
+}
 
 export default function ArticleContent({ article, slug, category, relatedArticles = [] }: { article: any, slug: string, category: string, relatedArticles?: any[] }) {
   const [copied, setCopied] = useState(false)
@@ -19,44 +42,42 @@ export default function ArticleContent({ article, slug, category, relatedArticle
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const user = session?.user
-      if (user && article.id) {
-        supabase.from('saved_articles').select('id').eq('user_id', user.id).eq('article_id', article.id).single()
-          .then(({ data }) => { if (data) setSaved(true) })
-      }
-    })
+    const auth = getAuthFromCookie()
+    if (auth?.uid && article.id) {
+      fetch(`${SUPABASE_URL}/rest/v1/saved_articles?select=id&user_id=eq.${auth.uid}&article_id=eq.${article.id}&limit=1`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      }).then(r => r.json()).then(data => { if (data?.[0]) setSaved(true) }).catch(() => {})
+    }
   }, [article.id])
 
   async function handleSave() {
-    const { data: { session } } = await supabase.auth.getSession()
-    const user = session?.user
-    if (!user) { setShowLoginPrompt(true); return }
+    const auth = getAuthFromCookie()
+    if (!auth?.uid) { setShowLoginPrompt(true); return }
     setSaveLoading(true)
     if (saved) {
-      await supabase.from('saved_articles').delete().eq('user_id', user.id).eq('article_id', article.id)
+      await fetch(`${SUPABASE_URL}/rest/v1/saved_articles?user_id=eq.${auth.uid}&article_id=eq.${article.id}`, {
+        method: 'DELETE',
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      })
       setSaved(false)
     } else {
-      await supabase.from('saved_articles').insert({ user_id: user.id, article_id: article.id })
+      await fetch(`${SUPABASE_URL}/rest/v1/saved_articles`, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ user_id: auth.uid, article_id: article.id })
+      })
       setSaved(true)
     }
     setSaveLoading(false)
   }
 
   useEffect(() => {
-    // Cache session at mount so scroll handler and exit handler can use it synchronously
-    let cachedUserId: string | null = null
-    let cachedToken: string | null = null
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        cachedUserId = session.user.id
-        cachedToken = session.access_token
-      }
-      // Fire view event once session is resolved — only scores if authenticated
-      if (cachedUserId && cachedToken) {
-        try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: cachedUserId, token: cachedToken, event_type: 'view', article_slug: slug, category_slug: category }) }) } catch(e) {}
-      }
-    })
+    const auth = getAuthFromCookie()
+    const uid = auth?.uid || null
+    const token = auth?.token || null
+    if (uid && token) {
+      try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: uid, token, event_type: 'view', article_slug: slug, category_slug: category }) }) } catch(e) {}
+    }
     const checkpoints = { 25: false, 50: false, 75: false, 100: false }
     function onScroll() {
       const el = document.documentElement
@@ -64,9 +85,8 @@ export default function ArticleContent({ article, slug, category, relatedArticle
       for (const [depth, fired] of Object.entries(checkpoints)) {
         if (!fired && pct >= Number(depth)) {
           checkpoints[Number(depth)] = true
-          // Only fire scoring if authenticated — anonymous users scroll silently
-          if (cachedUserId && cachedToken) {
-            try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: cachedUserId, token: cachedToken, event_type: `scroll_${depth}`, article_slug: slug, category_slug: category }) }) } catch(e) {}
+          if (uid && token) {
+            try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: uid, token, event_type: `scroll_${depth}`, article_slug: slug, category_slug: category }) }) } catch(e) {}
           }
         }
       }
@@ -75,8 +95,8 @@ export default function ArticleContent({ article, slug, category, relatedArticle
     const start = Date.now()
     function onExit() {
       const seconds = Math.round((Date.now() - start) / 1000)
-      if (seconds > 10 && cachedUserId && cachedToken) {
-        try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true, body: JSON.stringify({ user_id: cachedUserId, token: cachedToken, event_type: 'time_on_page', article_slug: slug, category_slug: category, metadata: { seconds } }) }) } catch(e) {}
+      if (seconds > 10 && uid && token) {
+        try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true, body: JSON.stringify({ user_id: uid, token, event_type: 'time_on_page', article_slug: slug, category_slug: category, metadata: { seconds } }) }) } catch(e) {}
       }
     }
     window.addEventListener('beforeunload', onExit)
