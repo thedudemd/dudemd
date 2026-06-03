@@ -105,7 +105,7 @@ export default function NotificationBell() {
           ) : (
             <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
               {notifications.map(n => (
-                
+                <a
                   key={n.id}
                   href={n.link || '#'}
                   onClick={() => markRead(n.id)}
