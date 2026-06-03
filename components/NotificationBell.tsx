@@ -1,4 +1,3 @@
-cat > ~/dudemd/components/NotificationBell.tsx << 'ENDOFFILE'
 'use client'
 import { useEffect, useRef, useState } from 'react'
 
@@ -115,7 +114,7 @@ export default function NotificationBell() {
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
                     {!n.read && <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'var(--color-gold)', flexShrink: 0, marginTop: 5 }} />}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: '13px', fontWeight: n.read ? 400 : 600, color: 'var(--color-navy)', margin: '0 0 0.2rem', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{n.title}</p>
+                      <p style={{ fontSize: '13px', fontWeight: n.read ? 400 : 600, color: 'var(--color-navy)', margin: '0 0 0.2rem', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{n.title}</p>
                       <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>{new Date(n.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                     </div>
                   </div>
@@ -128,6 +127,3 @@ export default function NotificationBell() {
     </div>
   )
 }
-ENDOFFILE
-echo "File created"</parameter>
-<parameter name="description">Create NotificationBell component file directly</parameter>
