@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
@@ -48,6 +48,7 @@ export default function AccountPage() {
   const [username, setUsername] = useState('')
   const [usernameError, setUsernameError] = useState('')
   const [usernameChecking, setUsernameChecking] = useState(false)
+  const usernameDebounceRef = useRef<any>(null)
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedProfile, setSavedProfile] = useState(false)
@@ -80,7 +81,6 @@ export default function AccountPage() {
     }).catch(() => setLoading(false))
   }, [])
 
-  // Load recently read on overview tab
   useEffect(() => {
     if (!auth || activeTab !== 'overview') return
     setRecentLoading(true)
@@ -88,7 +88,6 @@ export default function AccountPage() {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
     }).then(r => r.json()).then(async events => {
       if (!Array.isArray(events) || events.length === 0) { setRecentLoading(false); return }
-      // Deduplicate slugs keeping most recent
       const seen = new Set<string>()
       const slugs: string[] = []
       for (const e of events) {
@@ -105,7 +104,6 @@ export default function AccountPage() {
       })
       const articles = await res.json()
       if (!Array.isArray(articles)) { setRecentLoading(false); return }
-      // Re-sort to match original recency order
       const sorted = slugs.map(s => articles.find((a: any) => a.slug === s)).filter(Boolean)
       setRecentArticles(sorted)
       setRecentLoading(false)
@@ -113,7 +111,8 @@ export default function AccountPage() {
   }, [auth, activeTab])
 
   useEffect(() => {
-    if (!auth || activeTab !== 'saved') return
+    if (!auth) return
+    if (activeTab !== 'saved' && savedArticles.length > 0) return
     setSavedLoading(true)
     fetch(`${SUPABASE_URL}/rest/v1/saved_articles?select=article_id,saved_at,articles(id,title,slug,excerpt,cover_image_url,published_at,categories!articles_category_id_fkey(name,slug))&user_id=eq.${auth.uid}&order=saved_at.desc`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
@@ -181,23 +180,25 @@ export default function AccountPage() {
     setUploading(false)
   }
 
-  async function handleUsernameChange(val: string) {
+  function handleUsernameChange(val: string) {
     const lower = val.toLowerCase().replace(/[^a-z0-9_]/g, '')
     setUsername(lower)
     setUsernameError('')
     const localError = validateUsername(lower)
     if (localError) { setUsernameError(localError); return }
     if (lower === profile?.username) return
-    // Check uniqueness
+    if (usernameDebounceRef.current) clearTimeout(usernameDebounceRef.current)
     setUsernameChecking(true)
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id&username=eq.${lower}&limit=1`, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
-    })
-    const data = await res.json()
-    setUsernameChecking(false)
-    if (Array.isArray(data) && data.length > 0) {
-      setUsernameError('Username already taken')
-    }
+    usernameDebounceRef.current = setTimeout(async () => {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id&username=eq.${lower}&limit=1`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      })
+      const data = await res.json()
+      setUsernameChecking(false)
+      if (Array.isArray(data) && data.length > 0) {
+        setUsernameError('Username already taken')
+      }
+    }, 500)
   }
 
   async function handleSave(e: React.FormEvent) {
