@@ -36,22 +36,13 @@ function validateUsername(val: string): string | null {
   return null
 }
 
-type Tab = 'overview' | 'saved' | 'foryou' | 'new' | 'community' | 'settings'
-
-const NAV_ITEMS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'overview', label: 'Home', icon: '⌂' },
-  { id: 'foryou', label: 'For You', icon: '✦' },
-  { id: 'saved', label: 'Saved', icon: '◇' },
-  { id: 'new', label: 'New', icon: '◎' },
-  { id: 'community', label: 'Community', icon: '◈' },
-  { id: 'settings', label: 'Settings', icon: '⚙' },
-]
+type Tab = 'feed' | 'saved' | 'new' | 'community' | 'settings'
 
 export default function AccountPage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [auth, setAuth] = useState<any>(null)
-  const [activeTab, setActiveTab] = useState<Tab>('overview')
+  const [activeTab, setActiveTab] = useState<Tab>('feed')
   const [fullName, setFullName] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
   const [username, setUsername] = useState('')
@@ -68,10 +59,9 @@ export default function AccountPage() {
   const [savedLoading, setSavedLoading] = useState(false)
   const [newArticles, setNewArticles] = useState<any[]>([])
   const [newLoading, setNewLoading] = useState(false)
-  const [forYouArticles, setForYouArticles] = useState<any[]>([])
-  const [forYouLoading, setForYouLoading] = useState(false)
-  const [recentArticles, setRecentArticles] = useState<any[]>([])
-  const [recentLoading, setRecentLoading] = useState(false)
+  const [feedArticles, setFeedArticles] = useState<any[]>([])
+  const [feedLoading, setFeedLoading] = useState(false)
+  const [recentSlugs, setRecentSlugs] = useState<string[]>([])
   const [moreOpen, setMoreOpen] = useState(false)
 
   useEffect(() => {
@@ -91,38 +81,59 @@ export default function AccountPage() {
     }).catch(() => setLoading(false))
   }, [])
 
-  useEffect(() => {
-    if (!auth || activeTab !== 'overview') return
-    setRecentLoading(true)
-    fetch(`${SUPABASE_URL}/rest/v1/user_events?select=article_slug,created_at&user_id=eq.${auth.uid}&event_type=eq.view&order=created_at.desc&limit=40`, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
-    }).then(r => r.json()).then(async events => {
-      if (!Array.isArray(events) || events.length === 0) { setRecentLoading(false); return }
-      const seen = new Set<string>()
-      const slugs: string[] = []
-      for (const e of events) {
-        if (e.article_slug && !seen.has(e.article_slug)) {
-          seen.add(e.article_slug)
-          slugs.push(e.article_slug)
-          if (slugs.length >= 6) break
-        }
-      }
-      if (slugs.length === 0) { setRecentLoading(false); return }
-      const filter = slugs.map(s => `slug.eq.${s}`).join(',')
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,cover_image_url,published_at,categories!articles_category_id_fkey(name,slug)&or=(${filter})&status=eq.published`, {
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
-      })
-      const articles = await res.json()
-      if (!Array.isArray(articles)) { setRecentLoading(false); return }
-      const sorted = slugs.map(s => articles.find((a: any) => a.slug === s)).filter(Boolean)
-      setRecentArticles(sorted)
-      setRecentLoading(false)
-    }).catch(() => setRecentLoading(false))
-  }, [auth, activeTab])
-
+  // Load main feed on mount — personalized + new articles merged
   useEffect(() => {
     if (!auth) return
-    if (activeTab !== 'saved' && savedArticles.length > 0) return
+    setFeedLoading(true)
+
+    // Get recently read slugs + user scores in parallel
+    Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/user_events?select=article_slug&user_id=eq.${auth.uid}&event_type=eq.view&order=created_at.desc&limit=20`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      }).then(r => r.json()),
+      fetch(`${SUPABASE_URL}/rest/v1/user_scores?select=category_scores&user_id=eq.${auth.uid}&limit=1`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      }).then(r => r.json()),
+      fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,excerpt,cover_image_url,published_at,categories!articles_category_id_fkey(name,slug)&status=eq.published&order=published_at.desc&limit=40`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      }).then(r => r.json())
+    ]).then(([events, scores, articles]) => {
+      // Track recently read
+      const seen = new Set<string>()
+      const slugs: string[] = []
+      if (Array.isArray(events)) {
+        for (const e of events) {
+          if (e.article_slug && !seen.has(e.article_slug)) {
+            seen.add(e.article_slug); slugs.push(e.article_slug)
+          }
+        }
+      }
+      setRecentSlugs(slugs)
+
+      if (!Array.isArray(articles)) { setFeedLoading(false); return }
+
+      // Get top category slugs from scores
+      let topSlugs: string[] = []
+      if (Array.isArray(scores) && scores[0]?.category_scores) {
+        topSlugs = Object.entries(scores[0].category_scores as Record<string, number>)
+          .sort((a, b) => b[1] - a[1]).slice(0, 5).map(([s]) => s)
+      }
+
+      // Build feed: personalized first, then rest — exclude recently read
+      const readSet = new Set(slugs)
+      const personalized = topSlugs.length > 0
+        ? articles.filter((a: any) => topSlugs.includes(a.categories?.slug) && !readSet.has(a.slug))
+        : []
+      const rest = articles.filter((a: any) => !personalized.includes(a) && !readSet.has(a.slug))
+      const recentRead = articles.filter((a: any) => readSet.has(a.slug))
+
+      setFeedArticles([...personalized, ...rest, ...recentRead].slice(0, 24))
+      setFeedLoading(false)
+    }).catch(() => setFeedLoading(false))
+  }, [auth])
+
+  useEffect(() => {
+    if (!auth || activeTab !== 'saved') return
     setSavedLoading(true)
     fetch(`${SUPABASE_URL}/rest/v1/saved_articles?select=article_id,saved_at,articles(id,title,slug,excerpt,cover_image_url,published_at,categories!articles_category_id_fkey(name,slug))&user_id=eq.${auth.uid}&order=saved_at.desc`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
@@ -143,33 +154,6 @@ export default function AccountPage() {
     }).catch(() => setNewLoading(false))
   }, [auth, activeTab])
 
-  useEffect(() => {
-    if (!auth || activeTab !== 'foryou') return
-    setForYouLoading(true)
-    fetch(`${SUPABASE_URL}/rest/v1/user_scores?select=category_scores&user_id=eq.${auth.uid}&limit=1`, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
-    }).then(r => r.json()).then(async rows => {
-      let topSlugs: string[] = []
-      if (Array.isArray(rows) && rows[0]?.category_scores) {
-        topSlugs = Object.entries(rows[0].category_scores as Record<string, number>)
-          .sort((a, b) => b[1] - a[1]).slice(0, 5).map(([slug]) => slug)
-      }
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,excerpt,cover_image_url,published_at,categories!articles_category_id_fkey(name,slug)&status=eq.published&order=published_at.desc&limit=40`, {
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
-      })
-      const articles = await res.json()
-      if (!Array.isArray(articles)) { setForYouArticles([]); setForYouLoading(false); return }
-      if (topSlugs.length > 0) {
-        const matched = articles.filter((a: any) => topSlugs.includes(a.categories?.slug))
-        const rest = articles.filter((a: any) => !topSlugs.includes(a.categories?.slug))
-        setForYouArticles([...matched, ...rest].slice(0, 20))
-      } else {
-        setForYouArticles(articles.slice(0, 20))
-      }
-      setForYouLoading(false)
-    }).catch(() => setForYouLoading(false))
-  }, [auth, activeTab])
-
   async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file || !auth) return
@@ -185,10 +169,9 @@ export default function AccountPage() {
 
   function handleUsernameChange(val: string) {
     const lower = val.toLowerCase().replace(/[^a-z0-9_]/g, '')
-    setUsername(lower)
-    setUsernameError('')
-    const localError = validateUsername(lower)
-    if (localError) { setUsernameError(localError); return }
+    setUsername(lower); setUsernameError('')
+    const err = validateUsername(lower)
+    if (err) { setUsernameError(err); return }
     if (lower === profile?.username) return
     if (usernameDebounceRef.current) clearTimeout(usernameDebounceRef.current)
     setUsernameChecking(true)
@@ -205,8 +188,8 @@ export default function AccountPage() {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (usernameError || usernameChecking) return
-    const localError = validateUsername(username)
-    if (username && localError) { setUsernameError(localError); return }
+    const err = validateUsername(username)
+    if (username && err) { setUsernameError(err); return }
     setSaving(true)
     await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
       method: 'PATCH',
@@ -259,7 +242,7 @@ export default function AccountPage() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-cream)' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f3ef' }}>
       <div style={{ width: 28, height: 28, border: '2px solid var(--color-gold)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
@@ -267,94 +250,79 @@ export default function AccountPage() {
 
   const firstName = fullName?.split(' ')[0] || 'Member'
   const memberYear = profile?.created_at ? new Date(profile.created_at).getFullYear() : '—'
-  const activeNav = NAV_ITEMS.find(n => n.id === activeTab)
 
-  function ArticleCard({ article, compact }: { article: any, compact?: boolean }) {
+  // Feed card — full editorial style
+  function FeedCard({ article, label }: { article: any, label?: string }) {
     const cat = article.categories
     const href = cat?.slug && article.slug ? `/articles/${cat.slug}/${article.slug}` : '#'
-    const date = article.published_at ? new Date(article.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''
-    if (compact) return (
-      <a href={href} style={{ display: 'flex', gap: '0.75rem', textDecoration: 'none', color: 'inherit', padding: '0.75rem 0', borderBottom: '1px solid var(--color-border)', alignItems: 'center' }}>
-        {article.cover_image_url && <img src={article.cover_image_url} alt={article.title} style={{ width: 52, height: 40, objectFit: 'cover', flexShrink: 0, borderRadius: 3 }} />}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {cat?.name && <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.2rem' }}>{cat.name}</p>}
-          <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', margin: 0, lineHeight: 1.35, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{article.title}</p>
-        </div>
-      </a>
-    )
+    const date = article.published_at ? new Date(article.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''
+    const isRecent = recentSlugs.includes(article.slug)
     return (
-      <a href={href} style={{ display: 'flex', gap: '1rem', textDecoration: 'none', color: 'inherit', padding: '1.1rem 0', borderBottom: '1px solid var(--color-border)' }}>
-        {article.cover_image_url && <img src={article.cover_image_url} alt={article.title} style={{ width: 88, height: 64, objectFit: 'cover', flexShrink: 0, borderRadius: 3 }} />}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {cat?.name && <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.35rem' }}>{cat.name}</p>}
-          <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.35rem', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{article.title}</p>
-          {date && <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>{date}</p>}
+      <a href={href} style={{ display: 'block', textDecoration: 'none', color: 'inherit', borderBottom: '1px solid var(--color-border)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+        {label && <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.75rem' }}>{label}</p>}
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+          {article.cover_image_url && (
+            <img src={article.cover_image_url} alt={article.title} style={{ width: 100, height: 72, objectFit: 'cover', flexShrink: 0, borderRadius: 3 }} />
+          )}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            {cat?.name && <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.4rem' }}>{cat.name}</p>}
+            <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.4rem', lineHeight: 1.35, fontFamily: 'Georgia, serif' }}>{article.title}</p>
+            {article.excerpt && <p style={{ fontSize: '13px', color: 'var(--color-slate)', margin: '0 0 0.5rem', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{article.excerpt}</p>}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              {date && <span style={{ fontSize: '11px', color: '#9a9085' }}>{date}</span>}
+              {isRecent && <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', backgroundColor: '#f0ede8', padding: '2px 6px', borderRadius: 2 }}>Read</span>}
+            </div>
+          </div>
         </div>
       </a>
     )
-  }
-
-  function SectionLabel({ children }: { children: string }) {
-    return <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9a9085', margin: '0 0 0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>{children}</p>
   }
 
   function Spinner() {
-    return <div style={{ textAlign: 'center', padding: '3rem 0' }}><div style={{ width: 24, height: 24, border: '2px solid var(--color-gold)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite', display: 'inline-block' }} /></div>
+    return <div style={{ padding: '3rem 0', textAlign: 'center' }}><div style={{ width: 22, height: 22, border: '2px solid var(--color-gold)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite', display: 'inline-block' }} /></div>
   }
 
-  function OverviewTab() {
+  function FeedTab() {
+    if (feedLoading) return <Spinner />
+    if (!feedArticles.length) return (
+      <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+        <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>No articles yet.</p>
+        <a href="/" style={{ fontSize: '12px', color: 'var(--color-gold)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>Browse DudeMD →</a>
+      </div>
+    )
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.75rem' }}>
-          {[
-            { label: 'Saved', value: savedArticles.length || '0', action: () => setActiveTab('saved') },
-            { label: 'Member Since', value: memberYear },
-            { label: 'Newsletter', value: profile?.newsletter_subscribed !== false ? 'Active' : 'Off' },
-          ].map((s, i) => (
-            <div key={i} onClick={s.action} style={{ backgroundColor: '#f5f3ef', border: '1px solid var(--color-border)', borderRadius: 4, padding: '1rem 0.75rem', textAlign: 'center', cursor: s.action ? 'pointer' : 'default' }}>
-              <p style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-navy)', margin: '0 0 0.2rem', fontFamily: 'Georgia, serif', lineHeight: 1 }}>{s.value}</p>
-              <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', margin: 0 }}>{s.label}</p>
-            </div>
-          ))}
-        </div>
-        {recentArticles.length > 0 && (
-          <div>
-            <SectionLabel>Recently Read</SectionLabel>
-            {recentArticles.map((a: any, i: number) => <ArticleCard key={i} article={a} compact />)}
-          </div>
-        )}
-        <div>
-          <SectionLabel>Your Hub</SectionLabel>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
-            {[
-              { label: 'For You', sub: 'Personalized feed', tab: 'foryou' as Tab },
-              { label: 'Saved Articles', sub: `${savedArticles.length} bookmarked`, tab: 'saved' as Tab },
-              { label: 'New Articles', sub: 'Latest from DudeMD', tab: 'new' as Tab },
-              { label: 'Community', sub: 'Coming soon', tab: 'community' as Tab },
-            ].map((item, i) => (
-              <button key={i} onClick={() => setActiveTab(item.tab)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '1rem', backgroundColor: '#f5f3ef', border: '1px solid var(--color-border)', borderRadius: 4, cursor: 'pointer', textAlign: 'left' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.2rem' }}>{item.label}</p>
-                <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>{item.sub}</p>
-              </button>
-            ))}
-          </div>
-        </div>
+      <div>
+        {feedArticles.map((a: any, i: number) => (
+          <FeedCard key={i} article={a} label={i === 0 ? 'For You' : i === 3 ? 'New & Fresh' : undefined} />
+        ))}
       </div>
     )
   }
 
-  function FeedTab({ articles, loading: l, emptyMsg, label }: { articles: any[], loading: boolean, emptyMsg: string, label: string }) {
-    if (l) return <Spinner />
+  function SavedTab() {
+    if (savedLoading) return <Spinner />
+    const articles = savedArticles.map((s: any) => s.articles).filter(Boolean)
     if (!articles.length) return (
-      <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-        <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>{emptyMsg}</p>
+      <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+        <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>No saved articles yet.</p>
+        <p style={{ fontSize: '13px', color: '#9a9085', marginBottom: '1.5rem' }}>Bookmark articles while reading to find them here.</p>
         <a href="/" style={{ fontSize: '12px', color: 'var(--color-gold)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>Browse Articles →</a>
       </div>
     )
     return (
       <div>
-        <SectionLabel>{label}</SectionLabel>
-        {articles.map((a: any, i: number) => <ArticleCard key={i} article={a} />)}
+        <p style={{ fontSize: '12px', color: '#9a9085', marginBottom: '1.25rem' }}>{articles.length} saved article{articles.length !== 1 ? 's' : ''}</p>
+        {articles.map((a: any, i: number) => <FeedCard key={i} article={a} />)}
+      </div>
+    )
+  }
+
+  function NewTab() {
+    if (newLoading) return <Spinner />
+    if (!newArticles.length) return <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-slate)' }}>No articles yet.</div>
+    return (
+      <div>
+        {newArticles.map((a: any, i: number) => <FeedCard key={i} article={a} />)}
       </div>
     )
   }
@@ -362,24 +330,23 @@ export default function AccountPage() {
   function CommunityTab() {
     return (
       <div style={{ textAlign: 'center', padding: '4rem 1.5rem' }}>
-        <div style={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <div style={{ width: 52, height: 52, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <p style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.5rem', fontFamily: 'Georgia, serif' }}>Community Coming Soon</p>
-        <p style={{ fontSize: '13px', color: 'var(--color-slate)', lineHeight: 1.7, maxWidth: 300, margin: '0 auto 1.5rem' }}>Circles, Q&A, events, badges and more.</p>
-        <span style={{ display: 'inline-block', padding: '0.4rem 1.1rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: 2 }}>Coming Soon</span>
+        <p style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.5rem', fontFamily: 'Georgia, serif' }}>Community Coming Soon</p>
+        <p style={{ fontSize: '13px', color: 'var(--color-slate)', lineHeight: 1.7, maxWidth: 280, margin: '0 auto 1.5rem' }}>Circles, Q&A, events, and badges are being built right now.</p>
+        <span style={{ display: 'inline-block', padding: '0.4rem 1rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' }}>Coming Soon</span>
       </div>
     )
   }
 
   function SettingsTab() {
     const inp: any = { width: '100%', padding: '0.8rem 1rem', border: '1px solid var(--color-border)', borderRadius: 4, fontSize: '14px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit', color: 'var(--color-navy)' }
-    const section: any = { backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 6, padding: '1.5rem', marginBottom: '1rem' }
     return (
-      <div>
-        <div style={section}>
-          <SectionLabel>Edit Profile</SectionLabel>
-          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 6, padding: '1.5rem' }}>
+          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9a9085', margin: '0 0 1.25rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>Edit Profile</p>
+          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>Full Name</label>
               <input style={inp} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" />
@@ -418,8 +385,8 @@ export default function AccountPage() {
             {savedProfile && <p style={{ fontSize: '13px', color: '#2d7a3a', textAlign: 'center', margin: 0 }}>✓ Saved.</p>}
           </form>
         </div>
-        <div style={section}>
-          <SectionLabel>Newsletter</SectionLabel>
+        <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 6, padding: '1.5rem' }}>
+          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9a9085', margin: '0 0 1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>Newsletter</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <p style={{ fontSize: '14px', fontWeight: 600, color: profile?.newsletter_subscribed !== false ? 'var(--color-navy)' : '#9a9085', margin: '0 0 0.2rem' }}>
@@ -427,20 +394,19 @@ export default function AccountPage() {
               </p>
               <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>Weekly men's wellness.</p>
             </div>
-            {profile?.newsletter_subscribed !== false ? (
-              <button onClick={handleUnsubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid #a32d2d', borderRadius: 4, backgroundColor: '#fff', color: '#a32d2d', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Unsubscribe</button>
-            ) : (
-              <button onClick={handleResubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-navy)', borderRadius: 4, backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Subscribe</button>
-            )}
+            {profile?.newsletter_subscribed !== false
+              ? <button onClick={handleUnsubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid #a32d2d', borderRadius: 4, backgroundColor: '#fff', color: '#a32d2d', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Unsubscribe</button>
+              : <button onClick={handleResubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-navy)', borderRadius: 4, backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Subscribe</button>
+            }
           </div>
         </div>
-        <button onClick={handleSignOut} style={{ width: '100%', padding: '0.85rem', backgroundColor: 'transparent', border: '1px solid var(--color-navy)', borderRadius: 4, color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: '0.75rem' }}>Sign Out</button>
+        <button onClick={handleSignOut} style={{ width: '100%', padding: '0.85rem', backgroundColor: 'transparent', border: '1px solid var(--color-navy)', borderRadius: 4, color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>Sign Out</button>
         {!showDelete ? (
           <button onClick={() => setShowDelete(true)} style={{ width: '100%', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', color: '#9a9085', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}>Delete My Account</button>
         ) : (
           <div style={{ backgroundColor: '#fff', border: '1px solid #a32d2d', borderRadius: 6, padding: '1.5rem' }}>
             <p style={{ fontSize: '14px', fontWeight: 700, color: '#a32d2d', marginBottom: '0.5rem' }}>⚠️ Delete Account</p>
-            <p style={{ fontSize: '13px', color: 'var(--color-slate)', marginBottom: '1.25rem', lineHeight: 1.6 }}>This permanently deletes your account and cannot be undone.</p>
+            <p style={{ fontSize: '13px', color: 'var(--color-slate)', marginBottom: '1.25rem', lineHeight: 1.6 }}>This permanently deletes your account.</p>
             <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>Type DELETE to confirm:</p>
             <input style={{ ...inp, border: '1px solid #a32d2d', marginBottom: '1rem' }} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} placeholder="DELETE" />
             <div style={{ display: 'flex', gap: '0.75rem' }}>
@@ -457,79 +423,125 @@ export default function AccountPage() {
 
   function renderContent() {
     switch (activeTab) {
-      case 'overview': return <OverviewTab />
-      case 'saved': return <FeedTab articles={savedArticles.map((s:any)=>s.articles).filter(Boolean)} loading={savedLoading} emptyMsg="No saved articles yet" label={`${savedArticles.length} Saved Article${savedArticles.length !== 1 ? 's' : ''}`} />
-      case 'foryou': return <FeedTab articles={forYouArticles} loading={forYouLoading} emptyMsg="Read some articles to personalize your feed" label="Picked For You" />
-      case 'new': return <FeedTab articles={newArticles} loading={newLoading} emptyMsg="No articles yet" label="Latest from DudeMD" />
+      case 'feed': return <FeedTab />
+      case 'saved': return <SavedTab />
+      case 'new': return <NewTab />
       case 'community': return <CommunityTab />
       case 'settings': return <SettingsTab />
     }
   }
+
+  const NAV: { id: Tab; label: string }[] = [
+    { id: 'feed', label: 'My Feed' },
+    { id: 'saved', label: 'Saved' },
+    { id: 'new', label: 'New' },
+    { id: 'community', label: 'Community' },
+    { id: 'settings', label: 'Settings' },
+  ]
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f5f3ef' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
-        .hub-sidebar-btn { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.7rem 1rem; background: none; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--color-slate); text-align: left; transition: background 0.15s, color 0.15s; letter-spacing: 0.02em; }
-        .hub-sidebar-btn:hover { background: rgba(14,26,43,0.05); color: var(--color-navy); }
-        .hub-sidebar-btn.active { background: var(--color-navy); color: #fff; }
-        .hub-nav-icon { font-size: 14px; width: 20px; text-align: center; opacity: 0.6; }
-        .hub-sidebar-btn.active .hub-nav-icon { opacity: 1; color: var(--color-gold); }
-        .hub-mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--color-navy); border-top: 1px solid rgba(255,255,255,0.08); z-index: 50; padding: 0 0 env(safe-area-inset-bottom); }
-        .hub-mobile-nav-inner { display: flex; }
-        .hub-mobile-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0.6rem 0.25rem; background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.45); font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.15s; min-width: 0; }
-        .hub-mobile-btn.active { color: var(--color-gold); }
-        .hub-mobile-icon { font-size: 17px; line-height: 1; }
-        .hub-more-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 60; }
-        .hub-more-drawer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 70; background: #fff; border-radius: 16px 16px 0 0; padding: 1.25rem 1.5rem 2.5rem; animation: slideUp 0.22s ease; }
+
+        /* Sidebar nav */
+        .snav-btn { display: flex; align-items: center; gap: 0.65rem; width: 100%; padding: 0.65rem 0.875rem; background: none; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 600; color: #4A5563; text-align: left; transition: background 0.12s, color 0.12s; }
+        .snav-btn:hover { background: rgba(14,26,43,0.06); color: #0e1a2b; }
+        .snav-btn.active { background: #0e1a2b; color: #fff; }
+        .snav-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.4; flex-shrink: 0; }
+        .snav-btn.active .snav-dot { background: #c9b28f; opacity: 1; }
+
+        /* Mobile subnav */
+        .mnav { display: none; position: sticky; top: 0; z-index: 30; background: #fff; border-bottom: 1px solid var(--color-border); overflow-x: auto; scrollbar-width: none; }
+        .mnav::-webkit-scrollbar { display: none; }
+        .mnav-inner { display: flex; padding: 0 1rem; gap: 0; min-width: max-content; }
+        .mnav-btn { padding: 0.875rem 1.1rem; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-size: 13px; font-weight: 600; color: #9a9085; white-space: nowrap; transition: color 0.15s, border-color 0.15s; letter-spacing: 0.01em; }
+        .mnav-btn.active { color: #0e1a2b; border-bottom-color: #c9b28f; }
+        .mnav-btn:hover { color: #0e1a2b; }
+
+        /* More drawer */
+        .more-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 60; }
+        .more-drawer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 70; background: #fff; border-radius: 14px 14px 0 0; padding: 1.25rem 1.5rem 2.5rem; animation: slideUp 0.2s ease; }
+
         @media (max-width: 768px) {
-          .hub-desktop-layout { display: none !important; }
-          .hub-mobile-layout { display: block !important; }
-          .hub-mobile-nav { display: flex !important; }
+          .hub-desktop { display: none !important; }
+          .hub-mobile { display: block !important; }
+          .mnav { display: block !important; }
         }
         @media (min-width: 769px) {
-          .hub-mobile-layout { display: none !important; }
-          .hub-desktop-layout { display: flex !important; }
+          .hub-mobile { display: none !important; }
+          .hub-desktop { display: flex !important; }
+          .mnav { display: none !important; }
         }
       `}</style>
 
       {/* ── DESKTOP ── */}
-      <div className="hub-desktop-layout" style={{ display: 'flex', maxWidth: 1080, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', alignItems: 'flex-start' }}>
-        {/* Sidebar */}
-        <div style={{ width: 210, flexShrink: 0, position: 'sticky', top: '1.5rem' }}>
-          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.25rem', marginBottom: '0.75rem', textAlign: 'center' }}>
+      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', alignItems: 'flex-start' }}>
+
+        {/* Left sidebar */}
+        <div style={{ width: 200, flexShrink: 0, position: 'sticky', top: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+
+          {/* Profile card */}
+          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.25rem', textAlign: 'center' }}>
             {avatarUrl ? (
-              <img src={avatarUrl} alt={firstName} style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)', margin: '0 auto 0.75rem', display: 'block' }} />
+              <img src={avatarUrl} alt={firstName} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)', margin: '0 auto 0.75rem', display: 'block' }} />
             ) : (
-              <div style={{ width: 60, height: 60, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.75rem' }}>
-                <span style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0).toUpperCase()}</span>
+              <div style={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.75rem' }}>
+                <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0).toUpperCase()}</span>
               </div>
             )}
             <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.15rem', fontFamily: 'Georgia, serif' }}>{fullName || firstName}</p>
-            {profile?.username && <p style={{ fontSize: '11px', color: 'var(--color-gold)', margin: '0 0 0.2rem', fontWeight: 600 }}>@{profile.username}</p>}
+            {profile?.username && <p style={{ fontSize: '11px', color: 'var(--color-gold)', margin: '0 0 0.25rem', fontWeight: 600 }}>@{profile.username}</p>}
             <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>Member since {memberYear}</p>
           </div>
-          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '0.5rem' }}>
-            {NAV_ITEMS.map(item => (
-              <button key={item.id} className={`hub-sidebar-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
-                <span className="hub-nav-icon">{item.icon}</span>
+
+          {/* Stats */}
+          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1rem' }}>
+            {[
+              { label: 'Saved', value: savedArticles.length || '—', action: () => setActiveTab('saved') },
+              { label: 'Newsletter', value: profile?.newsletter_subscribed !== false ? 'Active' : 'Off' },
+              { label: 'Member', value: memberYear },
+            ].map((s, i) => (
+              <div key={i} onClick={s.action} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: i < 2 ? '1px solid var(--color-border)' : 'none', cursor: s.action ? 'pointer' : 'default' }}>
+                <span style={{ fontSize: '12px', color: '#9a9085', fontWeight: 500 }}>{s.label}</span>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-navy)' }}>{s.value}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Nav */}
+          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '0.4rem' }}>
+            {NAV.map(item => (
+              <button key={item.id} className={`snav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
+                <span className="snav-dot" />
                 {item.label}
               </button>
             ))}
-            <div style={{ height: 1, backgroundColor: 'var(--color-border)', margin: '0.4rem 0.5rem' }} />
-            <button onClick={handleSignOut} className="hub-sidebar-btn" style={{ color: '#9a9085' }}>
-              <span className="hub-nav-icon" style={{ fontSize: 13 }}>↩</span>
+            <div style={{ height: 1, background: 'var(--color-border)', margin: '0.3rem 0.4rem' }} />
+            <button onClick={handleSignOut} className="snav-btn" style={{ color: '#9a9085' }}>
+              <span className="snav-dot" style={{ opacity: 0.3 }} />
               Sign Out
             </button>
           </div>
         </div>
 
-        {/* Content */}
+        {/* Main feed column */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif', letterSpacing: '-0.01em' }}>{activeNav?.label}</h2>
-          </div>
+          {/* Feed header — compact greeting */}
+          {activeTab === 'feed' && (
+            <div style={{ marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9a9085', margin: 0 }}>Welcome back, {firstName}</p>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-navy)', margin: '0.2rem 0 0', fontFamily: 'Georgia, serif' }}>Your Member Feed</h2>
+            </div>
+          )}
+          {activeTab !== 'feed' && (
+            <div style={{ marginBottom: '1.25rem' }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif' }}>
+                {NAV.find(n => n.id === activeTab)?.label}
+              </h2>
+            </div>
+          )}
           <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.5rem' }}>
             {renderContent()}
           </div>
@@ -537,64 +549,67 @@ export default function AccountPage() {
       </div>
 
       {/* ── MOBILE ── */}
-      <div className="hub-mobile-layout" style={{ display: 'none', paddingBottom: 72 }}>
-        <div style={{ backgroundColor: 'var(--color-navy)', padding: '1.1rem 1.25rem 0.9rem' }}>
+      <div className="hub-mobile" style={{ display: 'none' }}>
+
+        {/* Compact profile header */}
+        <div style={{ backgroundColor: 'var(--color-navy)', padding: '1rem 1.25rem 1.1rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
             {avatarUrl ? (
-              <img src={avatarUrl} alt={firstName} style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)', flexShrink: 0 }} />
+              <img src={avatarUrl} alt={firstName} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)', flexShrink: 0 }} />
             ) : (
-              <div style={{ width: 42, height: 42, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', border: '2px solid var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0).toUpperCase()}</span>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', border: '2px solid var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0).toUpperCase()}</span>
               </div>
             )}
-            <div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontSize: '14px', fontWeight: 700, color: '#fff', margin: '0 0 0.1rem', fontFamily: 'Georgia, serif' }}>{fullName || firstName}</p>
               <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
                 {profile?.username ? `@${profile.username} · ` : ''}Member since {memberYear}
               </p>
             </div>
+            {activeTab === 'feed' && (
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: '0 0 0.1rem' }}>Saved</p>
+                <p style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-gold)', margin: 0, fontFamily: 'Georgia, serif' }}>{savedArticles.length || '—'}</p>
+              </div>
+            )}
           </div>
         </div>
-        <div style={{ padding: '1rem 1.25rem 0.25rem' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif' }}>{activeNav?.label}</h2>
-        </div>
-        <div style={{ padding: '0.5rem 1.25rem 1rem' }}>
+
+        {/* Sticky text subnav */}
+        <nav className="mnav">
+          <div className="mnav-inner">
+            {NAV.slice(0, 4).map(item => (
+              <button key={item.id} className={`mnav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
+                {item.label}
+              </button>
+            ))}
+            <button className={`mnav-btn${activeTab === 'settings' ? ' active' : ''}`} onClick={() => setMoreOpen(true)}>
+              More
+            </button>
+          </div>
+        </nav>
+
+        {/* Content */}
+        <div style={{ padding: '1.25rem' }}>
+          {activeTab === 'feed' && (
+            <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', margin: '0 0 1.25rem' }}>Your Member Feed</p>
+          )}
           {renderContent()}
         </div>
       </div>
 
-      {/* Mobile bottom nav */}
-      <nav className="hub-mobile-nav">
-        <div className="hub-mobile-nav-inner">
-          {NAV_ITEMS.slice(0, 4).map(item => (
-            <button key={item.id} className={`hub-mobile-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
-              <span className="hub-mobile-icon">{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
-          <button className={`hub-mobile-btn${(activeTab === 'community' || activeTab === 'settings') ? ' active' : ''}`} onClick={() => setMoreOpen(true)}>
-            <span className="hub-mobile-icon">⋯</span>
-            More
-          </button>
-        </div>
-      </nav>
-
-      {/* More drawer */}
+      {/* More drawer (mobile) */}
       {moreOpen && (
         <>
-          <div className="hub-more-overlay" onClick={() => setMoreOpen(false)} />
-          <div className="hub-more-drawer">
-            <div style={{ width: 36, height: 4, backgroundColor: '#e0dbd4', borderRadius: 2, margin: '0 auto 1.25rem' }} />
-            <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.75rem' }}>More options</p>
-            {NAV_ITEMS.slice(4).map(item => (
-              <button key={item.id} onClick={() => { setActiveTab(item.id); setMoreOpen(false) }} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', width: '100%', padding: '0.875rem 0', borderBottom: '1px solid var(--color-border)', background: 'none', border: 'none', borderBottom: '1px solid var(--color-border)', cursor: 'pointer', textAlign: 'left' }}>
-                <span style={{ fontSize: 18, width: 24, textAlign: 'center' }}>{item.icon}</span>
-                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-navy)' }}>{item.label}</span>
-                <span style={{ marginLeft: 'auto', color: '#9a9085' }}>›</span>
-              </button>
-            ))}
-            <button onClick={handleSignOut} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', width: '100%', padding: '0.875rem 0', background: 'none', border: 'none', cursor: 'pointer', marginTop: '0.25rem' }}>
-              <span style={{ fontSize: 18, width: 24, textAlign: 'center' }}>↩</span>
+          <div className="more-overlay" onClick={() => setMoreOpen(false)} />
+          <div className="more-drawer">
+            <div style={{ width: 32, height: 3, backgroundColor: '#e0dbd4', borderRadius: 2, margin: '0 auto 1.25rem' }} />
+            <button onClick={() => { setActiveTab('settings'); setMoreOpen(false) }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '1rem 0', borderBottom: '1px solid var(--color-border)', background: 'none', border: 'none', borderBottom: '1px solid var(--color-border)', cursor: 'pointer' }}>
+              <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-navy)' }}>Settings</span>
+              <span style={{ color: '#9a9085' }}>›</span>
+            </button>
+            <button onClick={() => { handleSignOut() }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '1rem 0', background: 'none', border: 'none', cursor: 'pointer', marginTop: '0.25rem' }}>
               <span style={{ fontSize: '15px', fontWeight: 600, color: '#a32d2d' }}>Sign Out</span>
             </button>
           </div>
