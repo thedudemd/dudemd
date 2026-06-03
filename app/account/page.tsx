@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
 
+const PROHIBITED_USERNAMES = new Set(['admin','administrator','root','system','owner','team','staff','mod','moderator','support','help','helpdesk','contact','billing','security','official','verified','info','webmaster','postmaster','hostmaster','abuse','spam','noreply','no-reply','api','app','apps','dashboard','settings','account','accounts','profile','profiles','user','users','login','logout','signin','signout','signup','register','auth','authentication','password','reset','reset-password','forgot-password','welcome','home','index','search','explore','discover','about','contact','privacy','terms','legal','cookies','sitemap','robots','status','docs','documentation','faq','help-center','support-center','admin-panel','cms','editor','writers','author','authors','article','articles','category','categories','tag','tags','topic','topics','feed','foryou','saved','bookmarks','library','community','communities','circle','circles','group','groups','forum','forums','discussion','discussions','chat','messages','notifications','inbox','qa','qna','question','questions','answer','answers','ask','members','member','followers','following','leaderboard','badges','reputation','events','event','assistant','ai','bot','coach','experts','expert','editorial','newsroom','press','media','upload','uploads','asset','assets','image','images','static','public','private','internal','test','testing','dev','stage','staging','demo','preview','null','undefined','default','guest','anonymous','me','my','self','www','web','mail','email','ftp','ssh','cdn','dudemd','dude-md','dude_md','officialdudemd','dudemdofficial','dudemdteam','teamdudemd','dudemdstaff','dudemdadmin','askdudemd','dudemdai','dudemdassistant','dudemdcommunity','dudemdhelp','dudemdsupport','dudedoc','drdudemd','doctor','doctors','founder','founders','brand','partner','partners','partnerships','advertise','advertising','sponsor','sponsors','jobs','careers','newsletter','newsletters','subscribe','subscriptions','membercare','customercare','trust','safety','compliance','moderation','report','reports'])
+
 function getTokenAndUser() {
   try {
     const jar: Record<string, string> = {}
@@ -25,6 +27,15 @@ function getTokenAndUser() {
   return null
 }
 
+function validateUsername(val: string): string | null {
+  if (!val) return null
+  if (val.length < 3) return 'At least 3 characters required'
+  if (val.length > 20) return 'Maximum 20 characters'
+  if (!/^[a-z0-9_]+$/.test(val)) return 'Lowercase letters, numbers, and underscores only'
+  if (PROHIBITED_USERNAMES.has(val)) return 'That username is not available'
+  return null
+}
+
 type Tab = 'overview' | 'saved' | 'foryou' | 'new' | 'community' | 'settings'
 
 export default function AccountPage() {
@@ -34,6 +45,9 @@ export default function AccountPage() {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [fullName, setFullName] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
+  const [username, setUsername] = useState('')
+  const [usernameError, setUsernameError] = useState('')
+  const [usernameChecking, setUsernameChecking] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedProfile, setSavedProfile] = useState(false)
@@ -46,6 +60,8 @@ export default function AccountPage() {
   const [newLoading, setNewLoading] = useState(false)
   const [forYouArticles, setForYouArticles] = useState<any[]>([])
   const [forYouLoading, setForYouLoading] = useState(false)
+  const [recentArticles, setRecentArticles] = useState<any[]>([])
+  const [recentLoading, setRecentLoading] = useState(false)
 
   useEffect(() => {
     const a = getTokenAndUser()
@@ -58,10 +74,43 @@ export default function AccountPage() {
         setProfile(data[0])
         setFullName(data[0].full_name || '')
         setAvatarUrl(data[0].avatar_url || '')
+        setUsername(data[0].username || '')
       }
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])
+
+  // Load recently read on overview tab
+  useEffect(() => {
+    if (!auth || activeTab !== 'overview') return
+    setRecentLoading(true)
+    fetch(`${SUPABASE_URL}/rest/v1/user_events?select=article_slug,created_at&user_id=eq.${auth.uid}&event_type=eq.view&order=created_at.desc&limit=40`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+    }).then(r => r.json()).then(async events => {
+      if (!Array.isArray(events) || events.length === 0) { setRecentLoading(false); return }
+      // Deduplicate slugs keeping most recent
+      const seen = new Set<string>()
+      const slugs: string[] = []
+      for (const e of events) {
+        if (e.article_slug && !seen.has(e.article_slug)) {
+          seen.add(e.article_slug)
+          slugs.push(e.article_slug)
+          if (slugs.length >= 6) break
+        }
+      }
+      if (slugs.length === 0) { setRecentLoading(false); return }
+      const filter = slugs.map(s => `slug.eq.${s}`).join(',')
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,cover_image_url,published_at,categories!articles_category_id_fkey(name,slug)&or=(${filter})&status=eq.published`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      })
+      const articles = await res.json()
+      if (!Array.isArray(articles)) { setRecentLoading(false); return }
+      // Re-sort to match original recency order
+      const sorted = slugs.map(s => articles.find((a: any) => a.slug === s)).filter(Boolean)
+      setRecentArticles(sorted)
+      setRecentLoading(false)
+    }).catch(() => setRecentLoading(false))
+  }, [auth, activeTab])
 
   useEffect(() => {
     if (!auth || activeTab !== 'saved') return
@@ -132,15 +181,37 @@ export default function AccountPage() {
     setUploading(false)
   }
 
+  async function handleUsernameChange(val: string) {
+    const lower = val.toLowerCase().replace(/[^a-z0-9_]/g, '')
+    setUsername(lower)
+    setUsernameError('')
+    const localError = validateUsername(lower)
+    if (localError) { setUsernameError(localError); return }
+    if (lower === profile?.username) return
+    // Check uniqueness
+    setUsernameChecking(true)
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id&username=eq.${lower}&limit=1`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+    })
+    const data = await res.json()
+    setUsernameChecking(false)
+    if (Array.isArray(data) && data.length > 0) {
+      setUsernameError('Username already taken')
+    }
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
+    if (usernameError || usernameChecking) return
+    const localError = validateUsername(username)
+    if (username && localError) { setUsernameError(localError); return }
     setSaving(true)
     await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
       method: 'PATCH',
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({ full_name: fullName, avatar_url: avatarUrl })
+      body: JSON.stringify({ full_name: fullName, avatar_url: avatarUrl, username: username || null })
     })
-    setProfile({ ...profile, full_name: fullName, avatar_url: avatarUrl })
+    setProfile({ ...profile, full_name: fullName, avatar_url: avatarUrl, username: username || null })
     setSaving(false)
     setSavedProfile(true)
     setTimeout(() => setSavedProfile(false), 3000)
@@ -206,7 +277,7 @@ export default function AccountPage() {
     { id: 'settings', label: 'Settings' },
   ]
 
-  function ArticleCard({ article, reason }: { article: any, reason?: string }) {
+  function ArticleCard({ article }: { article: any }) {
     const cat = article.categories
     const href = cat?.slug && article.slug ? `/articles/${cat.slug}/${article.slug}` : '#'
     return (
@@ -217,10 +288,63 @@ export default function AccountPage() {
         <div style={{ flex: 1, minWidth: 0 }}>
           {cat?.name && <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.3rem' }}>{cat.name}</p>}
           <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.3rem', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{article.title}</p>
-          {reason && <p style={{ fontSize: '11px', color: 'var(--color-gold)', margin: '0 0 0.25rem', fontStyle: 'italic' }}>{reason}</p>}
           {article.published_at && <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>{new Date(article.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>}
         </div>
       </a>
+    )
+  }
+
+  function RecentlyRead() {
+    if (recentLoading) return <div style={{ fontSize: '13px', color: '#9a9085', padding: '1rem 0' }}>Loading...</div>
+    if (!recentArticles.length) return null
+    return (
+      <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.5rem', marginBottom: '1.5rem' }}>
+        <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.25rem' }}>Recently Read</p>
+        {recentArticles.map((a: any, i: number) => (
+          <a key={i} href={a.categories?.slug && a.slug ? `/articles/${a.categories.slug}/${a.slug}` : '#'} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.6rem 0', borderBottom: i < recentArticles.length - 1 ? '1px solid var(--color-border)' : 'none', textDecoration: 'none', color: 'inherit' }}>
+            {a.cover_image_url && <img src={a.cover_image_url} alt={a.title} style={{ width: 44, height: 34, objectFit: 'cover', flexShrink: 0, borderRadius: 2 }} />}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {a.categories?.name && <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.2rem' }}>{a.categories.name}</p>}
+              <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', margin: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{a.title}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    )
+  }
+
+  function OverviewTab() {
+    return (
+      <div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+          {[
+            { label: 'Saved', value: savedArticles.length || '—', action: () => setActiveTab('saved') },
+            { label: 'Member Since', value: profile?.created_at ? new Date(profile.created_at).getFullYear() : '—' },
+            { label: 'Newsletter', value: profile?.newsletter_subscribed !== false ? 'Active' : 'Off' },
+          ].map((stat, i) => (
+            <div key={i} onClick={stat.action} style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.25rem', textAlign: 'center', cursor: stat.action ? 'pointer' : 'default' }}>
+              <p style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.25rem', fontFamily: 'Georgia, serif' }}>{stat.value}</p>
+              <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', margin: 0 }}>{stat.label}</p>
+            </div>
+          ))}
+        </div>
+        <RecentlyRead />
+        <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.5rem' }}>
+          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Quick Links</p>
+          {[
+            { label: 'My Saved Articles', tab: 'saved' as Tab, icon: '🔖' },
+            { label: 'For You Feed', tab: 'foryou' as Tab, icon: '✨' },
+            { label: 'New on DudeMD', tab: 'new' as Tab, icon: '📰' },
+            { label: 'Community (Coming Soon)', tab: 'community' as Tab, icon: '👥' },
+          ].map((link, i) => (
+            <button key={i} onClick={() => setActiveTab(link.tab)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', padding: '0.75rem 0', borderBottom: i < 3 ? '1px solid var(--color-border)' : 'none', background: 'none', border: 'none', borderBottom: i < 3 ? '1px solid var(--color-border)' : 'none', cursor: 'pointer', textAlign: 'left' }}>
+              <span style={{ fontSize: 18 }}>{link.icon}</span>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-navy)' }}>{link.label}</span>
+              <span style={{ marginLeft: 'auto', color: '#9a9085', fontSize: 16 }}>›</span>
+            </button>
+          ))}
+        </div>
+      </div>
     )
   }
 
@@ -237,9 +361,7 @@ export default function AccountPage() {
     return (
       <div>
         <p style={{ fontSize: '12px', color: '#9a9085', marginBottom: '0.5rem' }}>{savedArticles.length} saved article{savedArticles.length !== 1 ? 's' : ''}</p>
-        {savedArticles.map((item: any, i: number) => (
-          <ArticleCard key={i} article={item.articles} />
-        ))}
+        {savedArticles.map((item: any, i: number) => <ArticleCard key={i} article={item.articles} />)}
       </div>
     )
   }
@@ -279,40 +401,6 @@ export default function AccountPage() {
     )
   }
 
-  function OverviewTab() {
-    return (
-      <div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
-          {[
-            { label: 'Saved', value: savedArticles.length || '—', action: () => setActiveTab('saved') },
-            { label: 'Member Since', value: profile?.created_at ? new Date(profile.created_at).getFullYear() : '—' },
-            { label: 'Newsletter', value: profile?.newsletter_subscribed !== false ? 'Active' : 'Off' },
-          ].map((stat, i) => (
-            <div key={i} onClick={stat.action} style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.25rem', textAlign: 'center', cursor: stat.action ? 'pointer' : 'default' }}>
-              <p style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.25rem', fontFamily: 'Georgia, serif' }}>{stat.value}</p>
-              <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', margin: 0 }}>{stat.label}</p>
-            </div>
-          ))}
-        </div>
-        <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.5rem', marginBottom: '1rem' }}>
-          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Quick Links</p>
-          {[
-            { label: 'My Saved Articles', tab: 'saved' as Tab, icon: '🔖' },
-            { label: 'For You Feed', tab: 'foryou' as Tab, icon: '✨' },
-            { label: 'New on DudeMD', tab: 'new' as Tab, icon: '📰' },
-            { label: 'Community (Coming Soon)', tab: 'community' as Tab, icon: '👥' },
-          ].map((link, i) => (
-            <button key={i} onClick={() => setActiveTab(link.tab)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', padding: '0.75rem 0', borderBottom: i < 3 ? '1px solid var(--color-border)' : 'none', background: 'none', border: 'none', borderBottom: i < 3 ? '1px solid var(--color-border)' : 'none', cursor: 'pointer', textAlign: 'left' }}>
-              <span style={{ fontSize: 18 }}>{link.icon}</span>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-navy)' }}>{link.label}</span>
-              <span style={{ marginLeft: 'auto', color: '#9a9085', fontSize: 16 }}>›</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   function SettingsTab() {
     const inp: any = { width: '100%', padding: '0.85rem', border: '1px solid var(--color-border)', fontSize: '15px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit', color: 'var(--color-navy)' }
     return (
@@ -323,6 +411,28 @@ export default function AccountPage() {
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>Full Name</label>
               <input style={inp} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>
+                Username
+                <span style={{ fontWeight: 400, color: '#9a9085', marginLeft: '0.5rem' }}>— your public handle for future community features</span>
+              </label>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#9a9085', fontSize: '15px', pointerEvents: 'none' }}>@</span>
+                <input
+                  style={{ ...inp, paddingLeft: '1.75rem', border: `1px solid ${usernameError ? '#a32d2d' : 'var(--color-border)'}` }}
+                  value={username}
+                  onChange={e => handleUsernameChange(e.target.value)}
+                  placeholder="yourhandle"
+                  maxLength={20}
+                />
+              </div>
+              {usernameChecking && <p style={{ fontSize: '12px', color: '#9a9085', margin: '0.3rem 0 0' }}>Checking availability...</p>}
+              {usernameError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: '0.3rem 0 0' }}>{usernameError}</p>}
+              {!usernameError && !usernameChecking && username && username !== profile?.username && (
+                <p style={{ fontSize: '12px', color: '#2d7a3a', margin: '0.3rem 0 0' }}>@{username} is available</p>
+              )}
+              <p style={{ fontSize: '11px', color: '#9a9085', margin: '0.3rem 0 0' }}>3–20 characters. Letters, numbers, underscores only.</p>
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.75rem' }}>Profile Picture</label>
@@ -340,7 +450,7 @@ export default function AccountPage() {
                 </label>
               </div>
             </div>
-            <button type="submit" disabled={saving} style={{ padding: '0.875rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>
+            <button type="submit" disabled={saving || !!usernameError || usernameChecking} style={{ padding: '0.875rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', opacity: saving || !!usernameError || usernameChecking ? 0.6 : 1 }}>
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
             {savedProfile && <p style={{ fontSize: '13px', color: '#2d7a3a', textAlign: 'center', margin: 0 }}>✓ Profile updated successfully.</p>}
@@ -411,7 +521,8 @@ export default function AccountPage() {
               </div>
             )}
             <div style={{ flex: 1, paddingBottom: '0.25rem' }}>
-              <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 700, color: '#fff', margin: '0 0 0.25rem' }}>{fullName || firstName}</h1>
+              <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 700, color: '#fff', margin: '0 0 0.2rem' }}>{fullName || firstName}</h1>
+              {profile?.username && <p style={{ fontSize: '13px', color: 'var(--color-gold)', margin: '0 0 0.2rem', fontWeight: 600 }}>@{profile.username}</p>}
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>Member since {profile?.created_at ? new Date(profile.created_at).getFullYear() : '—'}</p>
             </div>
           </div>
