@@ -88,25 +88,28 @@ export default function AccountPage() {
   useEffect(() => {
     if (!auth || activeTab !== 'foryou') return
     setForYouLoading(true)
-    // Pull top categories from user_scores, then fetch matching articles
-    fetch(`${SUPABASE_URL}/rest/v1/user_scores?select=category_slug,score&user_id=eq.${auth.uid}&order=score.desc&limit=5`, {
+    // Read the single user_scores row — category_scores is a JSONB object { slug: weight }
+    fetch(`${SUPABASE_URL}/rest/v1/user_scores?select=category_scores&user_id=eq.${auth.uid}&limit=1`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
-    }).then(r => r.json()).then(async scores => {
-      if (Array.isArray(scores) && scores.length > 0) {
-        const slugs = scores.map((s: any) => s.category_slug).filter(Boolean)
-        const filter = slugs.map((s: string) => `categories.slug.eq.${s}`).join(',')
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,excerpt,cover_image_url,published_at,categories(name,slug)&status=eq.published&order=published_at.desc&limit=20`, {
-          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
-        })
-        const articles = await res.json()
-        setForYouArticles(Array.isArray(articles) ? articles : [])
+    }).then(r => r.json()).then(async rows => {
+      let topSlugs: string[] = []
+      if (Array.isArray(rows) && rows[0]?.category_scores) {
+        topSlugs = Object.entries(rows[0].category_scores as Record<string, number>)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([slug]) => slug)
+      }
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,excerpt,cover_image_url,published_at,categories(name,slug)&status=eq.published&order=published_at.desc&limit=40`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      })
+      const articles = await res.json()
+      if (!Array.isArray(articles)) { setForYouArticles([]); setForYouLoading(false); return }
+      if (topSlugs.length > 0) {
+        const matched = articles.filter((a: any) => topSlugs.includes(a.categories?.slug))
+        const rest = articles.filter((a: any) => !topSlugs.includes(a.categories?.slug))
+        setForYouArticles([...matched, ...rest].slice(0, 20))
       } else {
-        // Fallback: show newest articles
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,excerpt,cover_image_url,published_at,categories(name,slug)&status=eq.published&order=published_at.desc&limit=20`, {
-          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
-        })
-        const articles = await res.json()
-        setForYouArticles(Array.isArray(articles) ? articles : [])
+        setForYouArticles(articles.slice(0, 20))
       }
       setForYouLoading(false)
     }).catch(() => setForYouLoading(false))
@@ -315,7 +318,6 @@ export default function AccountPage() {
     const inp: any = { width: '100%', padding: '0.85rem', border: '1px solid var(--color-border)', fontSize: '15px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit', color: 'var(--color-navy)' }
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        {/* Edit Profile */}
         <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.5rem' }}>
           <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1.25rem' }}>Edit Profile</p>
           <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -345,8 +347,6 @@ export default function AccountPage() {
             {savedProfile && <p style={{ fontSize: '13px', color: '#2d7a3a', textAlign: 'center', margin: 0 }}>✓ Profile updated successfully.</p>}
           </form>
         </div>
-
-        {/* Newsletter */}
         <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.5rem' }}>
           <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1.25rem' }}>Newsletter</p>
           {profile?.newsletter_subscribed !== false ? (
@@ -367,13 +367,9 @@ export default function AccountPage() {
             </div>
           )}
         </div>
-
-        {/* Sign Out */}
         <button onClick={handleSignOut} style={{ width: '100%', padding: '0.875rem', backgroundColor: 'transparent', border: '1px solid var(--color-navy)', color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
           Sign Out
         </button>
-
-        {/* Delete Account */}
         {!showDelete ? (
           <button onClick={() => setShowDelete(true)} style={{ width: '100%', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', color: '#9a9085', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}>
             Delete My Account
@@ -405,8 +401,6 @@ export default function AccountPage() {
         .hub-tab:hover { color: var(--color-navy); }
         @media (max-width: 600px) { .hub-tab { font-size: 11px; padding: 0.75rem 0; } }
       `}</style>
-
-      {/* PROFILE HEADER */}
       <div style={{ backgroundColor: 'var(--color-navy)', padding: '2.5rem 1.5rem 0' }}>
         <div style={{ maxWidth: '680px', margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.25rem', marginBottom: '1.5rem' }}>
@@ -422,8 +416,6 @@ export default function AccountPage() {
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>Member since {profile?.created_at ? new Date(profile.created_at).getFullYear() : '—'}</p>
             </div>
           </div>
-
-          {/* TABS */}
           <div style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', paddingBottom: '0', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
             {tabs.map(tab => (
               <button key={tab.id} className={`hub-tab${activeTab === tab.id ? ' active' : ''}`} onClick={() => setActiveTab(tab.id)}
@@ -434,8 +426,6 @@ export default function AccountPage() {
           </div>
         </div>
       </div>
-
-      {/* TAB CONTENT */}
       <div style={{ maxWidth: '680px', margin: '0 auto', padding: '2rem 1.5rem' }}>
         {activeTab === 'overview' && <OverviewTab />}
         {activeTab === 'saved' && <SavedTab />}
