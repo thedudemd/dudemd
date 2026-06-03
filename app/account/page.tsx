@@ -66,7 +66,7 @@ export default function AccountPage() {
   useEffect(() => {
     if (!auth || activeTab !== 'saved') return
     setSavedLoading(true)
-    fetch(`${SUPABASE_URL}/rest/v1/saved_articles?select=article_id,saved_at,articles(id,title,slug,excerpt,cover_image_url,published_at,categories(name,slug))&user_id=eq.${auth.uid}&order=saved_at.desc`, {
+    fetch(`${SUPABASE_URL}/rest/v1/saved_articles?select=article_id,saved_at,articles(id,title,slug,excerpt,cover_image_url,published_at,categories!articles_category_id_fkey(name,slug))&user_id=eq.${auth.uid}&order=saved_at.desc`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
     }).then(r => r.json()).then(data => {
       setSavedArticles(Array.isArray(data) ? data : [])
@@ -77,7 +77,7 @@ export default function AccountPage() {
   useEffect(() => {
     if (!auth || activeTab !== 'new') return
     setNewLoading(true)
-    fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,excerpt,cover_image_url,published_at,categories(name,slug)&status=eq.published&order=published_at.desc&limit=20`, {
+    fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,excerpt,cover_image_url,published_at,categories!articles_category_id_fkey(name,slug)&status=eq.published&order=published_at.desc&limit=20`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
     }).then(r => r.json()).then(data => {
       setNewArticles(Array.isArray(data) ? data : [])
@@ -88,7 +88,6 @@ export default function AccountPage() {
   useEffect(() => {
     if (!auth || activeTab !== 'foryou') return
     setForYouLoading(true)
-    // Read the single user_scores row — category_scores is a JSONB object { slug: weight }
     fetch(`${SUPABASE_URL}/rest/v1/user_scores?select=category_scores&user_id=eq.${auth.uid}&limit=1`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
     }).then(r => r.json()).then(async rows => {
@@ -99,7 +98,7 @@ export default function AccountPage() {
           .slice(0, 5)
           .map(([slug]) => slug)
       }
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,excerpt,cover_image_url,published_at,categories(name,slug)&status=eq.published&order=published_at.desc&limit=40`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,excerpt,cover_image_url,published_at,categories!articles_category_id_fkey(name,slug)&status=eq.published&order=published_at.desc&limit=40`, {
         headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
       })
       const articles = await res.json()
