@@ -38,6 +38,15 @@ function validateUsername(val: string): string | null {
 
 type Tab = 'overview' | 'saved' | 'foryou' | 'new' | 'community' | 'settings'
 
+const NAV_ITEMS: { id: Tab; label: string; icon: string }[] = [
+  { id: 'overview', label: 'Home', icon: '⌂' },
+  { id: 'foryou', label: 'For You', icon: '✦' },
+  { id: 'saved', label: 'Saved', icon: '◇' },
+  { id: 'new', label: 'New', icon: '◎' },
+  { id: 'community', label: 'Community', icon: '◈' },
+  { id: 'settings', label: 'Settings', icon: '⚙' },
+]
+
 export default function AccountPage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -63,6 +72,7 @@ export default function AccountPage() {
   const [forYouLoading, setForYouLoading] = useState(false)
   const [recentArticles, setRecentArticles] = useState<any[]>([])
   const [recentLoading, setRecentLoading] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
 
   useEffect(() => {
     const a = getTokenAndUser()
@@ -142,9 +152,7 @@ export default function AccountPage() {
       let topSlugs: string[] = []
       if (Array.isArray(rows) && rows[0]?.category_scores) {
         topSlugs = Object.entries(rows[0].category_scores as Record<string, number>)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
-          .map(([slug]) => slug)
+          .sort((a, b) => b[1] - a[1]).slice(0, 5).map(([slug]) => slug)
       }
       const res = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=id,title,slug,excerpt,cover_image_url,published_at,categories!articles_category_id_fkey(name,slug)&status=eq.published&order=published_at.desc&limit=40`, {
         headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
@@ -169,14 +177,9 @@ export default function AccountPage() {
     const ext = file.name.split('.').pop()
     const path = `avatars/${auth.uid}.${ext}`
     const res = await fetch(`${SUPABASE_URL}/storage/v1/object/media/${path}`, {
-      method: 'POST',
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` },
-      body: file
+      method: 'POST', headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }, body: file
     })
-    if (res.ok) {
-      const url = `${SUPABASE_URL}/storage/v1/object/public/media/${path}`
-      setAvatarUrl(url)
-    }
+    if (res.ok) setAvatarUrl(`${SUPABASE_URL}/storage/v1/object/public/media/${path}`)
     setUploading(false)
   }
 
@@ -195,9 +198,7 @@ export default function AccountPage() {
       })
       const data = await res.json()
       setUsernameChecking(false)
-      if (Array.isArray(data) && data.length > 0) {
-        setUsernameError('Username already taken')
-      }
+      if (Array.isArray(data) && data.length > 0) setUsernameError('Username already taken')
     }, 500)
   }
 
@@ -213,15 +214,13 @@ export default function AccountPage() {
       body: JSON.stringify({ full_name: fullName, avatar_url: avatarUrl, username: username || null })
     })
     setProfile({ ...profile, full_name: fullName, avatar_url: avatarUrl, username: username || null })
-    setSaving(false)
-    setSavedProfile(true)
+    setSaving(false); setSavedProfile(true)
     setTimeout(() => setSavedProfile(false), 3000)
   }
 
   async function handleUnsubscribe() {
     await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
-      method: 'PATCH',
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      method: 'PATCH', headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
       body: JSON.stringify({ newsletter_subscribed: false })
     })
     setProfile({ ...profile, newsletter_subscribed: false })
@@ -229,8 +228,7 @@ export default function AccountPage() {
 
   async function handleResubscribe() {
     await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
-      method: 'PATCH',
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      method: 'PATCH', headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
       body: JSON.stringify({ newsletter_subscribed: true })
     })
     setProfile({ ...profile, newsletter_subscribed: true })
@@ -240,8 +238,7 @@ export default function AccountPage() {
     if (deleteInput !== 'DELETE') return
     setDeleting(true)
     await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${auth.uid}`, {
-      method: 'DELETE',
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      method: 'DELETE', headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
     })
     document.cookie.split(';').forEach(c => {
       const name = c.split('=')[0].trim()
@@ -263,236 +260,192 @@ export default function AccountPage() {
 
   if (loading) return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-cream)' }}>
-      <div style={{ width: 32, height: 32, border: '3px solid var(--color-gold)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+      <div style={{ width: 28, height: 28, border: '2px solid var(--color-gold)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
 
   const firstName = fullName?.split(' ')[0] || 'Member'
-  const tabs: { id: Tab, label: string }[] = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'saved', label: 'Saved' },
-    { id: 'foryou', label: 'For You' },
-    { id: 'new', label: 'New Articles' },
-    { id: 'community', label: 'Community' },
-    { id: 'settings', label: 'Settings' },
-  ]
+  const memberYear = profile?.created_at ? new Date(profile.created_at).getFullYear() : '—'
+  const activeNav = NAV_ITEMS.find(n => n.id === activeTab)
 
-  function ArticleCard({ article }: { article: any }) {
+  function ArticleCard({ article, compact }: { article: any, compact?: boolean }) {
     const cat = article.categories
     const href = cat?.slug && article.slug ? `/articles/${cat.slug}/${article.slug}` : '#'
-    return (
-      <a href={href} style={{ display: 'flex', gap: '1rem', textDecoration: 'none', color: 'inherit', padding: '1.25rem 0', borderBottom: '1px solid var(--color-border)' }}>
-        {article.cover_image_url && (
-          <img src={article.cover_image_url} alt={article.title} style={{ width: 80, height: 60, objectFit: 'cover', flexShrink: 0, borderRadius: 2 }} />
-        )}
+    const date = article.published_at ? new Date(article.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''
+    if (compact) return (
+      <a href={href} style={{ display: 'flex', gap: '0.75rem', textDecoration: 'none', color: 'inherit', padding: '0.75rem 0', borderBottom: '1px solid var(--color-border)', alignItems: 'center' }}>
+        {article.cover_image_url && <img src={article.cover_image_url} alt={article.title} style={{ width: 52, height: 40, objectFit: 'cover', flexShrink: 0, borderRadius: 3 }} />}
         <div style={{ flex: 1, minWidth: 0 }}>
-          {cat?.name && <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.3rem' }}>{cat.name}</p>}
-          <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.3rem', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{article.title}</p>
-          {article.published_at && <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>{new Date(article.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>}
+          {cat?.name && <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.2rem' }}>{cat.name}</p>}
+          <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', margin: 0, lineHeight: 1.35, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{article.title}</p>
+        </div>
+      </a>
+    )
+    return (
+      <a href={href} style={{ display: 'flex', gap: '1rem', textDecoration: 'none', color: 'inherit', padding: '1.1rem 0', borderBottom: '1px solid var(--color-border)' }}>
+        {article.cover_image_url && <img src={article.cover_image_url} alt={article.title} style={{ width: 88, height: 64, objectFit: 'cover', flexShrink: 0, borderRadius: 3 }} />}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {cat?.name && <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.35rem' }}>{cat.name}</p>}
+          <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.35rem', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{article.title}</p>
+          {date && <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>{date}</p>}
         </div>
       </a>
     )
   }
 
-  function RecentlyRead() {
-    if (recentLoading) return <div style={{ fontSize: '13px', color: '#9a9085', padding: '1rem 0' }}>Loading...</div>
-    if (!recentArticles.length) return null
-    return (
-      <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.5rem', marginBottom: '1.5rem' }}>
-        <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.25rem' }}>Recently Read</p>
-        {recentArticles.map((a: any, i: number) => (
-          <a key={i} href={a.categories?.slug && a.slug ? `/articles/${a.categories.slug}/${a.slug}` : '#'} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.6rem 0', borderBottom: i < recentArticles.length - 1 ? '1px solid var(--color-border)' : 'none', textDecoration: 'none', color: 'inherit' }}>
-            {a.cover_image_url && <img src={a.cover_image_url} alt={a.title} style={{ width: 44, height: 34, objectFit: 'cover', flexShrink: 0, borderRadius: 2 }} />}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              {a.categories?.name && <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.2rem' }}>{a.categories.name}</p>}
-              <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', margin: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{a.title}</p>
-            </div>
-          </a>
-        ))}
-      </div>
-    )
+  function SectionLabel({ children }: { children: string }) {
+    return <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9a9085', margin: '0 0 0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>{children}</p>
+  }
+
+  function Spinner() {
+    return <div style={{ textAlign: 'center', padding: '3rem 0' }}><div style={{ width: 24, height: 24, border: '2px solid var(--color-gold)', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite', display: 'inline-block' }} /></div>
   }
 
   function OverviewTab() {
     return (
-      <div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '0.75rem' }}>
           {[
-            { label: 'Saved', value: savedArticles.length || '—', action: () => setActiveTab('saved') },
-            { label: 'Member Since', value: profile?.created_at ? new Date(profile.created_at).getFullYear() : '—' },
+            { label: 'Saved', value: savedArticles.length || '0', action: () => setActiveTab('saved') },
+            { label: 'Member Since', value: memberYear },
             { label: 'Newsletter', value: profile?.newsletter_subscribed !== false ? 'Active' : 'Off' },
-          ].map((stat, i) => (
-            <div key={i} onClick={stat.action} style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.25rem', textAlign: 'center', cursor: stat.action ? 'pointer' : 'default' }}>
-              <p style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.25rem', fontFamily: 'Georgia, serif' }}>{stat.value}</p>
-              <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', margin: 0 }}>{stat.label}</p>
+          ].map((s, i) => (
+            <div key={i} onClick={s.action} style={{ backgroundColor: '#f5f3ef', border: '1px solid var(--color-border)', borderRadius: 4, padding: '1rem 0.75rem', textAlign: 'center', cursor: s.action ? 'pointer' : 'default' }}>
+              <p style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-navy)', margin: '0 0 0.2rem', fontFamily: 'Georgia, serif', lineHeight: 1 }}>{s.value}</p>
+              <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', margin: 0 }}>{s.label}</p>
             </div>
           ))}
         </div>
-        <RecentlyRead />
-        <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.5rem' }}>
-          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1rem' }}>Quick Links</p>
-          {[
-            { label: 'My Saved Articles', tab: 'saved' as Tab, icon: '🔖' },
-            { label: 'For You Feed', tab: 'foryou' as Tab, icon: '✨' },
-            { label: 'New on DudeMD', tab: 'new' as Tab, icon: '📰' },
-            { label: 'Community (Coming Soon)', tab: 'community' as Tab, icon: '👥' },
-          ].map((link, i) => (
-            <button key={i} onClick={() => setActiveTab(link.tab)} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%', padding: '0.75rem 0', borderBottom: i < 3 ? '1px solid var(--color-border)' : 'none', background: 'none', border: 'none', borderBottom: i < 3 ? '1px solid var(--color-border)' : 'none', cursor: 'pointer', textAlign: 'left' }}>
-              <span style={{ fontSize: 18 }}>{link.icon}</span>
-              <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-navy)' }}>{link.label}</span>
-              <span style={{ marginLeft: 'auto', color: '#9a9085', fontSize: 16 }}>›</span>
-            </button>
-          ))}
+        {recentArticles.length > 0 && (
+          <div>
+            <SectionLabel>Recently Read</SectionLabel>
+            {recentArticles.map((a: any, i: number) => <ArticleCard key={i} article={a} compact />)}
+          </div>
+        )}
+        <div>
+          <SectionLabel>Your Hub</SectionLabel>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
+            {[
+              { label: 'For You', sub: 'Personalized feed', tab: 'foryou' as Tab },
+              { label: 'Saved Articles', sub: `${savedArticles.length} bookmarked`, tab: 'saved' as Tab },
+              { label: 'New Articles', sub: 'Latest from DudeMD', tab: 'new' as Tab },
+              { label: 'Community', sub: 'Coming soon', tab: 'community' as Tab },
+            ].map((item, i) => (
+              <button key={i} onClick={() => setActiveTab(item.tab)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '1rem', backgroundColor: '#f5f3ef', border: '1px solid var(--color-border)', borderRadius: 4, cursor: 'pointer', textAlign: 'left' }}>
+                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.2rem' }}>{item.label}</p>
+                <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>{item.sub}</p>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     )
   }
 
-  function SavedTab() {
-    if (savedLoading) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-slate)' }}>Loading...</div>
-    if (!savedArticles.length) return (
-      <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.5" style={{ marginBottom: '1rem' }}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-        <p style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>No saved articles yet</p>
-        <p style={{ fontSize: '14px', color: 'var(--color-slate)' }}>Bookmark articles while reading to find them here.</p>
-        <a href="/" style={{ display: 'inline-block', marginTop: '1.5rem', padding: '0.75rem 1.5rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>Browse Articles</a>
+  function FeedTab({ articles, loading: l, emptyMsg, label }: { articles: any[], loading: boolean, emptyMsg: string, label: string }) {
+    if (l) return <Spinner />
+    if (!articles.length) return (
+      <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
+        <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>{emptyMsg}</p>
+        <a href="/" style={{ fontSize: '12px', color: 'var(--color-gold)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>Browse Articles →</a>
       </div>
     )
     return (
       <div>
-        <p style={{ fontSize: '12px', color: '#9a9085', marginBottom: '0.5rem' }}>{savedArticles.length} saved article{savedArticles.length !== 1 ? 's' : ''}</p>
-        {savedArticles.map((item: any, i: number) => <ArticleCard key={i} article={item.articles} />)}
-      </div>
-    )
-  }
-
-  function ForYouTab() {
-    if (forYouLoading) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-slate)' }}>Loading your feed...</div>
-    if (!forYouArticles.length) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-slate)' }}>No articles found.</div>
-    return (
-      <div>
-        <p style={{ fontSize: '12px', color: '#9a9085', marginBottom: '0.5rem' }}>Articles picked based on your reading habits</p>
-        {forYouArticles.map((a: any, i: number) => <ArticleCard key={i} article={a} />)}
-      </div>
-    )
-  }
-
-  function NewArticlesTab() {
-    if (newLoading) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-slate)' }}>Loading...</div>
-    if (!newArticles.length) return <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--color-slate)' }}>No articles found.</div>
-    return (
-      <div>
-        <p style={{ fontSize: '12px', color: '#9a9085', marginBottom: '0.5rem' }}>Latest published articles</p>
-        {newArticles.map((a: any, i: number) => <ArticleCard key={i} article={a} />)}
+        <SectionLabel>{label}</SectionLabel>
+        {articles.map((a: any, i: number) => <ArticleCard key={i} article={a} />)}
       </div>
     )
   }
 
   function CommunityTab() {
     return (
-      <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-        <div style={{ width: 60, height: 60, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <div style={{ textAlign: 'center', padding: '4rem 1.5rem' }}>
+        <div style={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.5rem', fontFamily: 'Georgia, serif' }}>Community Coming Soon</p>
-        <p style={{ fontSize: '14px', color: 'var(--color-slate)', lineHeight: 1.7, maxWidth: 320, margin: '0 auto 1.5rem' }}>Circles, Q&A, events, badges and more. The DudeMD community is being built right now.</p>
-        <span style={{ display: 'inline-block', padding: '0.4rem 1rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Coming Soon</span>
+        <p style={{ fontSize: '17px', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '0.5rem', fontFamily: 'Georgia, serif' }}>Community Coming Soon</p>
+        <p style={{ fontSize: '13px', color: 'var(--color-slate)', lineHeight: 1.7, maxWidth: 300, margin: '0 auto 1.5rem' }}>Circles, Q&A, events, badges and more.</p>
+        <span style={{ display: 'inline-block', padding: '0.4rem 1.1rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: 2 }}>Coming Soon</span>
       </div>
     )
   }
 
   function SettingsTab() {
-    const inp: any = { width: '100%', padding: '0.85rem', border: '1px solid var(--color-border)', fontSize: '15px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit', color: 'var(--color-navy)' }
+    const inp: any = { width: '100%', padding: '0.8rem 1rem', border: '1px solid var(--color-border)', borderRadius: 4, fontSize: '14px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit', color: 'var(--color-navy)' }
+    const section: any = { backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 6, padding: '1.5rem', marginBottom: '1rem' }
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.5rem' }}>
-          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1.25rem' }}>Edit Profile</p>
-          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div>
+        <div style={section}>
+          <SectionLabel>Edit Profile</SectionLabel>
+          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>Full Name</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>Full Name</label>
               <input style={inp} value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>
-                Username
-                <span style={{ fontWeight: 400, color: '#9a9085', marginLeft: '0.5rem' }}>— your public handle for future community features</span>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>
+                Username <span style={{ fontWeight: 400, color: '#9a9085' }}>— your community handle</span>
               </label>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#9a9085', fontSize: '15px', pointerEvents: 'none' }}>@</span>
-                <input
-                  style={{ ...inp, paddingLeft: '1.75rem', border: `1px solid ${usernameError ? '#a32d2d' : 'var(--color-border)'}` }}
-                  defaultValue={username}
-                  onBlur={e => handleUsernameChange(e.target.value)}
-                  placeholder="yourhandle"
-                  maxLength={20}
-                />
+                <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#9a9085', fontSize: '14px', pointerEvents: 'none' }}>@</span>
+                <input style={{ ...inp, paddingLeft: '1.75rem', border: `1px solid ${usernameError ? '#a32d2d' : 'var(--color-border)'}` }} defaultValue={username} onBlur={e => handleUsernameChange(e.target.value)} placeholder="yourhandle" maxLength={20} />
               </div>
-              {usernameChecking && <p style={{ fontSize: '12px', color: '#9a9085', margin: '0.3rem 0 0' }}>Checking availability...</p>}
-              {usernameError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: '0.3rem 0 0' }}>{usernameError}</p>}
-              {!usernameError && !usernameChecking && username && username !== profile?.username && (
-                <p style={{ fontSize: '12px', color: '#2d7a3a', margin: '0.3rem 0 0' }}>@{username} is available</p>
-              )}
-              <p style={{ fontSize: '11px', color: '#9a9085', margin: '0.3rem 0 0' }}>3–20 characters. Letters, numbers, underscores only.</p>
+              {usernameChecking && <p style={{ fontSize: '11px', color: '#9a9085', margin: '0.3rem 0 0' }}>Checking...</p>}
+              {usernameError && <p style={{ fontSize: '11px', color: '#a32d2d', margin: '0.3rem 0 0' }}>{usernameError}</p>}
+              {!usernameError && !usernameChecking && username && username !== profile?.username && <p style={{ fontSize: '11px', color: '#2d7a3a', margin: '0.3rem 0 0' }}>@{username} is available</p>}
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.75rem' }}>Profile Picture</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.75rem' }}>Profile Photo</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt="preview" style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)', flexShrink: 0 }} />
+                  <img src={avatarUrl} alt="preview" style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)' }} />
                 ) : (
-                  <div style={{ width: 52, height: 52, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0)}</span>
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0)}</span>
                   </div>
                 )}
-                <label style={{ padding: '0.6rem 1.25rem', border: '1px solid var(--color-navy)', backgroundColor: '#fff', color: 'var(--color-navy)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
-                  {uploading ? 'Uploading...' : 'Upload Photo'}
+                <label style={{ padding: '0.55rem 1rem', border: '1px solid var(--color-navy)', borderRadius: 4, backgroundColor: '#fff', color: 'var(--color-navy)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>
+                  {uploading ? 'Uploading...' : 'Change Photo'}
                   <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarUpload} disabled={uploading} />
                 </label>
               </div>
             </div>
-            <button type="submit" disabled={saving || !!usernameError || usernameChecking} style={{ padding: '0.875rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', opacity: saving || !!usernameError || usernameChecking ? 0.6 : 1 }}>
+            <button type="submit" disabled={saving || !!usernameError || usernameChecking} style={{ padding: '0.85rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', borderRadius: 4, cursor: 'pointer', opacity: saving || !!usernameError || usernameChecking ? 0.6 : 1 }}>
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
-            {savedProfile && <p style={{ fontSize: '13px', color: '#2d7a3a', textAlign: 'center', margin: 0 }}>✓ Profile updated successfully.</p>}
+            {savedProfile && <p style={{ fontSize: '13px', color: '#2d7a3a', textAlign: 'center', margin: 0 }}>✓ Saved.</p>}
           </form>
         </div>
-        <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', padding: '1.5rem' }}>
-          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '1.25rem' }}>Newsletter</p>
-          {profile?.newsletter_subscribed !== false ? (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-navy)', margin: '0 0 0.25rem' }}>Subscribed ✓</p>
-                <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>Weekly men's wellness in your inbox.</p>
-              </div>
-              <button onClick={handleUnsubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid #a32d2d', backgroundColor: '#fff', color: '#a32d2d', fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>Unsubscribe</button>
+        <div style={section}>
+          <SectionLabel>Newsletter</SectionLabel>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ fontSize: '14px', fontWeight: 600, color: profile?.newsletter_subscribed !== false ? 'var(--color-navy)' : '#9a9085', margin: '0 0 0.2rem' }}>
+                {profile?.newsletter_subscribed !== false ? 'Subscribed ✓' : 'Not subscribed'}
+              </p>
+              <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>Weekly men's wellness.</p>
             </div>
-          ) : (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <p style={{ fontSize: '14px', fontWeight: 600, color: '#9a9085', margin: '0 0 0.25rem' }}>Not subscribed</p>
-                <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>Want weekly men's wellness?</p>
-              </div>
-              <button onClick={handleResubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-navy)', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontSize: '12px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', cursor: 'pointer' }}>Subscribe</button>
-            </div>
-          )}
+            {profile?.newsletter_subscribed !== false ? (
+              <button onClick={handleUnsubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid #a32d2d', borderRadius: 4, backgroundColor: '#fff', color: '#a32d2d', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Unsubscribe</button>
+            ) : (
+              <button onClick={handleResubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-navy)', borderRadius: 4, backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Subscribe</button>
+            )}
+          </div>
         </div>
-        <button onClick={handleSignOut} style={{ width: '100%', padding: '0.875rem', backgroundColor: 'transparent', border: '1px solid var(--color-navy)', color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>
-          Sign Out
-        </button>
+        <button onClick={handleSignOut} style={{ width: '100%', padding: '0.85rem', backgroundColor: 'transparent', border: '1px solid var(--color-navy)', borderRadius: 4, color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', marginBottom: '0.75rem' }}>Sign Out</button>
         {!showDelete ? (
-          <button onClick={() => setShowDelete(true)} style={{ width: '100%', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', color: '#9a9085', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}>
-            Delete My Account
-          </button>
+          <button onClick={() => setShowDelete(true)} style={{ width: '100%', padding: '0.5rem', backgroundColor: 'transparent', border: 'none', color: '#9a9085', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}>Delete My Account</button>
         ) : (
-          <div style={{ backgroundColor: '#fff', border: '1px solid #a32d2d', padding: '1.5rem' }}>
+          <div style={{ backgroundColor: '#fff', border: '1px solid #a32d2d', borderRadius: 6, padding: '1.5rem' }}>
             <p style={{ fontSize: '14px', fontWeight: 700, color: '#a32d2d', marginBottom: '0.5rem' }}>⚠️ Delete Account</p>
-            <p style={{ fontSize: '13px', color: 'var(--color-slate)', marginBottom: '1.25rem', lineHeight: 1.6 }}>This permanently deletes your account. This cannot be undone.</p>
+            <p style={{ fontSize: '13px', color: 'var(--color-slate)', marginBottom: '1.25rem', lineHeight: 1.6 }}>This permanently deletes your account and cannot be undone.</p>
             <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>Type DELETE to confirm:</p>
             <input style={{ ...inp, border: '1px solid #a32d2d', marginBottom: '1rem' }} value={deleteInput} onChange={e => setDeleteInput(e.target.value)} placeholder="DELETE" />
             <div style={{ display: 'flex', gap: '0.75rem' }}>
-              <button onClick={() => { setShowDelete(false); setDeleteInput('') }} style={{ flex: 1, padding: '0.75rem', border: '1px solid var(--color-border)', backgroundColor: '#fff', color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={handleDeleteAccount} disabled={deleteInput !== 'DELETE' || deleting} style={{ flex: 1, padding: '0.75rem', backgroundColor: deleteInput === 'DELETE' ? '#a32d2d' : '#f0ede8', color: deleteInput === 'DELETE' ? '#fff' : '#9a9085', border: 'none', fontWeight: 700, fontSize: '13px', cursor: deleteInput === 'DELETE' ? 'pointer' : 'not-allowed' }}>
+              <button onClick={() => { setShowDelete(false); setDeleteInput('') }} style={{ flex: 1, padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: 4, backgroundColor: '#fff', color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={handleDeleteAccount} disabled={deleteInput !== 'DELETE' || deleting} style={{ flex: 1, padding: '0.75rem', borderRadius: 4, backgroundColor: deleteInput === 'DELETE' ? '#a32d2d' : '#f0ede8', color: deleteInput === 'DELETE' ? '#fff' : '#9a9085', border: 'none', fontWeight: 700, fontSize: '13px', cursor: deleteInput === 'DELETE' ? 'pointer' : 'not-allowed' }}>
                 {deleting ? 'Deleting...' : 'Delete Forever'}
               </button>
             </div>
@@ -502,49 +455,151 @@ export default function AccountPage() {
     )
   }
 
+  function renderContent() {
+    switch (activeTab) {
+      case 'overview': return <OverviewTab />
+      case 'saved': return <FeedTab articles={savedArticles.map((s:any)=>s.articles).filter(Boolean)} loading={savedLoading} emptyMsg="No saved articles yet" label={`${savedArticles.length} Saved Article${savedArticles.length !== 1 ? 's' : ''}`} />
+      case 'foryou': return <FeedTab articles={forYouArticles} loading={forYouLoading} emptyMsg="Read some articles to personalize your feed" label="Picked For You" />
+      case 'new': return <FeedTab articles={newArticles} loading={newLoading} emptyMsg="No articles yet" label="Latest from DudeMD" />
+      case 'community': return <CommunityTab />
+      case 'settings': return <SettingsTab />
+    }
+  }
+
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-cream)' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f5f3ef' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
-        .hub-tab { background: none; border: none; cursor: pointer; padding: 0.75rem 0; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9a9085; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
-        .hub-tab.active { color: var(--color-navy); border-bottom-color: var(--color-gold); }
-        .hub-tab:hover { color: var(--color-navy); }
-        @media (max-width: 600px) { .hub-tab { font-size: 11px; padding: 0.75rem 0; } }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+        .hub-sidebar-btn { display: flex; align-items: center; gap: 0.75rem; width: 100%; padding: 0.7rem 1rem; background: none; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--color-slate); text-align: left; transition: background 0.15s, color 0.15s; letter-spacing: 0.02em; }
+        .hub-sidebar-btn:hover { background: rgba(14,26,43,0.05); color: var(--color-navy); }
+        .hub-sidebar-btn.active { background: var(--color-navy); color: #fff; }
+        .hub-nav-icon { font-size: 14px; width: 20px; text-align: center; opacity: 0.6; }
+        .hub-sidebar-btn.active .hub-nav-icon { opacity: 1; color: var(--color-gold); }
+        .hub-mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--color-navy); border-top: 1px solid rgba(255,255,255,0.08); z-index: 50; padding: 0 0 env(safe-area-inset-bottom); }
+        .hub-mobile-nav-inner { display: flex; }
+        .hub-mobile-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 0.6rem 0.25rem; background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.45); font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.15s; min-width: 0; }
+        .hub-mobile-btn.active { color: var(--color-gold); }
+        .hub-mobile-icon { font-size: 17px; line-height: 1; }
+        .hub-more-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 60; }
+        .hub-more-drawer { position: fixed; bottom: 0; left: 0; right: 0; z-index: 70; background: #fff; border-radius: 16px 16px 0 0; padding: 1.25rem 1.5rem 2.5rem; animation: slideUp 0.22s ease; }
+        @media (max-width: 768px) {
+          .hub-desktop-layout { display: none !important; }
+          .hub-mobile-layout { display: block !important; }
+          .hub-mobile-nav { display: flex !important; }
+        }
+        @media (min-width: 769px) {
+          .hub-mobile-layout { display: none !important; }
+          .hub-desktop-layout { display: flex !important; }
+        }
       `}</style>
-      <div style={{ backgroundColor: 'var(--color-navy)', padding: '2.5rem 1.5rem 0' }}>
-        <div style={{ maxWidth: '680px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.25rem', marginBottom: '1.5rem' }}>
+
+      {/* ── DESKTOP ── */}
+      <div className="hub-desktop-layout" style={{ display: 'flex', maxWidth: 1080, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', alignItems: 'flex-start' }}>
+        {/* Sidebar */}
+        <div style={{ width: 210, flexShrink: 0, position: 'sticky', top: '1.5rem' }}>
+          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.25rem', marginBottom: '0.75rem', textAlign: 'center' }}>
             {avatarUrl ? (
-              <img src={avatarUrl} alt={firstName} style={{ width: 72, height: 72, borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--color-gold)', flexShrink: 0 }} />
+              <img src={avatarUrl} alt={firstName} style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)', margin: '0 auto 0.75rem', display: 'block' }} />
             ) : (
-              <div style={{ width: 72, height: 72, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', border: '3px solid var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ fontSize: 28, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0).toUpperCase()}</span>
+              <div style={{ width: 60, height: 60, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.75rem' }}>
+                <span style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0).toUpperCase()}</span>
               </div>
             )}
-            <div style={{ flex: 1, paddingBottom: '0.25rem' }}>
-              <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.25rem, 3vw, 1.75rem)', fontWeight: 700, color: '#fff', margin: '0 0 0.2rem' }}>{fullName || firstName}</h1>
-              {profile?.username && <p style={{ fontSize: '13px', color: 'var(--color-gold)', margin: '0 0 0.2rem', fontWeight: 600 }}>@{profile.username}</p>}
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>Member since {profile?.created_at ? new Date(profile.created_at).getFullYear() : '—'}</p>
-            </div>
+            <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.15rem', fontFamily: 'Georgia, serif' }}>{fullName || firstName}</p>
+            {profile?.username && <p style={{ fontSize: '11px', color: 'var(--color-gold)', margin: '0 0 0.2rem', fontWeight: 600 }}>@{profile.username}</p>}
+            <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>Member since {memberYear}</p>
           </div>
-          <div style={{ display: 'flex', gap: '1.5rem', overflowX: 'auto', paddingBottom: '0', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-            {tabs.map(tab => (
-              <button key={tab.id} className={`hub-tab${activeTab === tab.id ? ' active' : ''}`} onClick={() => setActiveTab(tab.id)}
-                style={{ color: activeTab === tab.id ? '#fff' : 'rgba(255,255,255,0.5)', borderBottomColor: activeTab === tab.id ? 'var(--color-gold)' : 'transparent' }}>
-                {tab.label}
+          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '0.5rem' }}>
+            {NAV_ITEMS.map(item => (
+              <button key={item.id} className={`hub-sidebar-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
+                <span className="hub-nav-icon">{item.icon}</span>
+                {item.label}
               </button>
             ))}
+            <div style={{ height: 1, backgroundColor: 'var(--color-border)', margin: '0.4rem 0.5rem' }} />
+            <button onClick={handleSignOut} className="hub-sidebar-btn" style={{ color: '#9a9085' }}>
+              <span className="hub-nav-icon" style={{ fontSize: 13 }}>↩</span>
+              Sign Out
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif', letterSpacing: '-0.01em' }}>{activeNav?.label}</h2>
+          </div>
+          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.5rem' }}>
+            {renderContent()}
           </div>
         </div>
       </div>
-      <div style={{ maxWidth: '680px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-        {activeTab === 'overview' && <OverviewTab />}
-        {activeTab === 'saved' && <SavedTab />}
-        {activeTab === 'foryou' && <ForYouTab />}
-        {activeTab === 'new' && <NewArticlesTab />}
-        {activeTab === 'community' && <CommunityTab />}
-        {activeTab === 'settings' && <SettingsTab />}
+
+      {/* ── MOBILE ── */}
+      <div className="hub-mobile-layout" style={{ display: 'none', paddingBottom: 72 }}>
+        <div style={{ backgroundColor: 'var(--color-navy)', padding: '1.1rem 1.25rem 0.9rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={firstName} style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)', flexShrink: 0 }} />
+            ) : (
+              <div style={{ width: 42, height: 42, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', border: '2px solid var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0).toUpperCase()}</span>
+              </div>
+            )}
+            <div>
+              <p style={{ fontSize: '14px', fontWeight: 700, color: '#fff', margin: '0 0 0.1rem', fontFamily: 'Georgia, serif' }}>{fullName || firstName}</p>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+                {profile?.username ? `@${profile.username} · ` : ''}Member since {memberYear}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div style={{ padding: '1rem 1.25rem 0.25rem' }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif' }}>{activeNav?.label}</h2>
+        </div>
+        <div style={{ padding: '0.5rem 1.25rem 1rem' }}>
+          {renderContent()}
+        </div>
       </div>
+
+      {/* Mobile bottom nav */}
+      <nav className="hub-mobile-nav">
+        <div className="hub-mobile-nav-inner">
+          {NAV_ITEMS.slice(0, 4).map(item => (
+            <button key={item.id} className={`hub-mobile-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
+              <span className="hub-mobile-icon">{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+          <button className={`hub-mobile-btn${(activeTab === 'community' || activeTab === 'settings') ? ' active' : ''}`} onClick={() => setMoreOpen(true)}>
+            <span className="hub-mobile-icon">⋯</span>
+            More
+          </button>
+        </div>
+      </nav>
+
+      {/* More drawer */}
+      {moreOpen && (
+        <>
+          <div className="hub-more-overlay" onClick={() => setMoreOpen(false)} />
+          <div className="hub-more-drawer">
+            <div style={{ width: 36, height: 4, backgroundColor: '#e0dbd4', borderRadius: 2, margin: '0 auto 1.25rem' }} />
+            <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', marginBottom: '0.75rem' }}>More options</p>
+            {NAV_ITEMS.slice(4).map(item => (
+              <button key={item.id} onClick={() => { setActiveTab(item.id); setMoreOpen(false) }} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', width: '100%', padding: '0.875rem 0', borderBottom: '1px solid var(--color-border)', background: 'none', border: 'none', borderBottom: '1px solid var(--color-border)', cursor: 'pointer', textAlign: 'left' }}>
+                <span style={{ fontSize: 18, width: 24, textAlign: 'center' }}>{item.icon}</span>
+                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-navy)' }}>{item.label}</span>
+                <span style={{ marginLeft: 'auto', color: '#9a9085' }}>›</span>
+              </button>
+            ))}
+            <button onClick={handleSignOut} style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', width: '100%', padding: '0.875rem 0', background: 'none', border: 'none', cursor: 'pointer', marginTop: '0.25rem' }}>
+              <span style={{ fontSize: 18, width: 24, textAlign: 'center' }}>↩</span>
+              <span style={{ fontSize: '15px', fontWeight: 600, color: '#a32d2d' }}>Sign Out</span>
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
