@@ -22,3 +22,23 @@
   margin: 0 auto;
   padding: 0 1.5rem;
 }
+
+.article-link {
+  color: #1a5fa8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color 0.15s ease;
+}
+.article-link:hover {
+  color: #0e3d6e;
+  text-decoration-thickness: 2px;
+}
+.article-link:focus {
+  outline: 2px solid #c9b28f;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.article-link:visited {
+  color: #6b4fa8;
+}
