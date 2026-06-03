@@ -44,7 +44,19 @@ export default function ArticleContent({ article, slug, category, relatedArticle
   }
 
   useEffect(() => {
-    try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event_type: 'view', article_slug: slug, category_slug: category }) }) } catch(e) {}
+    // Cache session at mount so scroll handler and exit handler can use it synchronously
+    let cachedUserId: string | null = null
+    let cachedToken: string | null = null
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        cachedUserId = session.user.id
+        cachedToken = session.access_token
+      }
+      // Fire view event once session is resolved — only scores if authenticated
+      if (cachedUserId && cachedToken) {
+        try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: cachedUserId, token: cachedToken, event_type: 'view', article_slug: slug, category_slug: category }) }) } catch(e) {}
+      }
+    })
     const checkpoints = { 25: false, 50: false, 75: false, 100: false }
     function onScroll() {
       const el = document.documentElement
@@ -52,7 +64,10 @@ export default function ArticleContent({ article, slug, category, relatedArticle
       for (const [depth, fired] of Object.entries(checkpoints)) {
         if (!fired && pct >= Number(depth)) {
           checkpoints[Number(depth)] = true
-          try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event_type: `scroll_${depth}`, article_slug: slug, category_slug: category }) }) } catch(e) {}
+          // Only fire scoring if authenticated — anonymous users scroll silently
+          if (cachedUserId && cachedToken) {
+            try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: cachedUserId, token: cachedToken, event_type: `scroll_${depth}`, article_slug: slug, category_slug: category }) }) } catch(e) {}
+          }
         }
       }
     }
@@ -60,8 +75,8 @@ export default function ArticleContent({ article, slug, category, relatedArticle
     const start = Date.now()
     function onExit() {
       const seconds = Math.round((Date.now() - start) / 1000)
-      if (seconds > 10) {
-        try { navigator.sendBeacon('/api/personalization/score', JSON.stringify({ event_type: 'time_on_page', article_slug: slug, category_slug: category, metadata: { seconds } })) } catch(e) {}
+      if (seconds > 10 && cachedUserId && cachedToken) {
+        try { fetch('/api/personalization/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true, body: JSON.stringify({ user_id: cachedUserId, token: cachedToken, event_type: 'time_on_page', article_slug: slug, category_slug: category, metadata: { seconds } }) }) } catch(e) {}
       }
     }
     window.addEventListener('beforeunload', onExit)
