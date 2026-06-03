@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
+import NotificationBell from '@/components/NotificationBell'
 
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
@@ -41,7 +42,6 @@ export default function Nav() {
   useEffect(() => {
     async function loadNav() {
       try {
-        // Load parent categories
         const catsRes = await fetch(`${SUPABASE_URL}/rest/v1/categories?select=*&parent_id=is.null&enabled=eq.true&show_in_nav=eq.true&order=sort_order.asc,name.asc`, {
           headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
         })
@@ -49,13 +49,11 @@ export default function Nav() {
         if (!Array.isArray(cats)) return
 
         const items = await Promise.all(cats.map(async (cat: any) => {
-          // Load subcategories
           const subsRes = await fetch(`${SUPABASE_URL}/rest/v1/categories?select=name,slug&parent_id=eq.${cat.id}&enabled=eq.true&order=sort_order.asc,name.asc`, {
             headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
           })
           const subs = await subsRes.json()
 
-          // Load 2 recent published articles for this category
           const artsRes = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=slug,title,cover_image_url&category_id=eq.${cat.id}&published=eq.true&order=published_at.desc&limit=2`, {
             headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
           })
@@ -87,7 +85,6 @@ export default function Nav() {
           const eq = c.indexOf('=')
           jar[c.substring(0, eq).trim()] = c.substring(eq + 1).trim()
         })
-        // Support both single cookie and split cookie formats
         let raw = ''
         if (jar['sb-bicljoujevywrkzjeaoy-auth-token']) {
           raw = jar['sb-bicljoujevywrkzjeaoy-auth-token'].replace('base64-', '')
@@ -157,7 +154,8 @@ export default function Nav() {
       </Link>
     )
     return (
-      <div ref={userRef} style={{ position: 'relative' }}>
+      <div ref={userRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <NotificationBell />
         <button onClick={() => setUserOpen(!userOpen)} className="icon-btn" title={`${firstName}'s Account`}
           style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           {profile?.avatar_url ? (
@@ -186,8 +184,6 @@ export default function Nav() {
 
   return (
     <>
-
-
       <style>{`
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
         .container-content { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
@@ -253,24 +249,23 @@ export default function Nav() {
             </div>
           )}
         </div>
-      {/* GOLD BAR - below navy header */}
-      <div style={{ backgroundColor: 'var(--color-gold)', padding: '0.4rem 0' }}>
-        <div className="container-content">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
-            {session && profile ? (
-              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-navy)' }}>Welcome, <strong>{profile.full_name?.split(' ')[0]}</strong></span>
-            ) : (
-              <span />
-            )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              {!session && <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Sign In</Link>}
-              {!session && <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>}
-              {!session && <Link href="/join" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Subscribe</Link>}
-              {session && <Link href="/account" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>My Account</Link>}
+        <div style={{ backgroundColor: 'var(--color-gold)', padding: '0.4rem 0' }}>
+          <div className="container-content">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
+              {session && profile ? (
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-navy)' }}>Welcome, <strong>{profile.full_name?.split(' ')[0]}</strong></span>
+              ) : (
+                <span />
+              )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                {!session && <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Sign In</Link>}
+                {!session && <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>}
+                {!session && <Link href="/join" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Subscribe</Link>}
+                {session && <Link href="/account" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>My Account</Link>}
+              </div>
             </div>
           </div>
         </div>
-      </div>
       </header>
 
       {drawerOpen && <div className="drawer-overlay" onClick={() => setDrawerOpen(false)} />}
