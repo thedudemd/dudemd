@@ -24,20 +24,20 @@
 }
 
 .article-link {
-  color: #1B1D21;
+  color: #4A5563;
   text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
   text-decoration-color: #c9b28f;
   transition: text-decoration-color 0.15s ease, color 0.15s ease;
 }
 .article-link:hover {
-  color: #1B1D21;
+  color: #0e1a2b;
   text-decoration-color: #0e1a2b;
   text-decoration-thickness: 2px;
 }
 .article-link:visited {
-  color: #1B1D21;
+  color: #4A5563;
   text-decoration-color: #c9b28f;
 }
 .article-link:focus {
@@ -47,6 +47,6 @@
 }
 .ProseMirror .article-link,
 .ProseMirror .article-link:visited {
-  color: #1B1D21;
+  color: #4A5563;
   text-decoration-color: #c9b28f;
 }
