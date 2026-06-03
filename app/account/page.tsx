@@ -422,8 +422,8 @@ export default function AccountPage() {
                 <span style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#9a9085', fontSize: '15px', pointerEvents: 'none' }}>@</span>
                 <input
                   style={{ ...inp, paddingLeft: '1.75rem', border: `1px solid ${usernameError ? '#a32d2d' : 'var(--color-border)'}` }}
-                  value={username}
-                  onChange={e => handleUsernameChange(e.target.value)}
+                  defaultValue={username}
+                  onBlur={e => handleUsernameChange(e.target.value)}
                   placeholder="yourhandle"
                   maxLength={20}
                 />
