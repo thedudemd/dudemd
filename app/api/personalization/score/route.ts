@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-
 const EVENT_WEIGHTS: Record<string, number> = {
   article_view: 1,
   view: 1,
@@ -35,13 +33,14 @@ export async function POST(req: NextRequest) {
     await userSupabase.from('user_scores').insert({ user_id, category_scores: { [category_slug]: weight } })
   }
 
-  // Log to user_events for recently read and analytics
+  // Log to user_events
   await userSupabase.from('user_events').insert({
     user_id,
     event_type,
     article_slug: article_slug || null,
     category_slug,
     metadata: metadata || null,
+    session_id: `server-${Date.now()}-${Math.random().toString(36).slice(2)}`,
   })
 
   return NextResponse.json({ ok: true })
