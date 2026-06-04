@@ -450,7 +450,7 @@ export default function AccountPage() {
       `}</style>
 
       {/* ── DESKTOP ── */}
-      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', alignItems: 'flex-start' }}>
+      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', alignItems: 'flex-start', minHeight: 'calc(100vh - 4rem)' }}>
 
         {/* Sidebar — uses position:sticky on its own wrapper */}
         <div style={{ width: 200, flexShrink: 0 }}>
@@ -501,7 +501,7 @@ export default function AccountPage() {
       <div className="hub-mobile" style={{ display: 'none' }}>
 
         {/* Sticky subnav — sits directly below the site header, no profile header */}
-        <nav className="mnav" style={{ position: 'sticky', top: 118, zIndex: 30 }}>
+        <nav className="mnav" style={{ position: 'sticky', top: 130, zIndex: 30 }}>
           <div className="mnav-inner">
             {NAV.slice(0, 4).map(item => (
               <button key={item.id} className={`mnav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
