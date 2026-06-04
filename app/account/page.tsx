@@ -454,7 +454,7 @@ export default function AccountPage() {
 
         {/* Sidebar — uses position:sticky on its own wrapper */}
         <div style={{ width: 200, flexShrink: 0 }}>
-          <div style={{ position: 'fixed', top: 110, width: 200, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ position: 'fixed', top: 160, width: 200, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
             {/* Profile card — name + username + member since only, no avatar */}
             <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.25rem' }}>
