@@ -453,7 +453,7 @@ export default function AccountPage() {
       <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', height: 'calc(100vh - 110px)', overflow: 'hidden' }}>
 
         {/* Sidebar — uses position:sticky on its own wrapper */}
-        <div style={{ width: 200, flexShrink: 0 }}>
+        <div style={{ width: 200, flexShrink: 0, height: '100%', overflowY: 'hidden' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
             {/* Profile card — name + username + member since only, no avatar */}
