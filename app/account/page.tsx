@@ -38,6 +38,14 @@ function validateUsername(val: string): string | null {
 
 type Tab = 'feed' | 'saved' | 'new' | 'community' | 'settings'
 
+const NAV: { id: Tab; label: string }[] = [
+  { id: 'feed', label: 'My Feed' },
+  { id: 'saved', label: 'Saved' },
+  { id: 'new', label: 'New' },
+  { id: 'community', label: 'Community' },
+  { id: 'settings', label: 'Settings' },
+]
+
 export default function AccountPage() {
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -81,12 +89,9 @@ export default function AccountPage() {
     }).catch(() => setLoading(false))
   }, [])
 
-  // Load main feed on mount — personalized + new articles merged
   useEffect(() => {
     if (!auth) return
     setFeedLoading(true)
-
-    // Get recently read slugs + user scores in parallel
     Promise.all([
       fetch(`${SUPABASE_URL}/rest/v1/user_events?select=article_slug&user_id=eq.${auth.uid}&event_type=eq.view&order=created_at.desc&limit=20`, {
         headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
@@ -98,35 +103,24 @@ export default function AccountPage() {
         headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
       }).then(r => r.json())
     ]).then(([events, scores, articles]) => {
-      // Track recently read
       const seen = new Set<string>()
       const slugs: string[] = []
       if (Array.isArray(events)) {
         for (const e of events) {
-          if (e.article_slug && !seen.has(e.article_slug)) {
-            seen.add(e.article_slug); slugs.push(e.article_slug)
-          }
+          if (e.article_slug && !seen.has(e.article_slug)) { seen.add(e.article_slug); slugs.push(e.article_slug) }
         }
       }
       setRecentSlugs(slugs)
-
       if (!Array.isArray(articles)) { setFeedLoading(false); return }
-
-      // Get top category slugs from scores
       let topSlugs: string[] = []
       if (Array.isArray(scores) && scores[0]?.category_scores) {
         topSlugs = Object.entries(scores[0].category_scores as Record<string, number>)
           .sort((a, b) => b[1] - a[1]).slice(0, 5).map(([s]) => s)
       }
-
-      // Build feed: personalized first, then rest — exclude recently read
       const readSet = new Set(slugs)
-      const personalized = topSlugs.length > 0
-        ? articles.filter((a: any) => topSlugs.includes(a.categories?.slug) && !readSet.has(a.slug))
-        : []
+      const personalized = topSlugs.length > 0 ? articles.filter((a: any) => topSlugs.includes(a.categories?.slug) && !readSet.has(a.slug)) : []
       const rest = articles.filter((a: any) => !personalized.includes(a) && !readSet.has(a.slug))
       const recentRead = articles.filter((a: any) => readSet.has(a.slug))
-
       setFeedArticles([...personalized, ...rest, ...recentRead].slice(0, 24))
       setFeedLoading(false)
     }).catch(() => setFeedLoading(false))
@@ -251,26 +245,24 @@ export default function AccountPage() {
   const firstName = fullName?.split(' ')[0] || 'Member'
   const memberYear = profile?.created_at ? new Date(profile.created_at).getFullYear() : '—'
 
-  // Feed card — full editorial style
-  function FeedCard({ article, label }: { article: any, label?: string }) {
+  function FeedCard({ article }: { article: any }) {
     const cat = article.categories
     const href = cat?.slug && article.slug ? `/articles/${cat.slug}/${article.slug}` : '#'
     const date = article.published_at ? new Date(article.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''
-    const isRecent = recentSlugs.includes(article.slug)
+    const isRead = recentSlugs.includes(article.slug)
     return (
-      <a href={href} style={{ display: 'block', textDecoration: 'none', color: 'inherit', borderBottom: '1px solid var(--color-border)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
-        {label && <p style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.75rem' }}>{label}</p>}
+      <a href={href} style={{ display: 'block', textDecoration: 'none', color: 'inherit', borderBottom: '1px solid var(--color-border)', paddingBottom: '1.25rem', marginBottom: '1.25rem' }}>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
           {article.cover_image_url && (
-            <img src={article.cover_image_url} alt={article.title} style={{ width: 100, height: 72, objectFit: 'cover', flexShrink: 0, borderRadius: 3 }} />
+            <img src={article.cover_image_url} alt={article.title} style={{ width: 90, height: 66, objectFit: 'cover', flexShrink: 0, borderRadius: 3 }} />
           )}
           <div style={{ flex: 1, minWidth: 0 }}>
-            {cat?.name && <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.4rem' }}>{cat.name}</p>}
-            <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.4rem', lineHeight: 1.35, fontFamily: 'Georgia, serif' }}>{article.title}</p>
-            {article.excerpt && <p style={{ fontSize: '13px', color: 'var(--color-slate)', margin: '0 0 0.5rem', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{article.excerpt}</p>}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {cat?.name && <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.35rem' }}>{cat.name}</p>}
+            <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.35rem', lineHeight: 1.35, fontFamily: 'Georgia, serif' }}>{article.title}</p>
+            {article.excerpt && <p style={{ fontSize: '13px', color: 'var(--color-slate)', margin: '0 0 0.45rem', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{article.excerpt}</p>}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
               {date && <span style={{ fontSize: '11px', color: '#9a9085' }}>{date}</span>}
-              {isRecent && <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', backgroundColor: '#f0ede8', padding: '2px 6px', borderRadius: 2 }}>Read</span>}
+              {isRead && <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9a9085', backgroundColor: '#ebe8e3', padding: '2px 5px', borderRadius: 2 }}>Read</span>}
             </div>
           </div>
         </div>
@@ -290,13 +282,7 @@ export default function AccountPage() {
         <a href="/" style={{ fontSize: '12px', color: 'var(--color-gold)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>Browse DudeMD →</a>
       </div>
     )
-    return (
-      <div>
-        {feedArticles.map((a: any, i: number) => (
-          <FeedCard key={i} article={a} label={i === 0 ? 'For You' : i === 3 ? 'New & Fresh' : undefined} />
-        ))}
-      </div>
-    )
+    return <div>{feedArticles.map((a: any, i: number) => <FeedCard key={i} article={a} />)}</div>
   }
 
   function SavedTab() {
@@ -311,7 +297,7 @@ export default function AccountPage() {
     )
     return (
       <div>
-        <p style={{ fontSize: '12px', color: '#9a9085', marginBottom: '1.25rem' }}>{articles.length} saved article{articles.length !== 1 ? 's' : ''}</p>
+        <p style={{ fontSize: '11px', color: '#9a9085', margin: '0 0 1.25rem' }}>{articles.length} saved article{articles.length !== 1 ? 's' : ''}</p>
         {articles.map((a: any, i: number) => <FeedCard key={i} article={a} />)}
       </div>
     )
@@ -320,11 +306,7 @@ export default function AccountPage() {
   function NewTab() {
     if (newLoading) return <Spinner />
     if (!newArticles.length) return <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-slate)' }}>No articles yet.</div>
-    return (
-      <div>
-        {newArticles.map((a: any, i: number) => <FeedCard key={i} article={a} />)}
-      </div>
-    )
+    return <div>{newArticles.map((a: any, i: number) => <FeedCard key={i} article={a} />)}</div>
   }
 
   function CommunityTab() {
@@ -431,32 +413,24 @@ export default function AccountPage() {
     }
   }
 
-  const NAV: { id: Tab; label: string }[] = [
-    { id: 'feed', label: 'My Feed' },
-    { id: 'saved', label: 'Saved' },
-    { id: 'new', label: 'New' },
-    { id: 'community', label: 'Community' },
-    { id: 'settings', label: 'Settings' },
-  ]
-
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f5f3ef' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
 
-        /* Sidebar nav */
+        /* Desktop sidebar */
         .snav-btn { display: flex; align-items: center; gap: 0.65rem; width: 100%; padding: 0.65rem 0.875rem; background: none; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: 600; color: #4A5563; text-align: left; transition: background 0.12s, color 0.12s; }
         .snav-btn:hover { background: rgba(14,26,43,0.06); color: #0e1a2b; }
         .snav-btn.active { background: #0e1a2b; color: #fff; }
-        .snav-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.4; flex-shrink: 0; }
+        .snav-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.35; flex-shrink: 0; }
         .snav-btn.active .snav-dot { background: #c9b28f; opacity: 1; }
 
-        /* Mobile subnav */
-        .mnav { display: none; position: sticky; top: 0; z-index: 30; background: #fff; border-bottom: 1px solid var(--color-border); overflow-x: auto; scrollbar-width: none; }
+        /* Mobile subnav — sits below site header, sticky */
+        .mnav { display: none; background: #fff; border-bottom: 1px solid var(--color-border); overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
         .mnav::-webkit-scrollbar { display: none; }
-        .mnav-inner { display: flex; padding: 0 1rem; gap: 0; min-width: max-content; }
-        .mnav-btn { padding: 0.875rem 1.1rem; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-size: 13px; font-weight: 600; color: #9a9085; white-space: nowrap; transition: color 0.15s, border-color 0.15s; letter-spacing: 0.01em; }
+        .mnav-inner { display: flex; padding: 0 0.75rem; }
+        .mnav-btn { padding: 0.8rem 0.875rem; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-size: 13px; font-weight: 600; color: #9a9085; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
         .mnav-btn.active { color: #0e1a2b; border-bottom-color: #c9b28f; }
         .mnav-btn:hover { color: #0e1a2b; }
 
@@ -472,76 +446,51 @@ export default function AccountPage() {
         @media (min-width: 769px) {
           .hub-mobile { display: none !important; }
           .hub-desktop { display: flex !important; }
-          .mnav { display: none !important; }
         }
       `}</style>
 
       {/* ── DESKTOP ── */}
       <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', alignItems: 'flex-start' }}>
 
-        {/* Left sidebar */}
-        <div style={{ width: 200, flexShrink: 0, position: 'sticky', top: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {/* Sidebar — uses position:sticky on its own wrapper */}
+        <div style={{ width: 200, flexShrink: 0 }}>
+          <div style={{ position: 'sticky', top: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
-          {/* Profile card */}
-          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.25rem', textAlign: 'center' }}>
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={firstName} style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)', margin: '0 auto 0.75rem', display: 'block' }} />
-            ) : (
-              <div style={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.75rem' }}>
-                <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0).toUpperCase()}</span>
+            {/* Profile card — name + username + member since only, no avatar */}
+            <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.25rem' }}>
+              <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.2rem', fontFamily: 'Georgia, serif' }}>{fullName || firstName}</p>
+              {profile?.username && <p style={{ fontSize: '12px', color: 'var(--color-gold)', margin: '0 0 0.3rem', fontWeight: 600 }}>@{profile.username}</p>}
+              <p style={{ fontSize: '11px', color: '#9a9085', margin: '0 0 0.75rem' }}>Member since {memberYear}</p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.75rem', borderTop: '1px solid var(--color-border)' }}>
+                <span style={{ fontSize: '11px', color: '#9a9085' }}>Newsletter</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-navy)' }}>{profile?.newsletter_subscribed !== false ? 'Active' : 'Off'}</span>
               </div>
-            )}
-            <p style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.15rem', fontFamily: 'Georgia, serif' }}>{fullName || firstName}</p>
-            {profile?.username && <p style={{ fontSize: '11px', color: 'var(--color-gold)', margin: '0 0 0.25rem', fontWeight: 600 }}>@{profile.username}</p>}
-            <p style={{ fontSize: '11px', color: '#9a9085', margin: 0 }}>Member since {memberYear}</p>
-          </div>
+            </div>
 
-          {/* Stats */}
-          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1rem' }}>
-            {[
-              { label: 'Saved', value: savedArticles.length || '—', action: () => setActiveTab('saved') },
-              { label: 'Newsletter', value: profile?.newsletter_subscribed !== false ? 'Active' : 'Off' },
-              { label: 'Member', value: memberYear },
-            ].map((s, i) => (
-              <div key={i} onClick={s.action} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: i < 2 ? '1px solid var(--color-border)' : 'none', cursor: s.action ? 'pointer' : 'default' }}>
-                <span style={{ fontSize: '12px', color: '#9a9085', fontWeight: 500 }}>{s.label}</span>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-navy)' }}>{s.value}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Nav */}
-          <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '0.4rem' }}>
-            {NAV.map(item => (
-              <button key={item.id} className={`snav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
-                <span className="snav-dot" />
-                {item.label}
+            {/* Nav */}
+            <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '0.4rem' }}>
+              {NAV.map(item => (
+                <button key={item.id} className={`snav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
+                  <span className="snav-dot" />
+                  {item.label}
+                </button>
+              ))}
+              <div style={{ height: 1, background: 'var(--color-border)', margin: '0.3rem 0.4rem' }} />
+              <button onClick={handleSignOut} className="snav-btn" style={{ color: '#9a9085' }}>
+                <span className="snav-dot" style={{ opacity: 0.25 }} />
+                Sign Out
               </button>
-            ))}
-            <div style={{ height: 1, background: 'var(--color-border)', margin: '0.3rem 0.4rem' }} />
-            <button onClick={handleSignOut} className="snav-btn" style={{ color: '#9a9085' }}>
-              <span className="snav-dot" style={{ opacity: 0.3 }} />
-              Sign Out
-            </button>
+            </div>
           </div>
         </div>
 
-        {/* Main feed column */}
+        {/* Main content */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          {/* Feed header — compact greeting */}
-          {activeTab === 'feed' && (
-            <div style={{ marginBottom: '1.25rem' }}>
-              <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9a9085', margin: 0 }}>Welcome back, {firstName}</p>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-navy)', margin: '0.2rem 0 0', fontFamily: 'Georgia, serif' }}>Your Member Feed</h2>
-            </div>
-          )}
-          {activeTab !== 'feed' && (
-            <div style={{ marginBottom: '1.25rem' }}>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif' }}>
-                {NAV.find(n => n.id === activeTab)?.label}
-              </h2>
-            </div>
-          )}
+          <div style={{ marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif' }}>
+              {activeTab === 'feed' ? 'Your Feed' : NAV.find(n => n.id === activeTab)?.label}
+            </h2>
+          </div>
           <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.5rem' }}>
             {renderContent()}
           </div>
@@ -551,33 +500,8 @@ export default function AccountPage() {
       {/* ── MOBILE ── */}
       <div className="hub-mobile" style={{ display: 'none' }}>
 
-        {/* Compact profile header */}
-        <div style={{ backgroundColor: 'var(--color-navy)', padding: '1rem 1.25rem 1.1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
-            {avatarUrl ? (
-              <img src={avatarUrl} alt={firstName} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-gold)', flexShrink: 0 }} />
-            ) : (
-              <div style={{ width: 40, height: 40, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.1)', border: '2px solid var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-gold)' }}>{firstName.charAt(0).toUpperCase()}</span>
-              </div>
-            )}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: '14px', fontWeight: 700, color: '#fff', margin: '0 0 0.1rem', fontFamily: 'Georgia, serif' }}>{fullName || firstName}</p>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-                {profile?.username ? `@${profile.username} · ` : ''}Member since {memberYear}
-              </p>
-            </div>
-            {activeTab === 'feed' && (
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: '0 0 0.1rem' }}>Saved</p>
-                <p style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-gold)', margin: 0, fontFamily: 'Georgia, serif' }}>{savedArticles.length || '—'}</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Sticky text subnav */}
-        <nav className="mnav">
+        {/* Sticky subnav — sits directly below the site header, no profile header */}
+        <nav className="mnav" style={{ position: 'sticky', top: 0, zIndex: 30 }}>
           <div className="mnav-inner">
             {NAV.slice(0, 4).map(item => (
               <button key={item.id} className={`mnav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
@@ -590,16 +514,13 @@ export default function AccountPage() {
           </div>
         </nav>
 
-        {/* Content */}
+        {/* Content — no labels, straight into feed */}
         <div style={{ padding: '1.25rem' }}>
-          {activeTab === 'feed' && (
-            <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9a9085', margin: '0 0 1.25rem' }}>Your Member Feed</p>
-          )}
           {renderContent()}
         </div>
       </div>
 
-      {/* More drawer (mobile) */}
+      {/* More drawer */}
       {moreOpen && (
         <>
           <div className="more-overlay" onClick={() => setMoreOpen(false)} />
@@ -609,7 +530,7 @@ export default function AccountPage() {
               <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-navy)' }}>Settings</span>
               <span style={{ color: '#9a9085' }}>›</span>
             </button>
-            <button onClick={() => { handleSignOut() }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '1rem 0', background: 'none', border: 'none', cursor: 'pointer', marginTop: '0.25rem' }}>
+            <button onClick={handleSignOut} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '1rem 0', background: 'none', border: 'none', cursor: 'pointer', marginTop: '0.25rem' }}>
               <span style={{ fontSize: '15px', fontWeight: 600, color: '#a32d2d' }}>Sign Out</span>
             </button>
           </div>
