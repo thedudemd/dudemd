@@ -450,11 +450,11 @@ export default function AccountPage() {
       `}</style>
 
       {/* ── DESKTOP ── */}
-      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', minHeight: 'calc(100vh - 4rem)' }}>
+      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem' }}>
 
         {/* Sidebar — uses position:sticky on its own wrapper */}
-        <div style={{ width: 200, flexShrink: 0, position: 'relative' }}>
-          <div style={{ position: 'sticky', top: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ width: 200, flexShrink: 0 }}>
+          <div style={{ position: 'sticky', top: '24px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
             {/* Profile card — name + username + member since only, no avatar */}
             <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.25rem' }}>
