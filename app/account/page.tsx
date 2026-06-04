@@ -256,7 +256,7 @@ export default function AccountPage() {
           {article.cover_image_url && (
             <img src={article.cover_image_url} alt={article.title} style={{ width: 90, height: 66, objectFit: 'cover', flexShrink: 0, borderRadius: 3 }} />
           )}
-          <div style={{ flex: 1, minWidth: 0, marginLeft: 0 }}>
+          <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', height: '100%' }}>
             {cat?.name && <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.35rem' }}>{cat.name}</p>}
             <p style={{ fontSize: '15px', fontWeight: 700, color: 'var(--color-navy)', margin: '0 0 0.35rem', lineHeight: 1.35, fontFamily: 'Georgia, serif' }}>{article.title}</p>
             {article.excerpt && <p style={{ fontSize: '13px', color: 'var(--color-slate)', margin: '0 0 0.45rem', lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{article.excerpt}</p>}
@@ -450,11 +450,11 @@ export default function AccountPage() {
       `}</style>
 
       {/* ── DESKTOP ── */}
-      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem' }}>
+      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', height: 'calc(100vh - 155px)', overflow: 'hidden' }}>
 
         {/* Sidebar — uses position:sticky on its own wrapper */}
-        <div style={{ width: 200, flexShrink: 0, alignSelf: 'flex-start' }}>
-          <div style={{ position: 'sticky', top: '2rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ width: 200, flexShrink: 0, alignSelf: 'flex-start', flexShrink: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
             {/* Profile card — name + username + member since only, no avatar */}
             <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.25rem' }}>
@@ -485,7 +485,7 @@ export default function AccountPage() {
         </div>
 
         {/* Main content */}
-        <div style={{ flex: 1, minWidth: 0, marginLeft: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', height: '100%' }}>
           <div style={{ marginBottom: '1rem' }}>
             <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif' }}>
               {activeTab === 'feed' ? 'Your Feed' : NAV.find(n => n.id === activeTab)?.label}
