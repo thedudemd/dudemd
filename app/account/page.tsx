@@ -414,7 +414,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f5f3ef' }}>
+    <div style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f5f3ef' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
@@ -453,7 +453,7 @@ export default function AccountPage() {
       <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', height: 'calc(100vh - 155px)', overflow: 'hidden' }}>
 
         {/* Sidebar — uses position:sticky on its own wrapper */}
-        <div style={{ width: 200, flexShrink: 0, alignSelf: 'flex-start', flexShrink: 0 }}>
+        <div style={{ width: 200, flexShrink: 0 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
             {/* Profile card — name + username + member since only, no avatar */}
