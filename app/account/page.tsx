@@ -501,7 +501,7 @@ export default function AccountPage() {
       <div className="hub-mobile" style={{ display: 'none' }}>
 
         {/* Sticky subnav — sits directly below the site header, no profile header */}
-        <nav className="mnav" style={{ position: 'sticky', top: 0, zIndex: 30 }}>
+        <nav className="mnav" style={{ position: 'sticky', top: 118, zIndex: 30 }}>
           <div className="mnav-inner">
             {NAV.slice(0, 4).map(item => (
               <button key={item.id} className={`mnav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
