@@ -1,251 +1,133 @@
-// @ts-nocheck
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { supabase } from '@/lib/supabase/client'
-import { notFound } from 'next/navigation'
-import ArticleContent from '@/components/article/ArticleContent'
-import StandardLayout from '@/components/article/layouts/StandardLayout'
-import MagazineLayout from '@/components/article/layouts/MagazineLayout'
-import LongFormLayout from '@/components/article/layouts/LongFormLayout'
+'use client'
 
-export const revalidate = 60
+import { useState } from 'react'
+import Image from 'next/image'
+import { signInWithGoogle, signInWithApple, signInWithFacebook, signInWithMagicLink } from '@/lib/auth/supabase-auth'
 
-async function getArticle(slug: string) {
-  const { data } = await supabase
-    .from('articles')
-    .select('*, authors(name, slug, avatar_url, title, bio, twitter, instagram, linkedin, website), categories!articles_category_id_fkey(name, slug)')
-    .eq('slug', slug)
-    .eq('published', true)
-    .single()
-  return data
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" style={{width:20,height:20,flexShrink:0}} xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+  )
 }
 
-async function getRelated(categorySlug: string, currentSlug: string) {
-  const { data: category } = await supabase
-    .from('categories')
-    .select('id')
-    .eq('slug', categorySlug)
-    .single()
-  if (!category) return []
-  const { data } = await supabase
-    .from('articles')
-    .select('*, authors(name), categories!articles_category_id_fkey(name, slug)')
-    .eq('category_id', category.id)
-    .eq('published', true)
-    .neq('slug', currentSlug)
-    .limit(3)
-  return data || []
+function AppleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" style={{width:20,height:20,flexShrink:0,fill:'#f7f4ee'}} xmlns="http://www.w3.org/2000/svg">
+      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+    </svg>
+  )
 }
 
-export async function generateMetadata({ params }): Promise<Metadata> {
-  const { slug, category } = await params
-  const article = await getArticle(slug)
-  if (!article) return {}
-  return {
-    title: article.social_title || article.meta_title || article.title,
-    description: article.meta_description || article.excerpt,
-    alternates: {
-      canonical: `https://www.dudemd.com/articles/${category}/${slug}`,
-    },
-    openGraph: {
-      type: 'article',
-      title: article.social_title || article.meta_title || article.title,
-      description: article.social_description || article.meta_description || article.excerpt,
-      url: `https://www.dudemd.com/articles/${category}/${slug}`,
-      siteName: 'DudeMD',
-      images: article.cover_image_url ? [{ url: article.cover_image_url, width: 1200, height: 630 }] : [],
-      publishedTime: article.published_at,
-      modifiedTime: article.updated_at && new Date(article.updated_at) > new Date(article.published_at) ? article.updated_at : article.published_at,
-      authors: article.authors?.name ? [article.authors.name] : [],
-    },
-    other: {
-      'fb:app_id': ['2107832130079548'],
-      'fb:pages': ['849615384891054'],
-      'article:publisher': ['https://www.facebook.com/MyDudeMD'],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: article.social_title || article.meta_title || article.title,
-      description: article.meta_description || article.excerpt,
-      images: article.cover_image_url ? [article.cover_image_url] : [],
-    },
-  }
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" style={{width:20,height:20,flexShrink:0,fill:'#fff'}} xmlns="http://www.w3.org/2000/svg">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    </svg>
+  )
 }
 
-export default async function ArticlePage({ params }: { params: Promise<{ slug: string; category: string }> }) {
-  const { slug, category } = await params
-  const article = await getArticle(slug)
-  if (!article) notFound()
-  const related = await getRelated(article.categories?.slug, slug)
+export default function SignInPage() {
+  const [email, setEmail] = useState('')
+  const [magicLinkSent, setMagicLinkSent] = useState(false)
+  const [loading, setLoading] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": article.title,
-    "description": article.excerpt,
-    "image": article.cover_image_url,
-    "datePublished": article.published_at,
-    "dateModified": article.updated_at && new Date(article.updated_at) > new Date(article.published_at) ? article.updated_at : article.published_at,
-    "author": {
-      "@type": "Person",
-      "name": article.authors?.name,
-      "url": article.authors?.website || `https://www.dudemd.com/author/${article.authors?.slug}`,
-      "image": article.authors?.avatar_url,
-      "jobTitle": article.authors?.title,
-      "sameAs": [
-        article.authors?.twitter,
-        article.authors?.instagram,
-        article.authors?.linkedin
-      ].filter(Boolean)
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "DudeMD",
-      "url": "https://www.dudemd.com",
-      "logo": { "@type": "ImageObject", "url": "https://www.dudemd.com/og-image.png" }
-    },
-    "mainEntityOfPage": { "@type": "WebPage", "@id": `https://www.dudemd.com/articles/${category}/${slug}` }
+  async function handleGoogle() {
+    try { setLoading('google'); setError(null); await signInWithGoogle() }
+    catch { setError('Google sign-in failed.'); setLoading(null) }
+  }
+  async function handleApple() {
+    try { setLoading('apple'); setError(null); await signInWithApple() }
+    catch { setError('Apple sign-in not yet available.'); setLoading(null) }
+  }
+  async function handleFacebook() {
+    try { setLoading('facebook'); setError(null); await signInWithFacebook() }
+    catch { setError('Facebook sign-in not yet available.'); setLoading(null) }
+  }
+  async function handleMagicLink(e: React.FormEvent) {
+    e.preventDefault()
+    if (!email) return
+    try {
+      setLoading('magic'); setError(null)
+      await signInWithMagicLink(email)
+      setMagicLinkSent(true)
+    } catch {
+      setError('Could not send magic link.')
+    } finally { setLoading(null) }
   }
 
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.dudemd.com" },
-      { "@type": "ListItem", "position": 2, "name": article.categories?.name, "item": `https://www.dudemd.com/category/${article.categories?.slug}` },
-      { "@type": "ListItem", "position": 3, "name": article.title, "item": `https://www.dudemd.com/articles/${category}/${slug}` }
-    ]
-  }
-
-  const faqSchema = article.faq_items && Array.isArray(article.faq_items) && article.faq_items.length > 0 ? {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": article.faq_items.map((item: any) => ({
-      "@type": "Question",
-      "name": item.question,
-      "acceptedAnswer": { "@type": "Answer", "text": item.answer }
-    }))
-  } : null
-
-  const schemas = [articleSchema, breadcrumbSchema]
-  if (faqSchema) schemas.push(faqSchema)
+  const btn: React.CSSProperties = {display:'flex',alignItems:'center',justifyContent:'center',gap:10,padding:'12px 16px',borderRadius:8,fontSize:13,fontWeight:500,cursor:'pointer',border:'none',width:'100%'}
 
   return (
-    <main>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
-      <style>{`
-        .article-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-        .article-sidebar { order: 0; }
-        @media (min-width: 900px) {
-          .article-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 4rem; }
-          .article-sidebar { position: sticky; top: 6rem; }
-        }
-      `}</style>
+    <div style={{display:'flex',width:'100%',minHeight:'calc(100vh - 120px)',fontFamily:"system-ui,sans-serif"}}>
 
-      {article.layout === 'magazine' ? (
-        <MagazineLayout article={article}>
-          <div />
-        </MagazineLayout>
-      ) : article.layout === 'longform' ? (
-        <LongFormLayout article={article}>
-          <div />
-        </LongFormLayout>
-      ) : (
-        <>{article.show_hero !== false && article.cover_image_url && (<div style={{ width: '100%', overflow: 'hidden' }}><img src={article.cover_image_url} alt={`Cover image for ${article.title}`} style={{ width: '100%', height: 'auto', maxHeight: '520px', objectFit: 'cover', objectPosition: 'center center', display: 'block' }} /></div>)}</>
-      )}
+      {/* LEFT */}
+      <div style={{width:'45%',backgroundColor:'#f7f4ee',display:'flex',flexDirection:'column',justifyContent:'center',padding:'40px 48px',boxSizing:'border-box'}}>
+        <div style={{display:'flex',flexDirection:'column',gap:18,maxWidth:'320px',width:'100%',margin:'0 auto'}}>
 
-      <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
-        <div className="article-grid" style={{ alignItems: 'start' }}>
-          <article>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <Link href="/" style={{ fontSize: '12px', color: '#9a9085', textDecoration: 'none' }}>Home</Link>
-              <span style={{ fontSize: '12px', color: '#9a9085' }}>›</span>
-              <Link href={`/category/${article.categories?.slug}`} style={{ fontSize: '12px', color: '#9a9085', textDecoration: 'none' }}>{article.categories?.name}</Link>
-              <span style={{ fontSize: '12px', color: '#9a9085' }}>›</span>
-              <span style={{ fontSize: '12px', color: 'var(--color-slate)' }}>{article.title}</span>
+          <h1 style={{fontSize:26,fontWeight:700,color:'#0e1a2b',margin:0,textAlign:'center'}}>Sign in</h1>
+
+          <div style={{display:'flex',justifyContent:'center'}}>
+            <Image src="/images/onepass-logo.png" alt="OnePass" width={170} height={52} style={{objectFit:'contain'}} priority />
+          </div>
+
+          <div style={{height:1,background:'#d1cfc9'}}/>
+
+          {error && <div style={{background:'#fdecea',color:'#a32d2d',border:'1px solid #f09595',borderRadius:8,padding:'10px 14px',fontSize:13}}>{error}</div>}
+
+          <div style={{display:'flex',flexDirection:'column',gap:9}}>
+            <button onClick={handleGoogle} disabled={loading!==null} style={{...btn,background:'#fff',border:'1px solid #d1cfc9',color:'#1B1D21'}}>
+              <GoogleIcon/>{loading==='google'?'Connecting…':'Continue with Google'}
+            </button>
+            <button onClick={handleApple} disabled={loading!==null} style={{...btn,background:'#1B1D21',color:'#f7f4ee'}}>
+              <AppleIcon/>{loading==='apple'?'Connecting…':'Continue with Apple'}
+            </button>
+            <button onClick={handleFacebook} disabled={loading!==null} style={{...btn,background:'#1877F2',color:'#fff'}}>
+              <FacebookIcon/>{loading==='facebook'?'Connecting…':'Continue with Facebook'}
+            </button>
+          </div>
+
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <div style={{flex:1,height:1,background:'#d1cfc9'}}/>
+            <span style={{fontSize:11,color:'#4A5563'}}>or</span>
+            <div style={{flex:1,height:1,background:'#d1cfc9'}}/>
+          </div>
+
+          {magicLinkSent ? (
+            <div style={{background:'#eef7ee',color:'#2d6a2d',border:'1px solid #b6ddb6',borderRadius:8,padding:14,fontSize:13,textAlign:'center'}}>
+              ✓ Magic link sent to <strong>{email}</strong>
             </div>
-
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
-              <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{article.categories?.name}</span>
-              <span style={{ fontSize: '12px', color: '#9a9085' }}>{article.read_time}</span>
+          ) : (
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              <label style={{fontSize:10,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.12em',color:'#4A5563'}}>Email address</label>
+              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{padding:'11px 14px',borderRadius:8,border:'1px solid #d1cfc9',fontSize:13,background:'#fff',color:'#0e1a2b',outline:'none',width:'100%',boxSizing:'border-box'}}/>
+              <button onClick={handleMagicLink} disabled={loading!==null||!email} style={{...btn,background:'#0e1a2b',color:'#f7f4ee',fontWeight:600,opacity:(!email||loading!==null)?0.5:1}}>
+                {loading==='magic'?'Sending…':'Send magic link'}
+              </button>
             </div>
+          )}
 
-            <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', lineHeight: 1.15, color: 'var(--color-navy)', marginBottom: '1.25rem' }}>
-              {article.title}
-            </h1>
+          <p style={{fontSize:11,color:'#4A5563',textAlign:'center',margin:0,lineHeight:1.6}}>
+            By signing in you agree to our <a href="/terms" style={{color:'#0e1a2b'}}>Terms</a> and <a href="/privacy" style={{color:'#0e1a2b'}}>Privacy Policy</a>.
+          </p>
 
-            <p style={{ fontSize: '18px', color: 'var(--color-slate)', lineHeight: 1.65, marginBottom: '1.5rem', fontStyle: 'italic', borderLeft: '3px solid var(--color-gold)', paddingLeft: '1rem' }}>
-              {article.excerpt}
-            </p>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--color-border)', marginBottom: '2rem' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {article.authors?.avatar_url ? (
-                    <img src={article.authors.avatar_url} alt={article.authors.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                  ) : (
-                    <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-gold)' }}>{article.authors?.name?.charAt(0)}</span>
-                  )}
-              </div>
-              <div>
-                <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-navy)', margin: 0 }}>
-                  {article.authors?.slug ? (
-                    <Link href={`/authors/${article.authors.slug}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{article.authors.name}</Link>
-                  ) : article.authors?.name}
-                </p>
-                <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>{new Date(article.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                {article.updated_at && new Date(article.updated_at) > new Date(article.published_at) && <p style={{ fontSize: '11px', color: '#9a9085', margin: '2px 0 0' }}>Updated: {new Date(article.updated_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>}
-              </div>
-            </div>
-
-            <ArticleContent article={article} slug={slug} category={category} relatedArticles={related} />
-          </article>
-
-          <aside className="article-sidebar">
-            <div style={{ backgroundColor: 'var(--color-navy)', padding: '1.5rem', marginBottom: '2rem' }}>
-              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.5rem' }}>Free Newsletter</p>
-              <p style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-cream)', lineHeight: 1.3, marginBottom: '1rem' }}>Men&apos;s health that doesn&apos;t waste your time.</p>
-              <input type="email" placeholder="your@email.com" style={{ width: '100%', padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-cream)', outline: 'none', fontSize: '14px', marginBottom: '0.5rem', boxSizing: 'border-box' }} />
-              <button style={{ width: '100%', padding: '0.75rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>Join Free</button>
-            </div>
-
-            {related.length > 0 && (
-              <div>
-                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1.25rem' }}>Related Articles</p>
-                {related.map((a) => (
-                  <Link key={a.slug} href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ display: 'flex', gap: '0.75rem', textDecoration: 'none', marginBottom: '1.25rem', alignItems: 'start' }}>
-                    <img src={a.cover_image_url} alt={`${a.title} thumbnail`} style={{ width: '72px', height: '54px', objectFit: 'cover', flexShrink: 0 }} />
-                    <div>
-                      <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.25rem' }}>{a.categories?.name}</p>
-                      <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', lineHeight: 1.3, margin: 0 }}>{a.title}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </aside>
+          <p style={{fontSize:10,color:'#4A5563',textAlign:'center',margin:0}}>© {new Date().getFullYear()} DudeMD. A Rise Media Network publication.</p>
         </div>
       </div>
 
-      {related.length > 0 && (
-        <section style={{ borderTop: '1px solid var(--color-border)', padding: '3rem 0', backgroundColor: 'var(--color-cream)' }}>
-          <div className="container-content">
-            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.25rem', color: 'var(--color-navy)', marginBottom: '2rem' }}>More to Read</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '2rem' }}>
-              {related.map((a) => (
-                <article key={a.slug}>
-                  <Link href={`/articles/${a.categories?.slug}/${a.slug}`}>
-                    <img src={a.cover_image_url} alt={`${a.title} thumbnail`} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block', marginBottom: '1rem' }} />
-                  </Link>
-                  <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{a.categories?.name}</span>
-                  <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1.3, color: 'var(--color-navy)', marginTop: '0.4rem' }}>
-                    <Link href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
-                  </h3>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-    </main>
+      {/* RIGHT */}
+      <div style={{width:'55%',position:'relative',overflow:'hidden',background:'#0e1a2b',minHeight:'calc(100vh - 120px)'}}>
+        <video autoPlay muted loop playsInline style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'center top'}}>
+          <source src="https://res.cloudinary.com/dligiz9tp/video/upload/v1779320683/Modern_Wellness_For_Real_Life_3_dyoo0u.mp4" type="video/mp4"/>
+        </video>
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(to top,rgba(14,26,43,0.5) 0%,rgba(14,26,43,0.05) 40%,transparent 100%)'}}/>
+      </div>
+
+    </div>
   )
 }
