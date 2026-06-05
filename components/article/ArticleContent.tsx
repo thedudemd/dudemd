@@ -155,15 +155,8 @@ export default function ArticleContent({ article, slug, category, relatedArticle
   function ShareBar() {
     function handleFacebookShare(e: React.MouseEvent) {
       e.preventDefault()
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-      if (isMobile) {
-        window.location.href = `fb://share?u=${encoded}`
-        setTimeout(() => {
-          window.open(`https://www.facebook.com/dialog/share?app_id=2107832130079548&href=${encoded}&display=popup`, '_blank', 'noopener,width=600,height=600')
-        }, 2000)
-      } else {
-        window.open(`https://www.facebook.com/dialog/share?app_id=2107832130079548&href=${encoded}&display=popup`, '_blank', 'noopener,width=600,height=600')
-      }
+      const shareUrl = `https://facebook.com/dialog/share?app_id=2107832130079548&href=${encoded}&display=popup`
+      window.open(shareUrl, 'FacebookShare', 'width=600,height=400,resizable=yes,scrollbars=yes')
     }
 
     return (
