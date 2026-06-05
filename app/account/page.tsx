@@ -444,6 +444,7 @@ export default function AccountPage() {
           .mnav { display: block !important; }
         }
         @media (min-width: 769px) {
+          .hub-page { height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
           
           .hub-mobile { display: none !important; }
           .hub-desktop { display: flex !important; }
@@ -451,11 +452,11 @@ export default function AccountPage() {
       `}</style>
 
       {/* ── DESKTOP ── */}
-      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem' }}>
+      <div className="hub-desktop" style={{ display: 'flex', flex: 1, maxWidth: 1060, width: '100%', margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', overflow: 'hidden' }}>
 
         {/* Sidebar — uses position:sticky on its own wrapper */}
-        <div style={{ width: 200, flexShrink: 0 }}>
-          <div style={{ position: 'fixed', top: 160, width: 200, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ width: 200, flexShrink: 0, height: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
             {/* Profile card — name + username + member since only, no avatar */}
             <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.25rem' }}>
@@ -486,7 +487,7 @@ export default function AccountPage() {
         </div>
 
         {/* Main content */}
-        <div style={{ flex: 1, minWidth: 0, marginLeft: 228 }}>
+        <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', height: '100%', paddingRight: '0.5rem' }}>
           <div style={{ marginBottom: '1rem' }}>
             <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif' }}>
               {activeTab === 'feed' ? 'Your Feed' : NAV.find(n => n.id === activeTab)?.label}
@@ -502,7 +503,7 @@ export default function AccountPage() {
       <div className="hub-mobile" style={{ display: 'none' }}>
 
         {/* Sticky subnav — sits directly below the site header, no profile header */}
-        <nav className="mnav" style={{ position: 'fixed', top: 119, zIndex: 30, left: 0, right: 0 }}>
+        <nav className="mnav" style={{ position: 'fixed', top: 117, zIndex: 30, left: 0, right: 0 }}>
           <div className="mnav-inner">
             {NAV.slice(0, 4).map(item => (
               <button key={item.id} className={`mnav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
