@@ -414,7 +414,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div style={{ height: '100vh', overflow: 'hidden', backgroundColor: '#f5f3ef' }}>
+    <div className="hub-page" style={{ minHeight: '100vh', backgroundColor: '#f5f3ef' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
@@ -444,6 +444,7 @@ export default function AccountPage() {
           .mnav { display: block !important; }
         }
         @media (min-width: 769px) {
+          .hub-page { height: 100vh; overflow: hidden; }
           .hub-mobile { display: none !important; }
           .hub-desktop { display: flex !important; }
         }
