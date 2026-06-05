@@ -40,6 +40,12 @@ function EditArticleInner({ slug }: { slug: string }) {
   const imgInputRef = useRef<HTMLInputElement>(null)
   const suggestTimer = useRef<any>(null)
   const [showImgSearch, setShowImgSearch] = useState(false)
+  const [showLinkModal, setShowLinkModal] = useState(false)
+  const [linkUrl, setLinkUrl] = useState("")
+  const [linkSearch, setLinkSearch] = useState("")
+  const [linkResults, setLinkResults] = useState<any[]>([])
+  const [linkSearching, setLinkSearching] = useState(false)
+  const [linkTab, setLinkTab] = useState<"internal"|"external">("internal")
   const [imgSearchQuery, setImgSearchQuery] = useState('')
   const [imgSearchResults, setImgSearchResults] = useState<any[]>([])
   const [imgSearchLoading, setImgSearchLoading] = useState(false)
@@ -65,7 +71,7 @@ function EditArticleInner({ slug }: { slug: string }) {
   const editor = useEditor({
     extensions: [
       StarterKit, Underline, ResizableImage,
-      LinkExtension.configure({ openOnClick: false }),
+      LinkExtension.configure({ openOnClick: false, HTMLAttributes: { class: "article-link" } }),
       Placeholder.configure({ placeholder: 'Write your article here...' }),
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       TextStyle, Color, Highlight.configure({ multicolor: true }), Subscript, Superscript, CharacterCount, FontSize,
@@ -371,6 +377,9 @@ function EditArticleInner({ slug }: { slug: string }) {
                   <input ref={imgInputRef} type='file' accept='image/jpeg,image/png,image/webp,image/gif' style={{ display: 'none' }} onChange={handleImageUpload} />
                   <button type='button' onClick={() => imgInputRef.current?.click()} disabled={imgUploading} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', cursor: 'pointer' }}>{imgUploading ? 'Uploading...' : 'Image'}</button>
                   <button type='button' onClick={() => setShowImgSearch(true)} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #0e1a2b', backgroundColor: '#0e1a2b', color: '#f7f4ee', cursor: 'pointer' }}>Search Images</button>
+                  <button type='button' onClick={() => { const prev = editor?.getAttributes('link').href || ''; setLinkUrl(prev); setLinkTab('internal'); setLinkSearch(''); setLinkResults([]); setShowLinkModal(true); }} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #0e1a2b', backgroundColor: editor?.isActive('link') ? '#c9b28f' : '#fff', color: '#0e1a2b', cursor: 'pointer' }}>🔗 {editor?.isActive('link') ? 'Edit Link' : 'Link'}</button>
+                  {editor?.isActive('link') && <button type='button' onClick={() => editor.chain().focus().unsetLink().run()} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #c0392b', backgroundColor: '#fff', color: '#c0392b', cursor: 'pointer' }}>✕ Unlink</button>}
+                  <input type='color' title='Text Color' defaultValue='#000000' onChange={e => editor?.chain().focus().setColor(e.target.value).run()} style={{ width: 28, height: 28, padding: 0, border: '1px solid #ede8df', cursor: 'pointer', borderRadius: 2 }} />
                   <button type='button' onClick={() => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-right','float-none'); img.classList.add('float-left'); } }} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', cursor: 'pointer' }}>Img Left</button>
                   <button type='button' onClick={() => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-left','float-none'); img.classList.add('float-right'); } }} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', cursor: 'pointer' }}>Img Right</button>
                 </div>
@@ -569,6 +578,46 @@ function EditArticleInner({ slug }: { slug: string }) {
               </div>
             )}
             <p style={{ fontSize: '10px', color: '#4A5563', marginTop: '1.5rem', borderTop: '1px solid #ede8df', paddingTop: '1rem' }}>Photos by <a href='https://unsplash.com?utm_source=dudemd&utm_medium=referral' target='_blank' rel='noopener noreferrer' style={{ color: '#0e1a2b' }}>Unsplash</a></p>
+          </div>
+        </div>
+      )}
+
+      {showLinkModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+          <div style={{ backgroundColor: '#fff', width: '100%', maxWidth: '500px', padding: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <p style={{ fontWeight: 700, fontSize: '14px', color: '#0e1a2b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Insert Link</p>
+              <button onClick={() => setShowLinkModal(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>✕</button>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+              <button onClick={() => setLinkTab('internal')} style={{ flex: 1, padding: '0.5rem', fontWeight: 700, fontSize: '12px', border: '1px solid #ede8df', backgroundColor: linkTab === 'internal' ? '#0e1a2b' : '#fff', color: linkTab === 'internal' ? '#fff' : '#0e1a2b', cursor: 'pointer' }}>Internal Article</button>
+              <button onClick={() => setLinkTab('external')} style={{ flex: 1, padding: '0.5rem', fontWeight: 700, fontSize: '12px', border: '1px solid #ede8df', backgroundColor: linkTab === 'external' ? '#0e1a2b' : '#fff', color: linkTab === 'external' ? '#fff' : '#0e1a2b', cursor: 'pointer' }}>External URL</button>
+            </div>
+            {linkTab === 'internal' ? (
+              <div>
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                  <input autoFocus value={linkSearch} onChange={e => setLinkSearch(e.target.value)} placeholder='Search article title...' style={{ flex: 1, padding: '0.6rem', border: '1px solid #ede8df', fontSize: '13px', outline: 'none' }}
+                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); setLinkSearching(true); fetch('https://bicljoujevywrkzjeaoy.supabase.co/rest/v1/articles?select=title,slug,categories!articles_category_id_fkey(slug)&title=ilike.*' + encodeURIComponent(linkSearch) + '*&status=eq.published&limit=8', { headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g' } }).then(r=>r.json()).then(d=>{ setLinkResults(Array.isArray(d)?d:[]); setLinkSearching(false); }).catch(()=>setLinkSearching(false)); } }} />
+                  <button onClick={() => { setLinkSearching(true); fetch('https://bicljoujevywrkzjeaoy.supabase.co/rest/v1/articles?select=title,slug,categories!articles_category_id_fkey(slug)&title=ilike.*' + encodeURIComponent(linkSearch) + '*&status=eq.published&limit=8', { headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g' } }).then(r=>r.json()).then(d=>{ setLinkResults(Array.isArray(d)?d:[]); setLinkSearching(false); }).catch(()=>setLinkSearching(false)); }} style={{ padding: '0.6rem 1rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>{linkSearching ? '...' : 'Search'}</button>
+                </div>
+                {linkResults.length > 0 && (
+                  <div style={{ border: '1px solid #ede8df', maxHeight: '200px', overflowY: 'auto' }}>
+                    {linkResults.map((a, i) => (
+                      <button key={i} onClick={() => { editor?.chain().focus().setLink({ href: '/articles/' + a.categories?.slug + '/' + a.slug, target: '_self' }).run(); setShowLinkModal(false); }} style={{ display: 'block', width: '100%', padding: '0.6rem 0.75rem', textAlign: 'left', background: 'none', border: 'none', borderBottom: '1px solid #ede8df', fontSize: '13px', color: '#0e1a2b', cursor: 'pointer' }}>
+                        {a.title}
+                        <span style={{ display: 'block', fontSize: '11px', color: '#9a9085' }}>/articles/{a.categories?.slug}/{a.slug}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {linkResults.length === 0 && linkSearch && !linkSearching && <p style={{ fontSize: '12px', color: '#9a9085', margin: '0.5rem 0' }}>No results.</p>}
+              </div>
+            ) : (
+              <div>
+                <input autoFocus value={linkUrl} onChange={e => setLinkUrl(e.target.value)} placeholder='https://example.com' style={{ width: '100%', padding: '0.6rem', border: '1px solid #ede8df', fontSize: '13px', outline: 'none', boxSizing: 'border-box', marginBottom: '0.75rem' }} />
+                <button onClick={() => { if (linkUrl) { editor?.chain().focus().setLink({ href: linkUrl, target: '_blank' }).run(); setShowLinkModal(false); } }} style={{ width: '100%', padding: '0.75rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>Insert Link</button>
+              </div>
+            )}
           </div>
         </div>
       )}
