@@ -71,6 +71,11 @@ export default function AccountPage() {
   const [feedLoading, setFeedLoading] = useState(false)
   const [recentSlugs, setRecentSlugs] = useState<string[]>([])
   const [moreOpen, setMoreOpen] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordMsg, setPasswordMsg] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [savingPassword, setSavingPassword] = useState(false)
 
   useEffect(() => {
     const a = getTokenAndUser()
@@ -223,6 +228,21 @@ export default function AccountPage() {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.dudemd.com`
     })
     window.location.href = '/'
+  }
+
+  async function handlePasswordChange(e: React.FormEvent) {
+    e.preventDefault()
+    setPasswordMsg(''); setPasswordError('')
+    if (newPassword.length < 8) { setPasswordError('Password must be at least 8 characters.'); return }
+    if (newPassword !== confirmPassword) { setPasswordError('Passwords do not match.'); return }
+    setSavingPassword(true)
+    const { supabase } = await import('@/lib/supabase/client')
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    setSavingPassword(false)
+    if (error) { setPasswordError(error.message); return }
+    setPasswordMsg('Password updated successfully.')
+    setNewPassword(''); setConfirmPassword('')
+    setTimeout(() => setPasswordMsg(''), 4000)
   }
 
   function handleSignOut() {
@@ -381,6 +401,24 @@ export default function AccountPage() {
               : <button onClick={handleResubscribe} style={{ padding: '0.5rem 1rem', border: '1px solid var(--color-navy)', borderRadius: 4, backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Subscribe</button>
             }
           </div>
+        </div>
+        <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 6, padding: '1.5rem' }}>
+          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9a9085', margin: '0 0 1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>Change Password</p>
+          <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>New Password</label>
+              <input type="password" style={inp} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Minimum 8 characters" />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>Confirm New Password</label>
+              <input type="password" style={inp} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Re-enter new password" />
+            </div>
+            {passwordError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: 0 }}>{passwordError}</p>}
+            {passwordMsg && <p style={{ fontSize: '12px', color: '#2d7a3a', margin: 0 }}>✓ {passwordMsg}</p>}
+            <button type="submit" disabled={savingPassword} style={{ padding: '0.85rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', borderRadius: 4, cursor: 'pointer', opacity: savingPassword ? 0.6 : 1 }}>
+              {savingPassword ? 'Updating...' : 'Update Password'}
+            </button>
+          </form>
         </div>
         <button onClick={handleSignOut} style={{ width: '100%', padding: '0.85rem', backgroundColor: 'transparent', border: '1px solid var(--color-navy)', borderRadius: 4, color: 'var(--color-navy)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>Sign Out</button>
         {!showDelete ? (
