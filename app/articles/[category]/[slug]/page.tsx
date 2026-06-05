@@ -58,11 +58,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
       modifiedTime: article.updated_at && new Date(article.updated_at) > new Date(article.published_at) ? article.updated_at : article.published_at,
       authors: article.authors?.name ? [article.authors.name] : [],
     },
-    other: {
-      'fb:app_id': ['2107832130079548'],
-      'fb:pages': ['849615384891054'],
-      'article:publisher': ['https://www.facebook.com/MyDudeMD'],
-    },
+
     twitter: {
       card: 'summary_large_image',
       title: article.social_title || article.meta_title || article.title,
