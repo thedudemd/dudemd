@@ -444,8 +444,8 @@ export default function AccountPage() {
           .mnav { display: block !important; }
         }
         @media (min-width: 769px) {
-          .hub-page { height: 100vh; overflow: hidden; display: flex; flex-direction: column; overscroll-behavior: none; }
-          html, body { overscroll-behavior: none; }
+          .hub-page { min-height: 100vh; }
+          
           
           .hub-mobile { display: none !important; }
           .hub-desktop { display: flex !important; }
@@ -453,7 +453,7 @@ export default function AccountPage() {
       `}</style>
 
       {/* ── DESKTOP ── */}
-      <div className="hub-desktop" style={{ display: 'flex', flex: 1, maxWidth: 1060, width: '100%', margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', overflow: 'hidden' }}>
+      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, width: '100%', margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', height: 'calc(100vh - 130px)', overflow: 'hidden' }}>
 
         {/* Sidebar — uses position:sticky on its own wrapper */}
         <div style={{ width: 200, flexShrink: 0, height: '100%', overflow: 'hidden' }}>
