@@ -155,8 +155,18 @@ export default function ArticleContent({ article, slug, category, relatedArticle
   function ShareBar() {
     function handleFacebookShare(e: React.MouseEvent) {
       e.preventDefault()
-      const shareUrl = `https://facebook.com/dialog/share?app_id=2107832130079548&href=${encoded}&display=popup`
-      window.open(shareUrl, 'FacebookShare', 'width=600,height=400,resizable=yes,scrollbars=yes')
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      if (!isMobile) {
+        window.open(`https://facebook.com/dialog/share?app_id=2107832130079548&href=${encoded}&display=popup`, 'FacebookShare', 'width=600,height=400,resizable=yes,scrollbars=yes')
+      } else {
+        navigator.clipboard.writeText(url).catch(() => {})
+        const modal = document.createElement('div')
+        modal.id = 'fb-share-modal'
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1.5rem'
+        modal.innerHTML = `<div style="background:#fff;max-width:360px;width:100%;border-radius:12px;padding:2rem;text-align:center;font-family:system-ui,sans-serif"><p style="font-size:18px;font-weight:700;color:#0e1a2b;margin:0 0 0.5rem">Share to Facebook</p><p style="font-size:14px;color:#555;margin:0 0 1.5rem">To share this article in your Facebook App:</p><div style="background:#f7f4ee;border-radius:8px;padding:0.75rem;margin-bottom:1rem;font-size:13px;color:#333;word-break:break-all">${url}</div><button onclick="navigator.clipboard.writeText('${url}');this.textContent='✓ Link Copied!';this.style.background='#2d7a3a'" style="width:100%;padding:0.875rem;background:#c9b28f;color:#0e1a2b;font-weight:700;font-size:14px;border:none;border-radius:8px;cursor:pointer;margin-bottom:0.75rem">Copy Link</button><p style="font-size:13px;color:#555;margin:0 0 0.75rem">Tap below to open Facebook, then paste into "What's on your mind?"</p><a href="fb://feed" style="display:block;width:100%;padding:0.875rem;background:#1877F2;color:#fff;font-weight:700;font-size:14px;border-radius:8px;text-decoration:none;box-sizing:border-box">Open Facebook App</a><button onclick="document.getElementById('fb-share-modal').remove()" style="margin-top:1rem;background:none;border:none;color:#999;font-size:13px;cursor:pointer">Cancel</button></div>`
+        modal.onclick = (ev) => { if (ev.target === modal) modal.remove() }
+        document.body.appendChild(modal)
+      }
     }
 
     return (
