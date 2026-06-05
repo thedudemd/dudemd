@@ -451,7 +451,7 @@ export default function AccountPage() {
       `}</style>
 
       {/* ── DESKTOP ── */}
-      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', height: 'calc(100vh - 155px)', overflow: 'hidden' }}>
+      <div className="hub-desktop" style={{ display: 'flex', maxWidth: 1060, margin: '0 auto', padding: '2rem 1.5rem', gap: '1.75rem', height: 'calc(100vh - 110px)', overflow: 'hidden' }}>
 
         {/* Sidebar — uses position:sticky on its own wrapper */}
         <div style={{ width: 200, flexShrink: 0 }}>
@@ -486,7 +486,7 @@ export default function AccountPage() {
         </div>
 
         {/* Main content */}
-        <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', height: '100%', overscrollBehavior: 'contain' }}>
+        <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', height: '100%' }}>
           <div style={{ marginBottom: '1rem' }}>
             <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif' }}>
               {activeTab === 'feed' ? 'Your Feed' : NAV.find(n => n.id === activeTab)?.label}
@@ -502,7 +502,7 @@ export default function AccountPage() {
       <div className="hub-mobile" style={{ display: 'none' }}>
 
         {/* Sticky subnav — sits directly below the site header, no profile header */}
-        <nav className="mnav" style={{ position: 'fixed', top: 117, zIndex: 30, left: 0, right: 0 }}>
+        <nav className="mnav" style={{ position: 'fixed', top: 118, zIndex: 30, left: 0, right: 0 }}>
           <div className="mnav-inner">
             {NAV.slice(0, 4).map(item => (
               <button key={item.id} className={`mnav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
