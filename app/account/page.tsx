@@ -414,7 +414,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="hub-page" style={{ minHeight: '100vh', backgroundColor: '#f5f3ef' }}>
+    <div className="hub-page" style={{ backgroundColor: '#f5f3ef' }}>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg) } }
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
@@ -502,7 +502,7 @@ export default function AccountPage() {
       <div className="hub-mobile" style={{ display: 'none' }}>
 
         {/* Sticky subnav — sits directly below the site header, no profile header */}
-        <nav className="mnav" style={{ position: 'sticky', top: 0, zIndex: 30 }}>
+        <nav className="mnav" style={{ position: 'fixed', top: 118, zIndex: 30, left: 0, right: 0 }}>
           <div className="mnav-inner">
             {NAV.slice(0, 4).map(item => (
               <button key={item.id} className={`mnav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
@@ -516,7 +516,7 @@ export default function AccountPage() {
         </nav>
 
         {/* Content — no labels, straight into feed */}
-        <div style={{ padding: '1.25rem' }}>
+        <div style={{ padding: '1.25rem', paddingTop: '4rem' }}>
           {renderContent()}
         </div>
       </div>
