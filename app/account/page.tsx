@@ -486,7 +486,7 @@ export default function AccountPage() {
         </div>
 
         {/* Main content */}
-        <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', height: '100%' }}>
+        <div style={{ flex: 1, minWidth: 0, overflowY: 'auto', height: '100%', overscrollBehavior: 'contain' }}>
           <div style={{ marginBottom: '1rem' }}>
             <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--color-navy)', margin: 0, fontFamily: 'Georgia, serif' }}>
               {activeTab === 'feed' ? 'Your Feed' : NAV.find(n => n.id === activeTab)?.label}
