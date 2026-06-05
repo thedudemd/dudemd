@@ -155,7 +155,18 @@ export default function ArticleContent({ article, slug, category, relatedArticle
   function ShareBar() {
     function handleFacebookShare(e: React.MouseEvent) {
       e.preventDefault()
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encoded}&display=popup`, '_blank', 'noopener')
+      const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encoded}`
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      if (isMobile) {
+        // Try to open Facebook app directly to post composer via universal link
+        window.location.href = `fb://facewebmodal/f?href=${encoded}`
+        // Fall back to sharer.php in browser after short delay if app doesn't open
+        setTimeout(() => {
+          window.open(shareUrl, '_blank', 'noopener')
+        }, 1500)
+      } else {
+        window.open(shareUrl, '_blank', 'noopener,width=600,height=600')
+      }
     }
 
     return (
