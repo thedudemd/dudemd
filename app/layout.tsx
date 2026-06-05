@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import Nav from '@/components/layout/Nav'
@@ -108,7 +109,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GoogleOneTap />
         <main className="min-h-screen">{children}</main>
         <Footer />
-      </body>
+      <GoogleAnalytics gaId="G-FRVXC9JBB4" />
+    </body>
     </html>
   )
 }
