@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
           .select('onboarding_complete')
           .eq('id', session.user.id)
           .single()
-        if (profile === null) {
+        if (!profile?.onboarding_complete) {
           return NextResponse.redirect(`${origin}/welcome?uid=${session.user.id}`)
         }
       }
