@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     default: "DudeMD — Modern Men's Wellness for Real Life",
     template: '%s | DudeMD',
   },
-  description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
+  description: "DudeMD covers the many dimensions of men's well-being — from health and recovery to mindset, work, money, relationships, and daily life — in a practical, real-world way.",
   metadataBase: new URL('https://www.dudemd.com'),
   openGraph: {
     type: 'website',
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     url: 'https://www.dudemd.com',
     siteName: 'DudeMD',
     title: "DudeMD — Modern Men's Wellness for Real Life",
-    description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
+    description: "DudeMD covers the many dimensions of men's well-being — from health and recovery to mindset, work, money, relationships, and daily life — in a practical, real-world way.",
     images: [
       {
         url: '/og-image.png',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     site: '@mydudemd',
     creator: '@mydudemd',
     title: "DudeMD — Modern Men's Wellness for Real Life",
-    description: "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way.",
+    description: "DudeMD covers the many dimensions of men's well-being — from health and recovery to mindset, work, money, relationships, and daily life — in a practical, real-world way.",
     images: ['/og-image.png'],
   },
 
@@ -57,7 +57,7 @@ const organizationSchema = {
     "https://facebook.com/MyDudeMD",
     "https://tiktok.com/@TheDudeMd"
   ],
-  "description": "DudeMD is a men's wellness media brand covering the many dimensions of well-being, from health and recovery to mindset, work, money, relationships, and daily life - in a real practical way."
+  "description": "DudeMD covers the many dimensions of men's well-being — from health and recovery to mindset, work, money, relationships, and daily life — in a practical, real-world way."
 }
 
 const websiteSchema = {
