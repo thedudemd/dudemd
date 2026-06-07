@@ -450,7 +450,7 @@ export default function AccountPage() {
             {emailError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: 0 }}>{emailError}</p>}
             {emailMsg && <p style={{ fontSize: '12px', color: '#2d7a3a', margin: 0 }}>✓ {emailMsg}</p>}
             {codeSuccess && <p style={{ fontSize: '12px', color: '#2d7a3a', margin: 0 }}>✓ Email updated successfully.</p>}
-            {showCodeEntry && !codeSuccess && (
+            {emailMsg && !codeSuccess && (
               <form onSubmit={handleCodeConfirm} style={{ marginTop: '0.75rem', padding: '1rem', backgroundColor: 'var(--color-cream)', borderRadius: 4 }}>
                 <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-navy)', margin: '0 0 0.5rem' }}>Enter the 6-digit code from your email:</p>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
