@@ -415,7 +415,7 @@ export default function AccountPage() {
           <form onSubmit={handleEmailChange} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>New Email Address</label>
-              <input type="email" style={inp} value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder="Enter new email address" />
+              <input type="email" style={inp} defaultValue={newEmail} onBlur={e => setNewEmail(e.target.value)} placeholder="Enter new email address" />
             </div>
             {emailError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: 0 }}>{emailError}</p>}
             {emailMsg && <p style={{ fontSize: '12px', color: '#2d7a3a', margin: 0 }}>✓ {emailMsg}</p>}
