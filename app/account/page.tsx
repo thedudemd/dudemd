@@ -365,29 +365,6 @@ export default function AccountPage() {
     finally { setEmailSending(false) }
   }
 
-  async function handleCodeConfirm(e: React.FormEvent) {
-    e.preventDefault()
-    if (!confirmCode || !auth?.uid || !pendingEmail) return
-    setCodeLoading(true); setCodeError('')
-    try {
-      const res = await fetch('/api/auth/confirm-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: confirmCode, userId: auth.uid, newEmail: pendingEmail })
-      })
-      const data = await res.json()
-      if (data.success) {
-        setCodeSuccess(true)
-        setProfile({ ...profile, email: pendingEmail })
-        setShowCodeEntry(false)
-        setEmailMsg('')
-        setConfirmCode('')
-      } else {
-        setCodeError(data.error || 'Invalid code.')
-      }
-    } catch { setCodeError('Something went wrong.') }
-    finally { setCodeLoading(false) }
-  }
 
   function SettingsTab() {
     const inp: any = { width: '100%', padding: '0.8rem 1rem', border: '1px solid var(--color-border)', borderRadius: 4, fontSize: '14px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit', color: 'var(--color-navy)' }
@@ -444,25 +421,7 @@ export default function AccountPage() {
             </div>
             {emailError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: 0 }}>{emailError}</p>}
             {emailMsg && <p style={{ fontSize: '12px', color: '#2d7a3a', margin: 0 }}>✓ {emailMsg}</p>}
-            {codeSuccess && <p style={{ fontSize: '12px', color: '#2d7a3a', margin: 0 }}>✓ Email updated successfully.</p>}
-            {emailMsg && !codeSuccess && (
-              <form onSubmit={handleCodeConfirm} style={{ marginTop: '0.75rem', padding: '1rem', backgroundColor: 'var(--color-cream)', borderRadius: 4 }}>
-                <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-navy)', margin: '0 0 0.5rem' }}>Enter the 6-digit code from your email:</p>
-                <input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={6}
-                    value={confirmCode}
-                    onChange={e => setConfirmCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-                    placeholder="000000"
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: 4, fontSize: '1.2rem', letterSpacing: '0.3em', textAlign: 'center', outline: 'none', backgroundColor: '#fff', color: 'var(--color-navy)', boxSizing: 'border-box', display: 'block', marginBottom: '0.5rem' }}
-                  />
-                  <button type="submit" disabled={codeLoading || confirmCode.length !== 6} style={{ width: '100%', padding: '0.75rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', borderRadius: 4, cursor: 'pointer', display: 'block', opacity: confirmCode.length !== 6 || codeLoading ? 0.5 : 1 }}>
-                    {codeLoading ? 'Confirming...' : 'Confirm Email Change'}
-                  </button>
-                {codeError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: '0.5rem 0 0' }}>{codeError}</p>}
-              </form>
-            )}
+
             <button type="submit" disabled={emailSending || !newEmail} style={{ padding: '0.85rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', borderRadius: 4, cursor: 'pointer', opacity: emailSending || !newEmail ? 0.6 : 1 }}>
               {emailSending ? 'Sending...' : 'Send Confirmation Email'}
             </button>
