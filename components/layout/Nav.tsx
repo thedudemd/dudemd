@@ -142,6 +142,8 @@ export default function Nav() {
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
       document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.dudemd.com`
     })
+    localStorage.removeItem('dudemd-auth')
+    localStorage.removeItem('sb-bicljoujevywrkzjeaoy-auth-token')
     window.location.href = '/signin'
   }
 
