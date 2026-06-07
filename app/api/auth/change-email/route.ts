@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     html: `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; background: #0e1a2b; padding: 2rem;">
         <div style="text-align: center; margin-bottom: 2rem;">
-          <img src="https://www.dudemd.com/dude-md-email.svg" alt="DudeMD" style="height: 64px; width: auto;" />
+          <img src="https://bicljoujevywrkzjeaoy.supabase.co/storage/v1/object/public/media/article-images/1780803524618-pt9sjxvtbh.png" alt="DudeMD" style="height: 64px; width: auto;" />
         </div>
         <div style="background: #f7f4ee; padding: 2rem; border-radius: 4px;">
           <p style="font-size: 1.1rem; color: #0e1a2b; font-weight: 700; margin: 0 0 1rem;">Confirm your new email address</p>
