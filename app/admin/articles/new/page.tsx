@@ -64,6 +64,31 @@ function NewArticleInner() {
   const [fullscreen, setFullscreen] = useState(false)
   const searchParams = useSearchParams()
 
+  // Step A: sidebar section collapse state
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    coverImage: false, settings: false, seo: false, social: false, aiSuggestions: false, scores: false,
+    slugExcerpt: false, layout: false,
+  })
+  function toggleSection(key: string) {
+    setOpenSections(s => ({ ...s, [key]: !s[key] }))
+  }
+
+  // Step B: cover image Unsplash search state (separate from in-editor search)
+  const [coverSearchQuery, setCoverSearchQuery] = useState('')
+  const [coverSearchResults, setCoverSearchResults] = useState<any[]>([])
+  const [coverSearchLoading, setCoverSearchLoading] = useState(false)
+
+  async function searchCoverUnsplash(q: string) {
+    if (q.trim().length < 2) return
+    setCoverSearchLoading(true)
+    try {
+      const res = await fetch('/api/unsplash?query=' + encodeURIComponent(q) + '&page=1')
+      const data = await res.json()
+      setCoverSearchResults(data.results || [])
+    } catch(e) {}
+    setCoverSearchLoading(false)
+  }
+
   const editor = useEditor({
     extensions: [
       StarterKit, Underline, ResizableImage,
@@ -351,6 +376,30 @@ function NewArticleInner() {
   const inp: any = { width: '100%', padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit' }
   const lbl: any = { display: 'block', fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#4A5563', marginBottom: '0.5rem' }
 
+  // Collapsible sidebar section component
+  function SidebarSection({ sectionKey, title, summary, children }: { sectionKey: string, title: string, summary?: string, children: React.ReactNode }) {
+    const isOpen = openSections[sectionKey]
+    return (
+      <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df' }}>
+        <button
+          type="button"
+          onClick={() => toggleSection(sectionKey)}
+          style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+        >
+          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#0e1a2b' }}>{title}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {!isOpen && summary && <span style={{ fontSize: '11px', color: '#9a9085', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{summary}</span>}
+            <span style={{ fontSize: '14px', color: '#9a9085', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', display: 'inline-block' }}>▾</span>
+          </div>
+        </button>
+        {isOpen && <div style={{ padding: '0 1.25rem 1.25rem' }}>{children}</div>}
+      </div>
+    )
+  }
+
+  const categoryName = categories.find(c => c.id === form.category_id)?.name
+  const authorName = authors.find(a => a.id === form.author_id)?.name
+
   return (
     <>
       <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee' }}>
@@ -363,7 +412,7 @@ function NewArticleInner() {
             </div>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <span style={{ fontSize: '12px', color: 'rgba(247,244,238,0.5)' }}>{getWordCount()} words · {getReadTime()}</span>
-              {autoSaved && <span style={{ fontSize: '11px', color: 'rgba(247,244,238,0.4)', fontStyle: 'italic' }}>{autoSaved}</span>}
+              {autoSaved && <span style={{ fontSize: '11px', color: 'rgba(247,244,238,0.4)', fontStyle: 'italic' }}>{autoSaved} <span style={{ color: 'rgba(247,244,238,0.25)' }}>(local only)</span></span>}
               <button onClick={() => handleSave('draft')} disabled={saving} style={{ fontSize: '12px', fontWeight: 700, color: '#f7f4ee', backgroundColor: 'transparent', border: '1px solid rgba(247,244,238,0.3)', padding: '0.5rem 1rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Save Draft</button>
               <button onClick={() => handleSave('published')} disabled={saving} style={{ fontSize: '12px', fontWeight: 700, color: '#0e1a2b', backgroundColor: '#c9b28f', border: 'none', padding: '0.5rem 1rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{saving ? 'Publishing...' : 'Publish'}</button>
               <button onClick={() => setFullscreen(f => !f)} style={{ fontSize: '12px', fontWeight: 700, color: '#f7f4ee', backgroundColor: 'transparent', border: '1px solid rgba(247,244,238,0.3)', padding: '0.5rem 1rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{fullscreen ? '⊠ Exit' : '⛶ Focus'}</button>
@@ -372,46 +421,90 @@ function NewArticleInner() {
         </header>
         <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: fullscreen ? '1fr' : '1fr 300px', gap: '2rem', alignItems: 'start' }}>
+            {/* LEFT COLUMN */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ display: fullscreen ? 'none' : 'block', padding: '1.25rem', backgroundColor: '#f7f4ee', border: '1px solid #ede8df' }}>
-                <label style={lbl}>Choose Article Layout</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '0.5rem' }}>
-                  <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'standard' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'standard' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'standard' ? '#0e1a2b' : '#fff', color: form.layout === 'standard' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
-                    <div style={{ height: 55, marginBottom: '0.5rem', background: 'linear-gradient(180deg, #c9b28f 0%, #c9b28f 35%, #f7f4ee 35%)', borderRadius: 2 }} />
-                    <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Standard</div>
-                    <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>Best for most articles. Clean image on top. Ideal for SEO.</div>
-                  </button>
-                  <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'magazine' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'magazine' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'magazine' ? '#0e1a2b' : '#fff', color: form.layout === 'magazine' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
-                    <div style={{ height: 55, marginBottom: '0.5rem', background: 'linear-gradient(180deg, #4A5563 0%, #0e1a2b 100%)', borderRadius: 2, display: 'flex', alignItems: 'flex-end', padding: '0.4rem' }}>
-                      <div style={{ width: '70%', height: 6, background: '#f7f4ee', borderRadius: 2, opacity: 0.9 }} />
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Magazine</div>
-                    <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>Title overlays a full-screen image. Best for features and trending stories.</div>
-                  </button>
-                  <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'longform' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'longform' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'longform' ? '#0e1a2b' : '#fff', color: form.layout === 'longform' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
-                    <div style={{ height: 55, marginBottom: '0.5rem', borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ height: '45%', background: '#0e1a2b', display: 'flex', alignItems: 'center', padding: '0 0.4rem' }}>
-                        <div style={{ width: '60%', height: 4, background: '#c9b28f', borderRadius: 2 }} />
-                      </div>
-                      <div style={{ height: '55%', background: '#f7f4ee' }} />
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Long Form</div>
-                    <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>Dark intro header draws readers in. Best for deep dives. Strongest for AEO.</div>
-                  </button>
-                </div>
-              </div>
-              <div style={{ display: fullscreen ? 'none' : 'block' }}>
+
+              {/* TITLE — always visible */}
+              <div>
                 <label style={lbl}>Title</label>
                 <input name="title" value={form.title} onChange={handleTitleChange} placeholder="Article title..." style={{ ...inp, fontSize: '20px', fontWeight: 600 }} />
               </div>
-              <div style={{ display: fullscreen ? 'none' : 'block' }}>
-                <label style={lbl}>Slug</label>
-                <input name="slug" value={form.slug} onChange={handleChange} style={inp} />
-              </div>
-              <div style={{ display: fullscreen ? 'none' : 'block' }}>
-                <label style={lbl}>Excerpt</label>
-                <textarea name="excerpt" value={form.excerpt} onChange={handleChange} rows={2} placeholder="Brief description..." style={{ ...inp, resize: 'vertical' as const }} />
-              </div>
+
+              {/* SLUG + EXCERPT — collapsed by default */}
+              {!fullscreen && (
+                <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df' }}>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('slugExcerpt')}
+                    style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                  >
+                    <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#0e1a2b' }}>Slug & Excerpt</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {!openSections.slugExcerpt && form.slug && <span style={{ fontSize: '11px', color: '#9a9085', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{form.slug}</span>}
+                      <span style={{ fontSize: '14px', color: '#9a9085', transform: openSections.slugExcerpt ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', display: 'inline-block' }}>▾</span>
+                    </div>
+                  </button>
+                  {openSections.slugExcerpt && (
+                    <div style={{ padding: '0 1.25rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div>
+                        <label style={lbl}>Slug</label>
+                        <input name="slug" value={form.slug} onChange={handleChange} style={inp} />
+                      </div>
+                      <div>
+                        <label style={lbl}>Excerpt</label>
+                        <textarea name="excerpt" value={form.excerpt} onChange={handleChange} rows={2} placeholder="Brief description..." style={{ ...inp, resize: 'vertical' as const }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* LAYOUT — collapsed by default */}
+              {!fullscreen && (
+                <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df' }}>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection('layout')}
+                    style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                  >
+                    <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#0e1a2b' }}>Article Layout</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {!openSections.layout && <span style={{ fontSize: '11px', color: '#9a9085' }}>{form.layout.charAt(0).toUpperCase() + form.layout.slice(1)}</span>}
+                      <span style={{ fontSize: '14px', color: '#9a9085', transform: openSections.layout ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', display: 'inline-block' }}>▾</span>
+                    </div>
+                  </button>
+                  {openSections.layout && (
+                    <div style={{ padding: '0 1.25rem 1.25rem' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+                        <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'standard' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'standard' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'standard' ? '#0e1a2b' : '#fff', color: form.layout === 'standard' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
+                          <div style={{ height: 55, marginBottom: '0.5rem', background: 'linear-gradient(180deg, #c9b28f 0%, #c9b28f 35%, #f7f4ee 35%)', borderRadius: 2 }} />
+                          <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Standard</div>
+                          <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>Best for most articles. Clean image on top. Ideal for SEO.</div>
+                        </button>
+                        <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'magazine' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'magazine' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'magazine' ? '#0e1a2b' : '#fff', color: form.layout === 'magazine' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
+                          <div style={{ height: 55, marginBottom: '0.5rem', background: 'linear-gradient(180deg, #4A5563 0%, #0e1a2b 100%)', borderRadius: 2, display: 'flex', alignItems: 'flex-end', padding: '0.4rem' }}>
+                            <div style={{ width: '70%', height: 6, background: '#f7f4ee', borderRadius: 2, opacity: 0.9 }} />
+                          </div>
+                          <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Magazine</div>
+                          <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>Title overlays a full-screen image. Best for features and trending stories.</div>
+                        </button>
+                        <button type="button" onClick={() => setForm(f => ({ ...f, layout: 'longform' }))} style={{ padding: '0.75rem', border: '2px solid ' + (form.layout === 'longform' ? '#0e1a2b' : '#ede8df'), backgroundColor: form.layout === 'longform' ? '#0e1a2b' : '#fff', color: form.layout === 'longform' ? '#f7f4ee' : '#4A5563', cursor: 'pointer', textAlign: 'left' }}>
+                          <div style={{ height: 55, marginBottom: '0.5rem', borderRadius: 2, overflow: 'hidden' }}>
+                            <div style={{ height: '45%', background: '#0e1a2b', display: 'flex', alignItems: 'center', padding: '0 0.4rem' }}>
+                              <div style={{ width: '60%', height: 4, background: '#c9b28f', borderRadius: 2 }} />
+                            </div>
+                            <div style={{ height: '55%', background: '#f7f4ee' }} />
+                          </div>
+                          <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Long Form</div>
+                          <div style={{ fontSize: '11px', opacity: 0.75, lineHeight: 1.4 }}>Dark intro header draws readers in. Best for deep dives. Strongest for AEO.</div>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* EDITOR — always visible */}
               <div>
                 <label style={lbl}>Content</label>
                 <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' as const, padding: '0.5rem', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#f7f4ee' }}>
@@ -448,59 +541,98 @@ function NewArticleInner() {
                   <EditorContent editor={editor} />
                 </div>
               </div>
-              <div style={{ display: fullscreen ? 'none' : 'block', backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>AI Article Suggestions</p>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <input type="text" placeholder="Enter keyword..." value={suggestKeyword} onChange={(e) => setSuggestKeyword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && fetchSuggestions(suggestKeyword)} style={{ ...inp, flex: 1 }} />
-                  <button onClick={() => fetchSuggestions(suggestKeyword)} disabled={suggestLoading} style={{ padding: '0.75rem 1.25rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase' as const, cursor: 'pointer', whiteSpace: 'nowrap' as const }}>{suggestLoading ? 'Loading...' : 'SUGGEST'}</button>
+
+              {/* SEO SETTINGS — collapsed */}
+              {!fullscreen && (
+                <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df' }}>
+                  <button type="button" onClick={() => toggleSection('seo')} style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#0e1a2b' }}>SEO Settings</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {!openSections.seo && <span style={{ fontSize: '11px', padding: '0.1rem 0.4rem', backgroundColor: scoreBg(seoScore), color: scoreColor(seoScore), fontWeight: 700 }}>SEO {seoScore}/100</span>}
+                      <span style={{ fontSize: '14px', color: '#9a9085', transform: openSections.seo ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', display: 'inline-block' }}>▾</span>
+                    </div>
+                  </button>
+                  {openSections.seo && (
+                    <div style={{ padding: '0 1.25rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div>
+                        <label style={lbl}>Meta Title ({form.meta_title.length}/60)</label>
+                        <input name="meta_title" value={form.meta_title} onChange={handleChange} style={inp} />
+                      </div>
+                      <div>
+                        <label style={lbl}>Meta Description ({form.meta_description.length}/160)</label>
+                        <textarea name="meta_description" value={form.meta_description} onChange={handleChange} rows={3} style={{ ...inp, resize: 'vertical' as const }} />
+                      </div>
+                    </div>
+                  )}
                 </div>
-                {suggestions.existing.length > 0 && (
-                  <div style={{ marginTop: '1.25rem' }}>
-                    <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Existing Articles to Link</p>
-                    {suggestions.existing.map((article, idx) => (
-                      <div key={idx} style={{ fontSize: '13px', color: '#0e1a2b', marginBottom: '0.4rem', paddingLeft: '0.75rem', borderLeft: '2px solid #c9b28f' }}>• {article}</div>
-                    ))}
-                  </div>
-                )}
-                {suggestions.topics.length > 0 && (
-                  <div style={{ marginTop: '1.25rem' }}>
-                    <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>New Topic Ideas</p>
-                    {suggestions.topics.map((topic, idx) => (
-                      <div key={idx} style={{ fontSize: '13px', color: '#0e1a2b', marginBottom: '0.4rem', paddingLeft: '0.75rem', borderLeft: '2px solid #c9b28f' }}>• {topic}</div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div style={{ display: fullscreen ? 'none' : 'block', backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>SEO Settings</p>
-                <div style={{ marginBottom: '1rem' }}>
-                  <label style={lbl}>Meta Title ({form.meta_title.length}/60)</label>
-                  <input name="meta_title" value={form.meta_title} onChange={handleChange} style={inp} />
+              )}
+
+              {/* SOCIAL — collapsed */}
+              {!fullscreen && (
+                <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df' }}>
+                  <button type="button" onClick={() => toggleSection('social')} style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#0e1a2b' }}>Facebook & Social</span>
+                    <span style={{ fontSize: '14px', color: '#9a9085', transform: openSections.social ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', display: 'inline-block' }}>▾</span>
+                  </button>
+                  {openSections.social && (
+                    <div style={{ padding: '0 1.25rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div>
+                        <label style={lbl}>Social Title</label>
+                        <input name="social_title" value={form.social_title} onChange={handleChange} placeholder="Defaults to meta title" style={inp} />
+                      </div>
+                      <div>
+                        <label style={lbl}>Social Description</label>
+                        <textarea name="social_description" value={form.social_description} onChange={handleChange} rows={2} placeholder="Defaults to meta description" style={{ ...inp, resize: 'vertical' as const }} />
+                      </div>
+                      <div>
+                        <label style={lbl}>Facebook Teaser Text</label>
+                        <textarea name="facebook_teaser_text" value={form.facebook_teaser_text} onChange={handleChange} rows={3} placeholder="2-3 sentence teaser for Facebook posts..." style={{ ...inp, resize: 'vertical' as const }} />
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <label style={lbl}>Meta Description ({form.meta_description.length}/160)</label>
-                  <textarea name="meta_description" value={form.meta_description} onChange={handleChange} rows={3} style={{ ...inp, resize: 'vertical' as const }} />
+              )}
+
+              {/* AI SUGGESTIONS — collapsed */}
+              {!fullscreen && (
+                <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df' }}>
+                  <button type="button" onClick={() => toggleSection('aiSuggestions')} style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#0e1a2b' }}>AI Article Suggestions</span>
+                    <span style={{ fontSize: '14px', color: '#9a9085', transform: openSections.aiSuggestions ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', display: 'inline-block' }}>▾</span>
+                  </button>
+                  {openSections.aiSuggestions && (
+                    <div style={{ padding: '0 1.25rem 1.25rem' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                        <input type="text" placeholder="Enter keyword..." value={suggestKeyword} onChange={(e) => setSuggestKeyword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && fetchSuggestions(suggestKeyword)} style={{ ...inp, flex: 1 }} />
+                        <button onClick={() => fetchSuggestions(suggestKeyword)} disabled={suggestLoading} style={{ padding: '0.75rem 1.25rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase' as const, cursor: 'pointer', whiteSpace: 'nowrap' as const }}>{suggestLoading ? 'Loading...' : 'SUGGEST'}</button>
+                      </div>
+                      {suggestions.existing.length > 0 && (
+                        <div style={{ marginBottom: '1rem' }}>
+                          <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Existing Articles to Link</p>
+                          {suggestions.existing.map((article, idx) => (
+                            <div key={idx} style={{ fontSize: '13px', color: '#0e1a2b', marginBottom: '0.4rem', paddingLeft: '0.75rem', borderLeft: '2px solid #c9b28f' }}>• {article}</div>
+                          ))}
+                        </div>
+                      )}
+                      {suggestions.topics.length > 0 && (
+                        <div>
+                          <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>New Topic Ideas</p>
+                          {suggestions.topics.map((topic, idx) => (
+                            <div key={idx} style={{ fontSize: '13px', color: '#0e1a2b', marginBottom: '0.4rem', paddingLeft: '0.75rem', borderLeft: '2px solid #c9b28f' }}>• {topic}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div style={{ display: fullscreen ? 'none' : 'block', backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Facebook & Social</p>
-                <div style={{ marginBottom: '1rem' }}>
-                  <label style={lbl}>Social Title</label>
-                  <input name="social_title" value={form.social_title} onChange={handleChange} placeholder="Defaults to meta title" style={inp} />
-                </div>
-                <div style={{ marginBottom: '1rem' }}>
-                  <label style={lbl}>Social Description</label>
-                  <textarea name="social_description" value={form.social_description} onChange={handleChange} rows={2} placeholder="Defaults to meta description" style={{ ...inp, resize: 'vertical' as const }} />
-                </div>
-                <div>
-                  <label style={lbl}>Facebook Teaser Text</label>
-                  <textarea name="facebook_teaser_text" value={form.facebook_teaser_text} onChange={handleChange} rows={3} placeholder="2-3 sentence teaser for Facebook posts..." style={{ ...inp, resize: 'vertical' as const }} />
-                </div>
-              </div>
+              )}
             </div>
-            <div style={{ display: fullscreen ? 'none' : 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '1rem' }}>
-              <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Article Scores</p>
+
+            {/* RIGHT SIDEBAR */}
+            <div style={{ display: fullscreen ? 'none' : 'flex', flexDirection: 'column', gap: '1rem', position: 'sticky', top: '1rem' }}>
+
+              {/* SCORES — collapsed */}
+              <SidebarSection sectionKey="scores" title="Article Scores" summary={`SEO ${seoScore} · AEO ${aeoScore} · Read ${readabilityScore}`}>
                 {[{ label: 'SEO', score: seoScore }, { label: 'AEO', score: aeoScore }, { label: 'Readability', score: readabilityScore }].map(({ label, score }) => (
                   <div key={label} style={{ marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
@@ -512,9 +644,10 @@ function NewArticleInner() {
                     </div>
                   </div>
                 ))}
-              </div>
-              <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df', padding: '1.5rem' }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b', marginBottom: '1rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Settings</p>
+              </SidebarSection>
+
+              {/* SETTINGS (tags, category, author) — collapsed */}
+              <SidebarSection sectionKey="settings" title="Settings" summary={[categoryName, authorName, form.tags.length ? `${form.tags.length} tag${form.tags.length > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ') || undefined}>
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={lbl}>Tags</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '0.4rem', marginBottom: '0.5rem' }}>
@@ -556,15 +689,63 @@ function NewArticleInner() {
                     </select>
                   </div>
                 )}
-                <div style={{ marginBottom: '1rem' }}>
+                <div>
                   <label style={lbl}>Author</label>
                   <select name="author_id" value={form.author_id} onChange={handleChange} style={inp}>
                     <option value="">Select...</option>
                     {authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                   </select>
                 </div>
+              </SidebarSection>
+
+              {/* COVER IMAGE — collapsed, with Unsplash search above URL field */}
+              <SidebarSection sectionKey="coverImage" title="Cover Image" summary={form.cover_image_url ? 'Image set ✓' : 'No image'}>
+                {/* Step B: Unsplash search for cover image */}
+                <div style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #ede8df' }}>
+                  <label style={{ ...lbl, marginBottom: '0.5rem' }}>Search Unsplash</label>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                    <input
+                      type='text'
+                      placeholder='Search cover images...'
+                      value={coverSearchQuery}
+                      onChange={e => setCoverSearchQuery(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && searchCoverUnsplash(coverSearchQuery)}
+                      style={{ ...inp, flex: 1, fontSize: '13px', padding: '0.5rem 0.6rem' }}
+                    />
+                    <button
+                      type='button'
+                      onClick={() => searchCoverUnsplash(coverSearchQuery)}
+                      disabled={coverSearchLoading}
+                      style={{ padding: '0.5rem 0.75rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' as const }}
+                    >{coverSearchLoading ? '...' : 'Search'}</button>
+                  </div>
+                  {coverSearchResults.length > 0 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.4rem', marginBottom: '0.5rem' }}>
+                      {coverSearchResults.slice(0, 9).map((photo: any) => (
+                        <div
+                          key={photo.id}
+                          onClick={() => {
+                            setForm(f => ({ ...f, cover_image_url: photo.url }))
+                            setCoverSearchResults([])
+                            setCoverSearchQuery('')
+                          }}
+                          style={{ cursor: 'pointer', border: '2px solid transparent', overflow: 'hidden', borderRadius: 2 }}
+                          onMouseEnter={e => (e.currentTarget.style.border = '2px solid #c9b28f')}
+                          onMouseLeave={e => (e.currentTarget.style.border = '2px solid transparent')}
+                        >
+                          <img src={photo.thumb} alt={photo.alt_description || ''} style={{ width: '100%', height: '56px', objectFit: 'cover', display: 'block' }} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {coverSearchResults.length > 0 && (
+                    <p style={{ fontSize: '10px', color: '#9a9085', margin: 0 }}>Click an image to set as cover · Photos by <a href='https://unsplash.com?utm_source=dudemd&utm_medium=referral' target='_blank' rel='noopener noreferrer' style={{ color: '#9a9085' }}>Unsplash</a></p>
+                  )}
+                </div>
+
+                {/* Manual URL field — unchanged */}
                 <div>
-                  <label style={lbl}>Cover Image URL</label>
+                  <label style={lbl}>Article Cover URL</label>
                   <input name="cover_image_url" value={form.cover_image_url} onChange={handleChange} placeholder="https://..." style={inp} />
                   {form.cover_image_url && <img src={form.cover_image_url} alt="preview" style={{ width: '100%', height: '120px', objectFit: 'cover', marginTop: '0.5rem' }} />}
                   <button type='button' onClick={() => setForm(f => ({...f, show_hero: !f.show_hero}))} style={{ width: '100%', marginTop: '0.5rem', padding: '0.5rem', border: '1px solid ' + (form.show_hero ? '#2d7a3a' : '#e8e4de'), backgroundColor: form.show_hero ? '#e8f5ea' : '#fff', color: form.show_hero ? '#2d7a3a' : '#9a9085', fontWeight: 700, fontSize: '11px', cursor: 'pointer', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{form.show_hero ? '✓ Show as Hero Image' : 'Hide Hero Image'}</button>
@@ -582,7 +763,9 @@ function NewArticleInner() {
                     </div>
                   )}
                 </div>
-              </div>
+              </SidebarSection>
+
+              {/* SAVE BUTTONS */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <button onClick={() => handleSave('draft')} disabled={saving} style={{ width: '100%', padding: '0.875rem', backgroundColor: 'transparent', border: '1px solid #0e1a2b', color: '#0e1a2b', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase' as const, cursor: 'pointer' }}>Save as Draft</button>
                 <button onClick={() => handleSave('review')} disabled={saving} style={{ width: '100%', padding: '0.875rem', backgroundColor: '#d4820a', color: '#fff', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase' as const, border: 'none', cursor: 'pointer' }}>Submit for Review</button>
