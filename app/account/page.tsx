@@ -453,20 +453,18 @@ export default function AccountPage() {
             {emailMsg && !codeSuccess && (
               <form onSubmit={handleCodeConfirm} style={{ marginTop: '0.75rem', padding: '1rem', backgroundColor: 'var(--color-cream)', borderRadius: 4 }}>
                 <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-navy)', margin: '0 0 0.5rem' }}>Enter the 6-digit code from your email:</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <input
+                <input
                     type="text"
                     inputMode="numeric"
                     maxLength={6}
                     value={confirmCode}
                     onChange={e => setConfirmCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
                     placeholder="000000"
-                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: 4, fontSize: '1.2rem', letterSpacing: '0.3em', textAlign: 'center', outline: 'none', backgroundColor: '#fff', color: 'var(--color-navy)', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: 4, fontSize: '1.2rem', letterSpacing: '0.3em', textAlign: 'center', outline: 'none', backgroundColor: '#fff', color: 'var(--color-navy)', boxSizing: 'border-box', display: 'block', marginBottom: '0.5rem' }}
                   />
-                  <button type="submit" disabled={codeLoading || confirmCode.length !== 6} style={{ width: '100%', padding: '0.75rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', borderRadius: 4, cursor: 'pointer', opacity: confirmCode.length !== 6 || codeLoading ? 0.5 : 1 }}>
+                  <button type="submit" disabled={codeLoading || confirmCode.length !== 6} style={{ width: '100%', padding: '0.75rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', borderRadius: 4, cursor: 'pointer', display: 'block', opacity: confirmCode.length !== 6 || codeLoading ? 0.5 : 1 }}>
                     {codeLoading ? 'Confirming...' : 'Confirm Email Change'}
                   </button>
-                </div>
                 {codeError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: '0.5rem 0 0' }}>{codeError}</p>}
               </form>
             )}
