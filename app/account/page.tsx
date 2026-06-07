@@ -52,12 +52,7 @@ export default function AccountPage() {
   const [emailSending, setEmailSending] = useState(false)
   const [emailMsg, setEmailMsg] = useState('')
   const [emailError, setEmailError] = useState('')
-  const [showCodeEntry, setShowCodeEntry] = useState(false)
-  const [confirmCode, setConfirmCode] = useState('')
-  const [codeError, setCodeError] = useState('')
-  const [codeSuccess, setCodeSuccess] = useState(false)
-  const [codeLoading, setCodeLoading] = useState(false)
-  const [pendingEmail, setPendingEmail] = useState('')
+
   const [loading, setLoading] = useState(true)
   const [auth, setAuth] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<Tab>('feed')
