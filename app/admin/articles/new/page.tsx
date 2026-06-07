@@ -923,7 +923,7 @@ function NewArticleInner() {
 
                 {/* No structure set at all */}
                 {!form.is_pillar_content && !form.pillar_topic_id && !form.cornerstone_article_id && (
-                  <p style={{{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}}>Set article structure in the Article Structure section above to enable contextual linking.</p>
+                  <p style={{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}>Set article structure in the Article Structure section above to enable contextual linking.</p>
                 )}
 
                 {/* CLUSTER → PARENT PILLAR */}
@@ -935,20 +935,20 @@ function NewArticleInner() {
                       const href = `/articles/${parentPillarData.categories?.slug}/${parentPillarData.slug}`
                       const linked = isAlreadyLinked(href)
                       return (
-                        <div style={{{ backgroundColor: '#f7f4ee', border: '1px solid #ede8df', padding: '0.75rem', borderRadius: 2, marginBottom: '0.5rem' }}}>
-                          <div style={{{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.35rem', lineHeight: 1.4 }}}>{parentPillarData.title}</div>
+                        <div style={{ backgroundColor: '#f7f4ee', border: '1px solid #ede8df', padding: '0.75rem', borderRadius: 2, marginBottom: '0.5rem' }}>
+                          <div style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.35rem', lineHeight: 1.4 }}>{parentPillarData.title}</div>
                           {linked
-                            ? <span style={{{ fontSize: '11px', color: '#2d7a3a', fontWeight: 600 }}}>✓ Already linked in this article</span>
+                            ? <span style={{ fontSize: '11px', color: '#2d7a3a', fontWeight: 600 }}>✓ Already linked in this article</span>
                             : <button
                                 type="button"
                                 onClick={() => insertInternalLink(href, parentPillarData.title)}
-                                style={{{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}}
+                                style={{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}
                               >Insert parent pillar link</button>
                           }
                         </div>
                       )
                     })() : (
-                      <p style={{{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}}>Loading parent pillar...</p>
+                      <p style={{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}>Loading parent pillar...</p>
                     )}
                   </div>
                 )}
@@ -997,14 +997,14 @@ function NewArticleInner() {
                           const href = `/articles/${a.categories?.slug}/${a.slug}`
                           const linked = isAlreadyLinked(href)
                           return (
-                            <div key={a.id} style={{{ backgroundColor: '#f7f4ee', border: '1px solid #ede8df', padding: '0.75rem', borderRadius: 2, marginBottom: '0.5rem' }}}>
-                              <div style={{{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.35rem', lineHeight: 1.4 }}}>{a.title}</div>
+                            <div key={a.id} style={{ backgroundColor: '#f7f4ee', border: '1px solid #ede8df', padding: '0.75rem', borderRadius: 2, marginBottom: '0.5rem' }}>
+                              <div style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.35rem', lineHeight: 1.4 }}>{a.title}</div>
                               {linked
-                                ? <span style={{{ fontSize: '11px', color: '#2d7a3a', fontWeight: 600 }}}>✓ Already linked in this article</span>
+                                ? <span style={{ fontSize: '11px', color: '#2d7a3a', fontWeight: 600 }}>✓ Already linked in this article</span>
                                 : <button
                                     type="button"
                                     onClick={() => insertInternalLink(href, a.title)}
-                                    style={{{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}}
+                                    style={{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}
                                   >Insert cluster article link</button>
                               }
                             </div>
@@ -1029,20 +1029,20 @@ function NewArticleInner() {
                       const href = `/articles/${cornerstoneData.categories?.slug}/${cornerstoneData.slug}`
                       const linked = isAlreadyLinked(href)
                       return (
-                        <div style={{{ backgroundColor: '#f7f4ee', border: '1px solid #ede8df', padding: '0.75rem', borderRadius: 2, marginBottom: '0.5rem' }}}>
-                          <div style={{{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.35rem', lineHeight: 1.4 }}}>{cornerstoneData.title}</div>
+                        <div style={{ backgroundColor: '#f7f4ee', border: '1px solid #ede8df', padding: '0.75rem', borderRadius: 2, marginBottom: '0.5rem' }}>
+                          <div style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.35rem', lineHeight: 1.4 }}>{cornerstoneData.title}</div>
                           {linked
-                            ? <span style={{{ fontSize: '11px', color: '#2d7a3a', fontWeight: 600 }}}>✓ Already linked in this article</span>
+                            ? <span style={{ fontSize: '11px', color: '#2d7a3a', fontWeight: 600 }}>✓ Already linked in this article</span>
                             : <button
                                 type="button"
                                 onClick={() => insertInternalLink(href, cornerstoneData.title)}
-                                style={{{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}}
+                                style={{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}
                               >Insert cornerstone link</button>
                           }
                         </div>
                       )
                     })() : (
-                      <p style={{{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}}>Loading cornerstone article...</p>
+                      <p style={{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}>Loading cornerstone article...</p>
                     )}
                   </div>
                 )}
