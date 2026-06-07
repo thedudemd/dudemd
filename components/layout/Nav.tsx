@@ -79,6 +79,7 @@ export default function Nav() {
 
   useEffect(() => {
     function getTokenAndUser() {
+      // Try cookies first
       try {
         const jar: Record<string, string> = {}
         document.cookie.split(';').forEach(c => {
@@ -97,6 +98,19 @@ export default function Nav() {
         const token = parsed.access_token
         const uid = parsed.user?.id
         if (token && uid) return { token, uid }
+      } catch {}
+      // Fall back to localStorage (used by Supabase browser client)
+      try {
+        const keys = ['dudemd-auth', 'sb-bicljoujevywrkzjeaoy-auth-token']
+        for (const key of keys) {
+          const raw = localStorage.getItem(key)
+          if (raw) {
+            const parsed = JSON.parse(raw)
+            const token = parsed.access_token
+            const uid = parsed.user?.id
+            if (token && uid) return { token, uid }
+          }
+        }
       } catch {}
       return null
     }
