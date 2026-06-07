@@ -41,11 +41,11 @@ export default function SignInPage() {
   }, [])
 
   async function handleGoogle() {
-    try { setLoading('google'); setError(null); await signInWithGoogle() }
+    try { setError(null); await signInWithGoogle(); setLoading('google') }
     catch (err) { console.error("Google auth error:", err); setError('Google sign-in failed.'); setLoading(null) }
   }
   async function handleFacebook() {
-    try { setLoading('facebook'); setError(null); await signInWithFacebook() }
+    try { setError(null); await signInWithFacebook(); setLoading('facebook') }
     catch { setError('Facebook sign-in not yet available.'); setLoading(null) }
   }
   async function handleForgotPassword() {
