@@ -72,6 +72,7 @@ function NewArticleInner() {
   const [cornerstoneData, setCornerstoneData] = useState<any>(null)
   const [clusterArticles, setClusterArticles] = useState<any[]>([])
   const [clusterLoading, setClusterLoading] = useState(false)
+  const [hasLoadedClusters, setHasLoadedClusters] = useState(false)
   const [draftsLoading, setDraftsLoading] = useState(false)
   const [wordTarget] = useState(800)
   const [showPublishConfirm, setShowPublishConfirm] = useState(false)
@@ -839,6 +840,9 @@ function NewArticleInner() {
                       <div style={{ fontSize: '11px', color: '#9a9085', lineHeight: 1.4, marginTop: '0.15rem' }}>This is a main topic hub. Cluster articles link to this.</div>
                     </div>
                   </label>
+                  {form.is_pillar_content && (
+                    <p style={{ fontSize: '12px', color: '#4A5563', fontStyle: 'italic' as const, margin: '0.5rem 0 0', lineHeight: 1.5 }}>This is the main hub article. Cluster articles should link back to this page.</p>
+                  )}
                 </div>
 
                 {/* Cornerstone toggle */}
@@ -874,6 +878,10 @@ function NewArticleInner() {
                     {pillarArticles.length === 0 && (
                       <p style={{ fontSize: '11px', color: '#9a9085', margin: '0.35rem 0 0' }}>No pillar articles exist yet. Create one first.</p>
                     )}
+                    {form.pillar_topic_id
+                      ? <p style={{ fontSize: '12px', color: '#4A5563', fontStyle: 'italic' as const, margin: '0.5rem 0 0', lineHeight: 1.5 }}>This is a cluster article. Add at least one link back to the parent pillar below.</p>
+                      : <p style={{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: '0.5rem 0 0', lineHeight: 1.5 }}>Select a parent pillar to connect this article to a topic hub.</p>
+                    }
                   </div>
                 )}
 
@@ -910,6 +918,9 @@ function NewArticleInner() {
                     : 'Ready'
                 }
               >
+                {/* Section hint */}
+                <p style={{ fontSize: '11px', color: '#9a9085', margin: '0 0 1rem', lineHeight: 1.5 }}>Set relationships in Article Structure first, then insert the actual links here.</p>
+
                 {/* No structure set at all */}
                 {!form.is_pillar_content && !form.pillar_topic_id && !form.cornerstone_article_id && (
                   <p style={{{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}}>Set article structure in the Article Structure section above to enable contextual linking.</p>
@@ -918,7 +929,8 @@ function NewArticleInner() {
                 {/* CLUSTER → PARENT PILLAR */}
                 {!form.is_pillar_content && form.pillar_topic_id && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: '0.5rem' }}>Parent Pillar</p>
+                    <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: '0.25rem' }}>Parent Pillar</p>
+                    <p style={{ fontSize: '11px', color: '#9a9085', margin: '0 0 0.5rem', lineHeight: 1.5 }}>Insert a link back to the parent pillar inside the article body.</p>
                     {parentPillarData ? (() => {
                       const href = `/articles/${parentPillarData.categories?.slug}/${parentPillarData.slug}`
                       const linked = isAlreadyLinked(href)
@@ -931,7 +943,7 @@ function NewArticleInner() {
                                 type="button"
                                 onClick={() => insertInternalLink(href, parentPillarData.title)}
                                 style={{{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}}
-                              >Insert link to parent pillar</button>
+                              >Insert parent pillar link</button>
                           }
                         </div>
                       )
@@ -944,6 +956,7 @@ function NewArticleInner() {
                 {/* PILLAR → CLUSTER ARTICLES */}
                 {form.is_pillar_content && (
                   <div style={{ marginBottom: '1rem' }}>
+                    <p style={{ fontSize: '11px', color: '#9a9085', margin: '0 0 0.5rem', lineHeight: 1.5 }}>Load connected cluster articles, then insert links to them inside this article.</p>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                       <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: 0 }}>Related Cluster Articles</p>
                       <button
@@ -958,20 +971,25 @@ function NewArticleInner() {
                           )
                           const slugData = await slugRes.json()
                           const articleId = slugData?.[0]?.id
-                          if (!articleId) { setClusterArticles([]); setClusterLoading(false); return }
+                          if (!articleId) { setClusterArticles([]); setHasLoadedClusters(true); setClusterLoading(false); return }
                           const res = await fetch(
                             `https://bicljoujevywrkzjeaoy.supabase.co/rest/v1/articles?select=id,title,slug,categories!articles_category_id_fkey(slug)&pillar_topic_id=eq.${articleId}&status=eq.published&order=title`,
                             { headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g' } }
                           )
                           const data = await res.json()
                           setClusterArticles(Array.isArray(data) ? data : [])
+                          setHasLoadedClusters(true)
                           setClusterLoading(false)
                         }}
                         style={{ fontSize: '11px', color: '#c9b28f', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}
                       >{clusterLoading ? 'Loading...' : 'Load'}</button>
                     </div>
                     {clusterArticles.length === 0 && !clusterLoading && (
-                      <p style={{{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}}>Save this article as a draft first to see connected cluster articles.</p>
+                      <p style={{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}>
+                        {hasLoadedClusters
+                          ? 'No cluster articles are connected yet.'
+                          : 'Save this article as a draft first. Then connected cluster articles can appear here.'}
+                      </p>
                     )}
                     {clusterArticles.length > 0 && (
                       <>
@@ -987,7 +1005,7 @@ function NewArticleInner() {
                                     type="button"
                                     onClick={() => insertInternalLink(href, a.title)}
                                     style={{{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}}
-                                  >Insert link</button>
+                                  >Insert cluster article link</button>
                               }
                             </div>
                           )
@@ -996,7 +1014,7 @@ function NewArticleInner() {
                           type="button"
                           onClick={() => insertRelatedClusterBlock(clusterArticles)}
                           style={{ width: '100%', marginTop: '0.25rem', padding: '0.5rem', backgroundColor: '#f7f4ee', border: '1px solid #0e1a2b', color: '#0e1a2b', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2 }}
-                        >Insert all as bulleted list</button>
+                        >Insert all cluster links as list</button>
                       </>
                     )}
                   </div>
@@ -1005,7 +1023,8 @@ function NewArticleInner() {
                 {/* CORNERSTONE LINK */}
                 {form.cornerstone_article_id && (
                   <div>
-                    <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: '0.5rem' }}>Cornerstone Article</p>
+                    <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: '0.25rem' }}>Cornerstone Article</p>
+                    <p style={{ fontSize: '11px', color: '#9a9085', margin: '0 0 0.5rem', lineHeight: 1.5 }}>This article is related to a cornerstone article. Add a link to connect the topic.</p>
                     {cornerstoneData ? (() => {
                       const href = `/articles/${cornerstoneData.categories?.slug}/${cornerstoneData.slug}`
                       const linked = isAlreadyLinked(href)
@@ -1018,7 +1037,7 @@ function NewArticleInner() {
                                 type="button"
                                 onClick={() => insertInternalLink(href, cornerstoneData.title)}
                                 style={{{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}}
-                              >Insert link to cornerstone</button>
+                              >Insert cornerstone link</button>
                           }
                         </div>
                       )
