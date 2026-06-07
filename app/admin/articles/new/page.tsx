@@ -64,10 +64,17 @@ function NewArticleInner() {
   const [fullscreen, setFullscreen] = useState(false)
   const searchParams = useSearchParams()
 
+  // Step C: new state
+  const [recentDrafts, setRecentDrafts] = useState<any[]>([])
+  const [draftsLoading, setDraftsLoading] = useState(false)
+  const [wordTarget] = useState(800)
+  const [showPublishConfirm, setShowPublishConfirm] = useState(false)
+  const [pendingPublishStatus, setPendingPublishStatus] = useState<string | null>(null)
+
   // Step A: sidebar section collapse state
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     coverImage: false, settings: false, seo: false, social: false, aiSuggestions: false, scores: false,
-    slugExcerpt: false, layout: false,
+    slugExcerpt: false, layout: false, myDrafts: false,
   })
   function toggleSection(key: string) {
     setOpenSections(s => ({ ...s, [key]: !s[key] }))
@@ -291,6 +298,24 @@ function NewArticleInner() {
       const { data: auths } = await supabase.from('authors').select('*').order('name')
       setCategories(cats || [])
       setAuthors(auths || [])
+      // Fetch my drafts via author user_id mapping
+      setDraftsLoading(true)
+      const { data: authorRecord } = await supabase
+        .from('authors')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single()
+      if (authorRecord) {
+        const { data: drafts } = await supabase
+          .from('articles')
+          .select('id, title, slug, updated_at')
+          .eq('status', 'draft')
+          .eq('author_id', authorRecord.id)
+          .order('updated_at', { ascending: false })
+          .limit(8)
+        setRecentDrafts(drafts || [])
+      }
+      setDraftsLoading(false)
     }
     init()
   }, [])
@@ -354,6 +379,13 @@ function NewArticleInner() {
   function scoreBg(s: number) { return s >= 80 ? '#e8f5ea' : s >= 50 ? '#fef3e2' : '#fdecea' }
 
   async function handleSave(status: string) {
+    if (status === "published" && !showPublishConfirm) {
+      setPendingPublishStatus('published')
+      setShowPublishConfirm(true)
+      return
+    }
+    setShowPublishConfirm(false)
+    setPendingPublishStatus(null)
     if (status === "published" && !form.cover_image_url && form.show_hero) {
       alert("Please add a cover image before publishing.")
       return
@@ -540,6 +572,15 @@ function NewArticleInner() {
                 <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: fullscreen ? 'calc(100vh - 200px)' : '500px', padding: '1rem' }}>
                   <EditorContent editor={editor} />
                 </div>
+                {/* Word count progress */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <div style={{ flex: 1, height: 4, backgroundColor: '#ede8df', borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${Math.min(100, Math.round((getWordCount() / wordTarget) * 100))}%`, backgroundColor: getWordCount() >= wordTarget ? '#2d7a3a' : getWordCount() >= wordTarget * 0.5 ? '#d4820a' : '#c9b28f', transition: 'width 0.3s, background-color 0.3s', borderRadius: 2 }} />
+                  </div>
+                  <span style={{ fontSize: '12px', color: getWordCount() >= wordTarget ? '#2d7a3a' : '#9a9085', whiteSpace: 'nowrap' as const, fontWeight: 600 }}>
+                    {getWordCount()} / {wordTarget} words {getWordCount() >= wordTarget ? '✓' : ''}
+                  </span>
+                </div>
               </div>
 
               {/* SEO SETTINGS — collapsed */}
@@ -608,9 +649,23 @@ function NewArticleInner() {
                       </div>
                       {suggestions.existing.length > 0 && (
                         <div style={{ marginBottom: '1rem' }}>
-                          <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Existing Articles to Link</p>
+                          <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', marginBottom: '0.5rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>Existing Articles to Link <span style={{ fontWeight: 400, textTransform: 'none' as const, letterSpacing: 0 }}>— click to insert link</span></p>
                           {suggestions.existing.map((article, idx) => (
-                            <div key={idx} style={{ fontSize: '13px', color: '#0e1a2b', marginBottom: '0.4rem', paddingLeft: '0.75rem', borderLeft: '2px solid #c9b28f' }}>• {article}</div>
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={async () => {
+                                const res = await fetch(`https://bicljoujevywrkzjeaoy.supabase.co/rest/v1/articles?select=title,slug,categories!articles_category_id_fkey(slug)&title=ilike.*${encodeURIComponent(article)}*&status=eq.published&limit=1`, { headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g' } })
+                                const data = await res.json()
+                                if (data?.[0]) {
+                                  const href = `/articles/${data[0].categories?.slug}/${data[0].slug}`
+                                  editor?.chain().focus().setLink({ href, target: '_self' }).run()
+                                }
+                              }}
+                              style={{ display: 'block', width: '100%', textAlign: 'left', fontSize: '13px', color: '#0e1a2b', marginBottom: '0.4rem', paddingLeft: '0.75rem', paddingTop: '0.35rem', paddingBottom: '0.35rem', borderLeft: '2px solid #c9b28f', background: 'none', border: 'none', borderLeft: '2px solid #c9b28f', cursor: 'pointer', borderRadius: 0 }}
+                              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#f7f4ee' }}
+                              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent' }}
+                            >🔗 {article}</button>
                           ))}
                         </div>
                       )}
@@ -644,6 +699,38 @@ function NewArticleInner() {
                     </div>
                   </div>
                 ))}
+              </SidebarSection>
+
+              {/* MY DRAFTS — collapsed */}
+              <SidebarSection sectionKey="myDrafts" title="My Drafts" summary={recentDrafts.length > 0 ? `${recentDrafts.length} draft${recentDrafts.length > 1 ? 's' : ''}` : draftsLoading ? 'Loading...' : 'None'}>
+                {draftsLoading ? (
+                  <p style={{ fontSize: '13px', color: '#9a9085', margin: 0 }}>Loading...</p>
+                ) : recentDrafts.length === 0 ? (
+                  <p style={{ fontSize: '13px', color: '#9a9085', margin: 0 }}>No drafts found linked to your author profile.</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                    {recentDrafts.map((draft: any) => {
+                      const updated = new Date(draft.updated_at)
+                      const now = new Date()
+                      const diffMs = now.getTime() - updated.getTime()
+                      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+                      const diffHrs = Math.floor(diffMs / (1000 * 60 * 60))
+                      const timeAgo = diffDays > 0 ? `${diffDays}d ago` : diffHrs > 0 ? `${diffHrs}h ago` : 'Just now'
+                      return (
+                        <a
+                          key={draft.id}
+                          href={`/admin/articles/${draft.id}/edit`}
+                          style={{ display: 'block', padding: '0.6rem 0.75rem', border: '1px solid #ede8df', backgroundColor: '#fff', textDecoration: 'none', borderRadius: 2 }}
+                          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#f7f4ee' }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = '#fff' }}
+                        >
+                          <div style={{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.2rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{draft.title || 'Untitled'}</div>
+                          <div style={{ fontSize: '11px', color: '#9a9085' }}>Draft · {timeAgo}</div>
+                        </a>
+                      )
+                    })}
+                  </div>
+                )}
               </SidebarSection>
 
               {/* SETTINGS (tags, category, author) — collapsed */}
@@ -828,6 +915,33 @@ function NewArticleInner() {
               </div>
             )}
             <p style={{ fontSize: '10px', color: '#4A5563', marginTop: '1.5rem', borderTop: '1px solid #ede8df', paddingTop: '1rem' }}>Photos by <a href='https://unsplash.com?utm_source=dudemd&utm_medium=referral' target='_blank' rel='noopener noreferrer' style={{ color: '#0e1a2b' }}>Unsplash</a></p>
+          </div>
+        </div>
+      )}
+
+      {/* Publish confirmation dialog */}
+      {showPublishConfirm && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+          <div style={{ backgroundColor: '#fff', width: '100%', maxWidth: '400px', padding: '2rem', borderRadius: 4 }}>
+            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.75rem' }}>Publish Article?</h2>
+            <p style={{ fontSize: '14px', color: '#4A5563', margin: '0 0 1.5rem', lineHeight: 1.6 }}>This will make the article live on dudemd.com immediately.</p>
+            {!form.cover_image_url && form.show_hero && (
+              <p style={{ fontSize: '13px', color: '#c0392b', margin: '0 0 1rem', fontWeight: 600 }}>⚠ No cover image is set. Add one or disable the hero image before publishing.</p>
+            )}
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button
+                onClick={() => { setShowPublishConfirm(false); setPendingPublishStatus(null) }}
+                style={{ flex: 1, padding: '0.875rem', border: '1px solid #ede8df', backgroundColor: '#fff', color: '#4A5563', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase' as const, cursor: 'pointer' }}
+              >Cancel</button>
+              <button
+                onClick={() => {
+                  if (!form.cover_image_url && form.show_hero) return
+                  handleSave('published')
+                }}
+                disabled={saving || (!form.cover_image_url && form.show_hero)}
+                style={{ flex: 2, padding: '0.875rem', border: 'none', backgroundColor: (!form.cover_image_url && form.show_hero) ? '#ccc' : '#0e1a2b', color: '#f7f4ee', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase' as const, cursor: (!form.cover_image_url && form.show_hero) ? 'not-allowed' : 'pointer' }}
+              >{saving ? 'Publishing...' : 'Publish Now'}</button>
+            </div>
           </div>
         </div>
       )}
