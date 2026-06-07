@@ -35,7 +35,7 @@ function NewArticleInner() {
   const [seoScore, setSeoScore] = useState(0)
   const [aeoScore, setAeoScore] = useState(0)
   const [readabilityScore, setReadabilityScore] = useState(0)
-  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '', layout: 'standard', tags: [] as string[], show_hero: true })
+  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '', layout: 'standard', tags: [] as string[], show_hero: true, is_pillar_content: false, is_cornerstone: false, pillar_topic_id: '', cornerstone_article_id: '' })
   const [canvaDesigns, setCanvaDesigns] = useState<any[]>([])
   const [showCanvaPicker, setShowCanvaPicker] = useState(false)
   const [imgUploading, setImgUploading] = useState(false)
@@ -66,6 +66,8 @@ function NewArticleInner() {
 
   // Step C: new state
   const [recentDrafts, setRecentDrafts] = useState<any[]>([])
+  const [pillarArticles, setPillarArticles] = useState<any[]>([])
+  const [allArticles, setAllArticles] = useState<any[]>([])
   const [draftsLoading, setDraftsLoading] = useState(false)
   const [wordTarget] = useState(800)
   const [showPublishConfirm, setShowPublishConfirm] = useState(false)
@@ -74,7 +76,7 @@ function NewArticleInner() {
   // Step A: sidebar section collapse state
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     coverImage: false, settings: false, seo: false, social: false, aiSuggestions: false, scores: false,
-    slugExcerpt: false, layout: false, myDrafts: false,
+    slugExcerpt: false, layout: false, myDrafts: false, articleStructure: false,
   })
   function toggleSection(key: string) {
     setOpenSections(s => ({ ...s, [key]: !s[key] }))
@@ -298,6 +300,18 @@ function NewArticleInner() {
       const { data: auths } = await supabase.from('authors').select('*').order('name')
       setCategories(cats || [])
       setAuthors(auths || [])
+      // Fetch pillar articles for Article Structure section
+      const { data: pillars } = await supabase
+        .from('articles')
+        .select('id, title')
+        .eq('is_pillar_content', true)
+        .order('title')
+      setPillarArticles(pillars || [])
+      const { data: allArts } = await supabase
+        .from('articles')
+        .select('id, title, is_cornerstone')
+        .order('title')
+      setAllArticles(allArts || [])
       // Fetch my drafts via author user_id mapping
       setDraftsLoading(true)
       const { data: authorRecord } = await supabase
@@ -340,7 +354,7 @@ function NewArticleInner() {
       const saved = localStorage.getItem(draftKey)
       if (saved) {
         const d = JSON.parse(saved)
-        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'', status: d.status||'draft', social_title: d.social_title||'', social_description: d.social_description||'', facebook_teaser_text: d.facebook_teaser_text||'', external_url: d.external_url||'', subcategory_id: d.subcategory_id||'', layout: d.layout||'standard', tags: d.tags||[], show_hero: d.show_hero !== false })
+        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'', status: d.status||'draft', social_title: d.social_title||'', social_description: d.social_description||'', facebook_teaser_text: d.facebook_teaser_text||'', external_url: d.external_url||'', subcategory_id: d.subcategory_id||'', layout: d.layout||'standard', tags: d.tags||[], show_hero: d.show_hero !== false, is_pillar_content: d.is_pillar_content||false, is_cornerstone: d.is_cornerstone||false, pillar_topic_id: d.pillar_topic_id||'', cornerstone_article_id: d.cornerstone_article_id||'' })
         if (editor && d.content) editor.commands.setContent(d.content)
         setAutoSaved('Draft restored')
         if (d.category_id) { supabase.from('categories').select('*').eq('parent_id', d.category_id).eq('enabled', true).order('sort_order').then(({data}) => setSubcategories(data||[])) }
@@ -400,7 +414,7 @@ function NewArticleInner() {
       setForm(f => ({ ...f, slug: finalSlug }))
     }
     const cleanForm = { ...form, slug: finalSlug, category_id: form.category_id || null, subcategory_id: form.subcategory_id || null, author_id: form.author_id || null }
-    const { error } = await supabase.from('articles').insert({ ...cleanForm, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null })
+    const { error } = await supabase.from('articles').insert({ ...cleanForm, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null, is_pillar_content: form.is_pillar_content, is_cornerstone: form.is_cornerstone, pillar_topic_id: form.pillar_topic_id || null, cornerstone_article_id: form.cornerstone_article_id || null })
     if (error) { alert('Error: ' + error.message); setSaving(false) }
     else { localStorage.removeItem('draft_' + session.user.id); router.push('/admin') }
   }
@@ -731,6 +745,94 @@ function NewArticleInner() {
                     })}
                   </div>
                 )}
+              </SidebarSection>
+
+              {/* ARTICLE STRUCTURE — collapsed */}
+              <SidebarSection
+                sectionKey="articleStructure"
+                title="Article Structure"
+                summary={
+                  form.is_pillar_content
+                    ? form.is_cornerstone ? 'Pillar · Cornerstone' : 'Pillar Article'
+                    : form.pillar_topic_id
+                    ? `Cluster under ${pillarArticles.find((p: any) => p.id === form.pillar_topic_id)?.title || '...'}`
+                    : form.is_cornerstone
+                    ? 'Cornerstone'
+                    : 'Standard Article'
+                }
+              >
+                {/* Pillar Content toggle */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={form.is_pillar_content}
+                      onChange={e => {
+                        const checked = e.target.checked
+                        setForm(f => ({ ...f, is_pillar_content: checked, pillar_topic_id: checked ? '' : f.pillar_topic_id }))
+                      }}
+                      style={{ marginTop: '2px', accentColor: '#0e1a2b', width: 16, height: 16, flexShrink: 0 }}
+                    />
+                    <div>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b' }}>Pillar Article</div>
+                      <div style={{ fontSize: '11px', color: '#9a9085', lineHeight: 1.4, marginTop: '0.15rem' }}>This is a main topic hub. Cluster articles link to this.</div>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Cornerstone toggle */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={form.is_cornerstone}
+                      onChange={e => setForm(f => ({ ...f, is_cornerstone: e.target.checked }))}
+                      style={{ marginTop: '2px', accentColor: '#0e1a2b', width: 16, height: 16, flexShrink: 0 }}
+                    />
+                    <div>
+                      <div style={{ fontSize: '13px', fontWeight: 700, color: '#0e1a2b' }}>Cornerstone Content</div>
+                      <div style={{ fontSize: '11px', color: '#9a9085', lineHeight: 1.4, marginTop: '0.15rem' }}>High-priority evergreen content. Influences SEO weight.</div>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Parent Pillar selector — only shown when not a pillar itself */}
+                {!form.is_pillar_content && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ ...lbl, marginBottom: '0.4rem' }}>Parent Pillar</label>
+                    <select
+                      value={form.pillar_topic_id}
+                      onChange={e => setForm(f => ({ ...f, pillar_topic_id: e.target.value }))}
+                      style={inp}
+                    >
+                      <option value="">None — standalone article</option>
+                      {pillarArticles.map((p: any) => (
+                        <option key={p.id} value={p.id}>{p.title}</option>
+                      ))}
+                    </select>
+                    {pillarArticles.length === 0 && (
+                      <p style={{ fontSize: '11px', color: '#9a9085', margin: '0.35rem 0 0' }}>No pillar articles exist yet. Create one first.</p>
+                    )}
+                  </div>
+                )}
+
+                {/* Cornerstone Article selector */}
+                <div>
+                  <label style={{ ...lbl, marginBottom: '0.4rem' }}>Related Cornerstone Article</label>
+                  <select
+                    value={form.cornerstone_article_id}
+                    onChange={e => setForm(f => ({ ...f, cornerstone_article_id: e.target.value }))}
+                    style={inp}
+                  >
+                    <option value="">None</option>
+                    {allArticles.filter((a: any) => a.is_cornerstone).map((a: any) => (
+                      <option key={a.id} value={a.id}>{a.title}</option>
+                    ))}
+                  </select>
+                  {allArticles.filter((a: any) => a.is_cornerstone).length === 0 && (
+                    <p style={{ fontSize: '11px', color: '#9a9085', margin: '0.35rem 0 0' }}>No cornerstone articles exist yet.</p>
+                  )}
+                </div>
               </SidebarSection>
 
               {/* SETTINGS (tags, category, author) — collapsed */}
