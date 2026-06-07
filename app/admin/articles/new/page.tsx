@@ -68,6 +68,10 @@ function NewArticleInner() {
   const [recentDrafts, setRecentDrafts] = useState<any[]>([])
   const [pillarArticles, setPillarArticles] = useState<any[]>([])
   const [allArticles, setAllArticles] = useState<any[]>([])
+  const [parentPillarData, setParentPillarData] = useState<any>(null)
+  const [cornerstoneData, setCornerstoneData] = useState<any>(null)
+  const [clusterArticles, setClusterArticles] = useState<any[]>([])
+  const [clusterLoading, setClusterLoading] = useState(false)
   const [draftsLoading, setDraftsLoading] = useState(false)
   const [wordTarget] = useState(800)
   const [showPublishConfirm, setShowPublishConfirm] = useState(false)
@@ -76,7 +80,7 @@ function NewArticleInner() {
   // Step A: sidebar section collapse state
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     coverImage: false, settings: false, seo: false, social: false, aiSuggestions: false, scores: false,
-    slugExcerpt: false, layout: false, myDrafts: false, articleStructure: false,
+    slugExcerpt: false, layout: false, myDrafts: false, articleStructure: false, internalLinking: false,
   })
   function toggleSection(key: string) {
     setOpenSections(s => ({ ...s, [key]: !s[key] }))
@@ -334,6 +338,18 @@ function NewArticleInner() {
     init()
   }, [])
 
+  // Fetch parent pillar data when pillar_topic_id changes
+  useEffect(() => {
+    if (form.pillar_topic_id) fetchParentPillar(form.pillar_topic_id)
+    else setParentPillarData(null)
+  }, [form.pillar_topic_id])
+
+  // Fetch cornerstone data when cornerstone_article_id changes
+  useEffect(() => {
+    if (form.cornerstone_article_id) fetchCornerstoneArticle(form.cornerstone_article_id)
+    else setCornerstoneData(null)
+  }, [form.cornerstone_article_id])
+
   useEffect(() => {
     if (!form.title && !editor?.getText()) return
     const timer = setTimeout(async () => {
@@ -421,6 +437,51 @@ function NewArticleInner() {
 
   const inp: any = { width: '100%', padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit' }
   const lbl: any = { display: 'block', fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#4A5563', marginBottom: '0.5rem' }
+
+  // Internal Linking helpers
+  function isAlreadyLinked(href: string): boolean {
+    if (!editor) return false
+    return editor.getHTML().includes(`href="${href}"`) || editor.getHTML().includes(`href='${href}'`)
+  }
+
+  function insertInternalLink(href: string, fallbackText: string) {
+    if (!editor) return
+    const { from, to } = editor.state.selection
+    const hasSelection = from !== to
+    if (hasSelection) {
+      editor.chain().focus().setLink({ href, target: '_self' }).run()
+    } else {
+      editor.chain().focus().insertContent(`<a href="${href}" target="_self">${fallbackText}</a> `).run()
+    }
+  }
+
+  async function insertRelatedClusterBlock(clusters: any[]) {
+    if (!editor || clusters.length === 0) return
+    const items = clusters
+      .map((a: any) => `<li><a href="/articles/${a.categories?.slug}/${a.slug}" target="_self">${a.title}</a></li>`)
+      .join('')
+    editor.chain().focus().insertContent(`<ul>${items}</ul>`).run()
+  }
+
+  async function fetchParentPillar(pillarId: string) {
+    if (!pillarId) { setParentPillarData(null); return }
+    const res = await fetch(
+      `https://bicljoujevywrkzjeaoy.supabase.co/rest/v1/articles?select=id,title,slug,categories!articles_category_id_fkey(slug)&id=eq.${pillarId}&limit=1`,
+      { headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g' } }
+    )
+    const data = await res.json()
+    setParentPillarData(data?.[0] || null)
+  }
+
+  async function fetchCornerstoneArticle(cornerstoneId: string) {
+    if (!cornerstoneId) { setCornerstoneData(null); return }
+    const res = await fetch(
+      `https://bicljoujevywrkzjeaoy.supabase.co/rest/v1/articles?select=id,title,slug,categories!articles_category_id_fkey(slug)&id=eq.${cornerstoneId}&limit=1`,
+      { headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g' } }
+    )
+    const data = await res.json()
+    setCornerstoneData(data?.[0] || null)
+  }
 
   // Collapsible sidebar section component
   function SidebarSection({ sectionKey, title, summary, children }: { sectionKey: string, title: string, summary?: string, children: React.ReactNode }) {
@@ -833,6 +894,139 @@ function NewArticleInner() {
                     <p style={{ fontSize: '11px', color: '#9a9085', margin: '0.35rem 0 0' }}>No cornerstone articles exist yet.</p>
                   )}
                 </div>
+              </SidebarSection>
+
+              {/* INTERNAL LINKING — collapsed */}
+              <SidebarSection
+                sectionKey="internalLinking"
+                title="Internal Linking"
+                summary={
+                  !form.is_pillar_content && !form.pillar_topic_id && !form.cornerstone_article_id
+                    ? 'Set article structure first'
+                    : form.is_pillar_content
+                    ? 'Pillar — link to cluster articles'
+                    : form.pillar_topic_id && parentPillarData
+                    ? `Links to: ${parentPillarData.title}`
+                    : 'Ready'
+                }
+              >
+                {/* No structure set at all */}
+                {!form.is_pillar_content && !form.pillar_topic_id && !form.cornerstone_article_id && (
+                  <p style={{{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}}>Set article structure in the Article Structure section above to enable contextual linking.</p>
+                )}
+
+                {/* CLUSTER → PARENT PILLAR */}
+                {!form.is_pillar_content && form.pillar_topic_id && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: '0.5rem' }}>Parent Pillar</p>
+                    {parentPillarData ? (() => {
+                      const href = `/articles/${parentPillarData.categories?.slug}/${parentPillarData.slug}`
+                      const linked = isAlreadyLinked(href)
+                      return (
+                        <div style={{{ backgroundColor: '#f7f4ee', border: '1px solid #ede8df', padding: '0.75rem', borderRadius: 2, marginBottom: '0.5rem' }}}>
+                          <div style={{{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.35rem', lineHeight: 1.4 }}}>{parentPillarData.title}</div>
+                          {linked
+                            ? <span style={{{ fontSize: '11px', color: '#2d7a3a', fontWeight: 600 }}}>✓ Already linked in this article</span>
+                            : <button
+                                type="button"
+                                onClick={() => insertInternalLink(href, parentPillarData.title)}
+                                style={{{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}}
+                              >Insert link to parent pillar</button>
+                          }
+                        </div>
+                      )
+                    })() : (
+                      <p style={{{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}}>Loading parent pillar...</p>
+                    )}
+                  </div>
+                )}
+
+                {/* PILLAR → CLUSTER ARTICLES */}
+                {form.is_pillar_content && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: 0 }}>Related Cluster Articles</p>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setClusterLoading(true)
+                          const savedSlug = form.slug
+                          if (!savedSlug) { setClusterLoading(false); return }
+                          const slugRes = await fetch(
+                            `https://bicljoujevywrkzjeaoy.supabase.co/rest/v1/articles?select=id&slug=eq.${savedSlug}&limit=1`,
+                            { headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g' } }
+                          )
+                          const slugData = await slugRes.json()
+                          const articleId = slugData?.[0]?.id
+                          if (!articleId) { setClusterArticles([]); setClusterLoading(false); return }
+                          const res = await fetch(
+                            `https://bicljoujevywrkzjeaoy.supabase.co/rest/v1/articles?select=id,title,slug,categories!articles_category_id_fkey(slug)&pillar_topic_id=eq.${articleId}&status=eq.published&order=title`,
+                            { headers: { apikey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g' } }
+                          )
+                          const data = await res.json()
+                          setClusterArticles(Array.isArray(data) ? data : [])
+                          setClusterLoading(false)
+                        }}
+                        style={{ fontSize: '11px', color: '#c9b28f', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}
+                      >{clusterLoading ? 'Loading...' : 'Load'}</button>
+                    </div>
+                    {clusterArticles.length === 0 && !clusterLoading && (
+                      <p style={{{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}}>Save this article as a draft first to see connected cluster articles.</p>
+                    )}
+                    {clusterArticles.length > 0 && (
+                      <>
+                        {clusterArticles.map((a: any) => {
+                          const href = `/articles/${a.categories?.slug}/${a.slug}`
+                          const linked = isAlreadyLinked(href)
+                          return (
+                            <div key={a.id} style={{{ backgroundColor: '#f7f4ee', border: '1px solid #ede8df', padding: '0.75rem', borderRadius: 2, marginBottom: '0.5rem' }}}>
+                              <div style={{{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.35rem', lineHeight: 1.4 }}}>{a.title}</div>
+                              {linked
+                                ? <span style={{{ fontSize: '11px', color: '#2d7a3a', fontWeight: 600 }}}>✓ Already linked in this article</span>
+                                : <button
+                                    type="button"
+                                    onClick={() => insertInternalLink(href, a.title)}
+                                    style={{{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}}
+                                  >Insert link</button>
+                              }
+                            </div>
+                          )
+                        })}
+                        <button
+                          type="button"
+                          onClick={() => insertRelatedClusterBlock(clusterArticles)}
+                          style={{ width: '100%', marginTop: '0.25rem', padding: '0.5rem', backgroundColor: '#f7f4ee', border: '1px solid #0e1a2b', color: '#0e1a2b', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2 }}
+                        >Insert all as bulleted list</button>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* CORNERSTONE LINK */}
+                {form.cornerstone_article_id && (
+                  <div>
+                    <p style={{ fontSize: '11px', fontWeight: 700, color: '#4A5563', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: '0.5rem' }}>Cornerstone Article</p>
+                    {cornerstoneData ? (() => {
+                      const href = `/articles/${cornerstoneData.categories?.slug}/${cornerstoneData.slug}`
+                      const linked = isAlreadyLinked(href)
+                      return (
+                        <div style={{{ backgroundColor: '#f7f4ee', border: '1px solid #ede8df', padding: '0.75rem', borderRadius: 2, marginBottom: '0.5rem' }}}>
+                          <div style={{{ fontSize: '13px', fontWeight: 600, color: '#0e1a2b', marginBottom: '0.35rem', lineHeight: 1.4 }}}>{cornerstoneData.title}</div>
+                          {linked
+                            ? <span style={{{ fontSize: '11px', color: '#2d7a3a', fontWeight: 600 }}}>✓ Already linked in this article</span>
+                            : <button
+                                type="button"
+                                onClick={() => insertInternalLink(href, cornerstoneData.title)}
+                                style={{{ padding: '0.4rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' as const, cursor: 'pointer', borderRadius: 2, whiteSpace: 'nowrap' as const }}}
+                              >Insert link to cornerstone</button>
+                          }
+                        </div>
+                      )
+                    })() : (
+                      <p style={{{ fontSize: '12px', color: '#9a9085', fontStyle: 'italic' as const, margin: 0 }}}>Loading cornerstone article...</p>
+                    )}
+                  </div>
+                )}
               </SidebarSection>
 
               {/* SETTINGS (tags, category, author) — collapsed */}
