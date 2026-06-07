@@ -52,6 +52,12 @@ export default function AccountPage() {
   const [emailSending, setEmailSending] = useState(false)
   const [emailMsg, setEmailMsg] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [showCodeEntry, setShowCodeEntry] = useState(false)
+  const [confirmCode, setConfirmCode] = useState('')
+  const [codeError, setCodeError] = useState('')
+  const [codeSuccess, setCodeSuccess] = useState(false)
+  const [codeLoading, setCodeLoading] = useState(false)
+  const [pendingEmail, setPendingEmail] = useState('')
   const [loading, setLoading] = useState(true)
   const [auth, setAuth] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<Tab>('feed')
@@ -358,10 +364,34 @@ export default function AccountPage() {
         body: JSON.stringify({ userId: auth.uid, newEmail, currentEmail: profile.email })
       })
       const data = await res.json()
-      if (data.success) { setEmailMsg('Confirmation email sent! Check your inbox.'); setNewEmail('') }
+      if (data.success) { setEmailMsg('Confirmation email sent! Check your inbox.'); setPendingEmail(newEmail); setNewEmail(''); setShowCodeEntry(true) }
       else setEmailError(data.error || 'Failed to send confirmation.')
     } catch { setEmailError('Something went wrong.') }
     finally { setEmailSending(false) }
+  }
+
+  async function handleCodeConfirm(e: React.FormEvent) {
+    e.preventDefault()
+    if (!confirmCode || !auth?.uid || !pendingEmail) return
+    setCodeLoading(true); setCodeError('')
+    try {
+      const res = await fetch('/api/auth/confirm-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: confirmCode, userId: auth.uid, newEmail: pendingEmail })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setCodeSuccess(true)
+        setProfile({ ...profile, email: pendingEmail })
+        setShowCodeEntry(false)
+        setEmailMsg('')
+        setConfirmCode('')
+      } else {
+        setCodeError(data.error || 'Invalid code.')
+      }
+    } catch { setCodeError('Something went wrong.') }
+    finally { setCodeLoading(false) }
   }
 
   function SettingsTab() {
@@ -419,6 +449,27 @@ export default function AccountPage() {
             </div>
             {emailError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: 0 }}>{emailError}</p>}
             {emailMsg && <p style={{ fontSize: '12px', color: '#2d7a3a', margin: 0 }}>✓ {emailMsg}</p>}
+            {codeSuccess && <p style={{ fontSize: '12px', color: '#2d7a3a', margin: 0 }}>✓ Email updated successfully.</p>}
+            {showCodeEntry && !codeSuccess && (
+              <form onSubmit={handleCodeConfirm} style={{ marginTop: '0.75rem', padding: '1rem', backgroundColor: 'var(--color-cream)', borderRadius: 4 }}>
+                <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-navy)', margin: '0 0 0.5rem' }}>Enter the 6-digit code from your email:</p>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={confirmCode}
+                    onChange={e => setConfirmCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="000000"
+                    style={{ flex: 1, padding: '0.75rem', border: '1px solid var(--color-border)', borderRadius: 4, fontSize: '1.2rem', letterSpacing: '0.3em', textAlign: 'center', outline: 'none', backgroundColor: '#fff', color: 'var(--color-navy)' }}
+                  />
+                  <button type="submit" disabled={codeLoading || confirmCode.length !== 6} style={{ padding: '0.75rem 1rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '12px', border: 'none', borderRadius: 4, cursor: 'pointer', opacity: confirmCode.length !== 6 || codeLoading ? 0.5 : 1 }}>
+                    {codeLoading ? '...' : 'Confirm'}
+                  </button>
+                </div>
+                {codeError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: '0.5rem 0 0' }}>{codeError}</p>}
+              </form>
+            )}
             <button type="submit" disabled={emailSending || !newEmail} style={{ padding: '0.85rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', borderRadius: 4, cursor: 'pointer', opacity: emailSending || !newEmail ? 0.6 : 1 }}>
               {emailSending ? 'Sending...' : 'Send Confirmation Email'}
             </button>
