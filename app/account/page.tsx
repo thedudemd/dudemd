@@ -48,11 +48,6 @@ const NAV: { id: Tab; label: string }[] = [
 
 export default function AccountPage() {
   const [profile, setProfile] = useState<any>(null)
-  const [newEmail, setNewEmail] = useState('')
-  const [emailSending, setEmailSending] = useState(false)
-  const [emailMsg, setEmailMsg] = useState('')
-  const [emailError, setEmailError] = useState('')
-
   const [loading, setLoading] = useState(true)
   const [auth, setAuth] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<Tab>('feed')
@@ -347,25 +342,6 @@ export default function AccountPage() {
     )
   }
 
-  async function handleEmailChange(e: React.FormEvent) {
-    e.preventDefault()
-    if (!newEmail || !auth?.uid || !profile?.email) return
-    if (newEmail === profile.email) { setEmailError('New email is the same as current.'); return }
-    setEmailSending(true); setEmailError(''); setEmailMsg('')
-    try {
-      const res = await fetch('/api/auth/change-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: auth.uid, newEmail, currentEmail: profile.email })
-      })
-      const data = await res.json()
-      if (data.success) { setEmailMsg('Confirmation email sent! Check your inbox.'); setPendingEmail(newEmail); setNewEmail(''); setShowCodeEntry(true) }
-      else setEmailError(data.error || 'Failed to send confirmation.')
-    } catch { setEmailError('Something went wrong.') }
-    finally { setEmailSending(false) }
-  }
-
-
   function SettingsTab() {
     const inp: any = { width: '100%', padding: '0.8rem 1rem', border: '1px solid var(--color-border)', borderRadius: 4, fontSize: '14px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit', color: 'var(--color-navy)' }
     return (
@@ -409,22 +385,6 @@ export default function AccountPage() {
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
             {savedProfile && <p style={{ fontSize: '13px', color: '#2d7a3a', textAlign: 'center', margin: 0 }}>✓ Saved.</p>}
-          </form>
-        </div>
-        <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 6, padding: '1.5rem' }}>
-          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#9a9085', margin: '0 0 1.25rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--color-border)' }}>Email Address</p>
-          <p style={{ fontSize: '13px', color: 'var(--color-slate)', margin: '0 0 1rem' }}>Current: <strong style={{ color: 'var(--color-navy)' }}>{profile?.email || '—'}</strong></p>
-          <form onSubmit={handleEmailChange} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--color-slate)', marginBottom: '0.4rem' }}>New Email Address</label>
-              <input type="email" style={inp} defaultValue={newEmail} onBlur={e => setNewEmail(e.target.value)} placeholder="Enter new email address" />
-            </div>
-            {emailError && <p style={{ fontSize: '12px', color: '#a32d2d', margin: 0 }}>{emailError}</p>}
-            {emailMsg && <p style={{ fontSize: '12px', color: '#2d7a3a', margin: 0 }}>✓ {emailMsg}</p>}
-
-            <button type="submit" disabled={emailSending || !newEmail} style={{ padding: '0.85rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', borderRadius: 4, cursor: 'pointer', opacity: emailSending || !newEmail ? 0.6 : 1 }}>
-              {emailSending ? 'Sending...' : 'Send Confirmation Email'}
-            </button>
           </form>
         </div>
         <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 6, padding: '1.5rem' }}>
