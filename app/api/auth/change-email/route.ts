@@ -47,11 +47,7 @@ export async function POST(req: NextRequest) {
           <div style="text-align: center; margin: 2rem 0;">
             <a href="${confirmLink}" style="display: inline-block; padding: 0.85rem 2rem; background: #0e1a2b; color: #f7f4ee; text-decoration: none; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;">Confirm New Email</a>
           </div>
-          <p style="color: #4A5563; line-height: 1.7; margin: 1.5rem 0 0.5rem;">If the button doesn't work, enter this 6-digit code on the confirmation page:</p>
-          <div style="text-align: center; margin: 1rem 0;">
-            <span style="font-size: 2.5rem; font-weight: 700; letter-spacing: 0.5rem; color: #0e1a2b; font-family: monospace;">${token}</span>
-          </div>
-          <p style="color: #9a9085; font-size: 0.85rem; margin: 1.5rem 0 0;">This code expires in 15 minutes. If you didn't request this change, you can ignore this email.</p>
+          <p style="color: #9a9085; font-size: 0.85rem; margin: 1.5rem 0 0;">If you didn't request this change, you can safely ignore this email.</p>
         </div>
         <p style="text-align: center; font-size: 0.75rem; color: #9a9085; margin-top: 1.5rem;">© ${new Date().getFullYear()} DudeMD. All rights reserved.</p>
       </div>
