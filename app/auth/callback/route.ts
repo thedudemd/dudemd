@@ -7,6 +7,13 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/'
+  const error = searchParams.get('error')
+
+  // If there's an error param but also an access_token in the hash,
+  // redirect to a client-side handler to process the implicit flow tokens
+  if (error && request.url.includes('access_token')) {
+    return NextResponse.redirect(`${origin}/auth/confirm${request.url.substring(request.url.indexOf('#'))}`)
+  }
 
   if (code) {
     const cookieStore = await cookies()
@@ -30,8 +37,8 @@ export async function GET(request: NextRequest) {
       }
     )
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
+    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+    if (!exchangeError) {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
         const { data: profile } = await supabase
@@ -47,5 +54,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/signin?error=auth_failed`)
+  // Handle implicit flow - redirect to client page to process hash tokens
+  return NextResponse.redirect(`${origin}/auth/confirm`)
 }
