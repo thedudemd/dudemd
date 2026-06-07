@@ -166,9 +166,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <span style={{ fontSize: '12px', color: '#9a9085' }}>{article.read_time}</span>
             </div>
 
-            <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', lineHeight: 1.15, color: 'var(--color-navy)', marginBottom: '1.25rem' }}>
-              {article.title}
-            </h1>
+            {(article.layout !== 'magazine' && article.layout !== 'longform') && (
+              <h1 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', lineHeight: 1.15, color: 'var(--color-navy)', marginBottom: '1.25rem' }}>
+                {article.title}
+              </h1>
+            )}
 
             <p style={{ fontSize: '18px', color: 'var(--color-slate)', lineHeight: 1.65, marginBottom: '1.5rem', fontStyle: 'italic', borderLeft: '3px solid var(--color-gold)', paddingLeft: '1rem' }}>
               {article.excerpt}
