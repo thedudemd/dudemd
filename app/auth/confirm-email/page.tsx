@@ -42,7 +42,7 @@ function ConfirmEmailInner() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-cream)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1.5rem', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ width: '100%', maxWidth: '420px', backgroundColor: '#fff', padding: '2.5rem 2rem', border: '1px solid var(--color-border)', textAlign: 'center' }}>
-        <img src="/dude-md.svg" alt="DudeMD" style={{ height: 48, width: 'auto', marginBottom: '1.5rem', filter: 'brightness(0) saturate(100%) invert(76%) sepia(20%) saturate(600%) hue-rotate(350deg) brightness(95%) contrast(88%)' }} />
+        
 
         {status === 'loading' && (
           <>
