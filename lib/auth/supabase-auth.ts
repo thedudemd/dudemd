@@ -1,63 +1,42 @@
 import { createBrowserClient } from '@supabase/ssr'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = 'https://bicljoujevywrkzjeaoy.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
 
-// Cookie domain shared across *.dudemd.com subdomains
 export function createClient() {
-  return createBrowserClient(supabaseUrl, supabaseAnonKey, {
-    cookieOptions: {
-      domain: '.dudemd.com',
-      path: '/',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    },
-  })
+  return createBrowserClient(supabaseUrl, supabaseAnonKey)
 }
 
 export async function signInWithGoogle() {
   const supabase = createClient()
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-    },
+    options: { redirectTo: 'https://www.dudemd.com/auth/callback' },
   })
   if (error) throw error
 }
 
 export async function signInWithApple() {
-  // TODO: Enable Apple provider in Supabase console before activating
   const supabase = createClient()
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'apple',
-    options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-    },
+    options: { redirectTo: 'https://www.dudemd.com/auth/callback' },
   })
   if (error) throw error
 }
 
 export async function signInWithFacebook() {
-  // TODO: Enable Facebook provider in Supabase console before activating
   const supabase = createClient()
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'facebook',
-    options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-    },
+    options: { redirectTo: 'https://www.dudemd.com/auth/callback', scopes: 'email,public_profile' },
   })
   if (error) throw error
 }
 
-export async function signInWithMagicLink(email: string) {
+export async function signInWithEmailPassword(email: string, password: string) {
   const supabase = createClient()
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-    },
-  })
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) throw error
 }
 
