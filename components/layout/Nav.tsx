@@ -321,7 +321,7 @@ export default function Nav() {
         </div>
 
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', padding: '1rem 0' }}>
-          {['Our Story', 'Editorial Policy', 'Advertise', 'Contact'].map((it) => (
+          {['About Us', 'Editorial Policy', 'Advertise', 'Contact'].map((it) => (
             <Link key={it} href={`/${it.toLowerCase().replace(/ /g, '-')}`}
               onClick={() => setDrawerOpen(false)}
               style={{ display: 'block', padding: '0.6rem 1.5rem', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', letterSpacing: '0.06em' }}>
