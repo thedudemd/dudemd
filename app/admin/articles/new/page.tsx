@@ -191,7 +191,7 @@ function NewArticleInner() {
       fd.append('file', file)
       const res = await fetch('/api/upload-image', { method: 'POST', body: fd })
       const data = await res.json()
-      if (data.url) { editor.chain().focus().setImage({ src: data.url }).run() }
+      if (data.url) { editor.chain().focus().insertContent({ type: 'image', attrs: { src: data.url } }).run() }
       else { alert('Upload failed: ' + (data.error || 'Unknown error')) }
     } catch (err) { alert('Upload failed') }
     setImgUploading(false)
@@ -211,7 +211,7 @@ function NewArticleInner() {
       fd.append('file', file)
       const res = await fetch('/api/upload-image', { method: 'POST', body: fd })
       const data = await res.json()
-      if (data.url) { editor.chain().focus().setImage({ src: data.url }).run() }
+      if (data.url) { editor.chain().focus().insertContent({ type: 'image', attrs: { src: data.url } }).run() }
       else { alert('Upload failed: ' + (data.error || 'Unknown error')) }
     } catch (err) { alert('Upload failed') }
     setImgUploading(false)
