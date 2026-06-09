@@ -26,6 +26,8 @@ function NewArticleInner() {
   const [categories, setCategories] = useState<any[]>([])
   const [subcategories, setSubcategories] = useState<any[]>([])
   const [tagInput, setTagInput] = useState("")
+  const tagInputRef = useRef<HTMLInputElement>(null)
+  const tagInputRef = useRef<HTMLInputElement>(null)
   const [authors, setAuthors] = useState<any[]>([])
   const [saving, setSaving] = useState(false)
   const [autoSaved, setAutoSaved] = useState('')
@@ -417,6 +419,26 @@ function NewArticleInner() {
     }
     setShowPublishConfirm(false)
     setPendingPublishStatus(null)
+    if (status === "published" && !form.category_id) {
+      alert("Please select a category before publishing.")
+      setShowPublishConfirm(false)
+      return
+    }
+    if (status === "published" && !form.author_id) {
+      alert("Please select an author before publishing.")
+      setShowPublishConfirm(false)
+      return
+    }
+    if (status === "published" && !form.category_id) {
+      alert("Please select a category before publishing.")
+      setShowPublishConfirm(false)
+      return
+    }
+    if (status === "published" && !form.author_id) {
+      alert("Please select an author before publishing.")
+      setShowPublishConfirm(false)
+      return
+    }
     if (status === "published" && !form.cover_image_url && form.show_hero) {
       alert("Please add a cover image before publishing.")
       return
@@ -431,7 +453,7 @@ function NewArticleInner() {
       setForm(f => ({ ...f, slug: finalSlug }))
     }
     const cleanForm = { ...form, slug: finalSlug, category_id: form.category_id || null, subcategory_id: form.subcategory_id || null, author_id: form.author_id || null }
-    const { error } = await supabase.from('articles').insert({ ...cleanForm, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null, is_pillar_content: form.is_pillar_content, is_cornerstone: form.is_cornerstone, pillar_topic_id: form.pillar_topic_id || null, cornerstone_article_id: form.cornerstone_article_id || null })
+    const { error } = await supabase.from('articles').insert({ ...cleanForm, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null, updated_at: new Date().toISOString(), updated_at: new Date().toISOString(), is_pillar_content: form.is_pillar_content, is_cornerstone: form.is_cornerstone, pillar_topic_id: form.pillar_topic_id || null, cornerstone_article_id: form.cornerstone_article_id || null })
     if (error) { alert('Error: ' + error.message); setSaving(false) }
     else { localStorage.removeItem('draft_' + session.user.id); router.push('/admin') }
   }
@@ -1060,7 +1082,7 @@ function NewArticleInner() {
                       </span>
                     ))}
                   </div>
-                  <input value={tagInput} onChange={e=>setTagInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&tagInput.trim()){e.preventDefault();setForm(f=>({...f,tags:[...(f.tags||[]),tagInput.trim()]}));setTagInput('')}}} placeholder="Type tag + Enter" style={inp} />
+                  <input ref={tagInputRef} defaultValue="" onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();const val=(e.target as HTMLInputElement).value.trim();if(val){setForm(f=>({...f,tags:[...(f.tags||[]),val]}));(e.target as HTMLInputElement).value=''}}}} placeholder="Type tag + Enter" style={inp} />
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
