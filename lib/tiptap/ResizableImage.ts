@@ -24,7 +24,7 @@ export const ResizableImage = Node.create({
   },
 
   addNodeView() {
-    return ({ node, updateAttributes }) => {
+    return ({ node, updateAttributes, editor }) => {
       const wrapper = document.createElement('div')
       wrapper.style.cssText = 'position:relative;display:block;max-width:100%;'
 
@@ -60,6 +60,7 @@ export const ResizableImage = Node.create({
           const pct = Math.round((finalWidth / parentWidth) * 100)
           img.style.width = pct + '%'
           updateAttributes({ width: pct + '%' })
+          editor.commands.focus()
           document.removeEventListener('mousemove', onMouseMove)
           document.removeEventListener('mouseup', onMouseUp)
         }
