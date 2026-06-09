@@ -210,7 +210,7 @@ export default async function HomePage() {
               { label: 'Mind', slug: 'mind' },
               { label: 'Recovery', slug: 'recovery' },
             ].map((cat) => (
-              <Link key={cat.slug} href={'/category/' + cat.slug} style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-cream)', textDecoration: 'none' }}>{cat.label}</Link>
+              <Link key={cat.slug} href={'/category/' + cat.slug} style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>{cat.label}</Link>
             ))}
           </div>
         </div>
