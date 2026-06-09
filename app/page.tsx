@@ -199,20 +199,18 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* WELLNESS MISSION BAND */}
-      <section style={{ backgroundColor: 'var(--color-navy)', padding: '3rem 0' }}>
+      {/* CATEGORY BAND */}
+      <section style={{ backgroundColor: 'var(--color-navy)', padding: '2.5rem 0' }}>
         <div className="container-content">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', textAlign: 'center' }}>
+          <div className="category-band-links">
             {[
-              { label: 'Mind', desc: 'Mental clarity, stress, focus' },
-              { label: 'Body', desc: 'Fitness, nutrition, recovery' },
-              { label: 'Style', desc: 'Grooming, fashion, presence' },
-              { label: 'Life', desc: 'Relationships, purpose, growth' },
-            ].map((p) => (
-              <div key={p.label}>
-                <p style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.4rem' }}>{p.label}</p>
-                <p style={{ fontSize: '13px', color: 'rgba(247,244,238,0.55)', lineHeight: 1.5 }}>{p.desc}</p>
-              </div>
+              { label: 'Fitness', slug: 'fitness' },
+              { label: 'Health', slug: 'health' },
+              { label: 'Lifestyle', slug: 'lifestyle' },
+              { label: 'Mind', slug: 'mind' },
+              { label: 'Recovery', slug: 'recovery' },
+            ].map((cat) => (
+              <Link key={cat.slug} href={'/category/' + cat.slug} style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-cream)', textDecoration: 'none' }}>{cat.label}</Link>
             ))}
           </div>
         </div>

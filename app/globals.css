@@ -87,3 +87,4 @@ ul li:empty, ul li p:empty { display: none; } ul li:has(p:empty):not(:has(p:not(
 .static-content li { margin-bottom: 0.4rem; }
 .static-content a { color: var(--color-gold); text-decoration: underline; }
 .static-content blockquote { border-left: 3px solid var(--color-gold); padding-left: 1rem; margin: 1rem 0; font-style: italic; color: var(--color-slate); }
+.category-band-links { display: flex; justify-content: center; align-items: center; gap: 3rem; flex-wrap: wrap; } @media (max-width: 768px) { .category-band-links { display: none; } }
