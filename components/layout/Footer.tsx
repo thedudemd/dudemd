@@ -3,6 +3,7 @@ import { supabaseServer } from '@/lib/supabase/server'
 
 export default async function Footer() {
   const { data: categories } = await supabaseServer.from("categories").select("name,slug").is("parent_id",null).eq("enabled",true).order("sort_order").order("name")
+  const { data: footerPages } = await supabaseServer.from("static_pages").select("title,slug").eq("placement","footer").eq("published",true).order("sort_order").order("title")
   return (
     <footer>
       <div style={{ backgroundColor: 'var(--color-navy)', padding: '4rem 0 2rem' }}>
@@ -31,8 +32,8 @@ export default async function Footer() {
             </div>
             <div>
               <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '1rem' }}>Company</p>
-              {['About Us','Editorial Policy','Contact','Advertise'].map((item) => (
-                <Link key={item} href={`/${item.toLowerCase().replace(' ','-')}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>{item}</Link>
+              {(footerPages || []).map((page) => (
+                <Link key={page.slug} href={`/${page.slug}`} style={{ display: 'block', fontSize: '13px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none', marginBottom: '0.5rem' }}>{page.title}</Link>
               ))}
             </div>
             <div>
