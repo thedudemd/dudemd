@@ -582,7 +582,7 @@ function NewArticleInner() {
           </div>
         </header>
         <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: fullscreen ? 'min(740px, 100%)' : '1fr 300px', gap: '2rem', alignItems: 'start', justifyContent: fullscreen ? 'center' : 'stretch' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: fullscreen ? '1fr' : '1fr 300px', gap: '2rem', alignItems: 'start' }}>
             {/* LEFT COLUMN */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
