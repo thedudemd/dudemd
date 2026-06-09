@@ -193,7 +193,7 @@ export default async function StaticPage({ params }: { params: Promise<{ slug: s
                   ))}
                 </div>
               )}
-              <div style={{ fontSize: '16px', color: 'var(--color-charcoal)', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: page.content || '' }} />
+              <div className="static-content" style={{ fontSize: '16px', color: 'var(--color-charcoal)', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: page.content || '' }} />
             </article>
           </div>
         </div>
