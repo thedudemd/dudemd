@@ -24,7 +24,7 @@ export const ResizableImage = Node.create({
   },
 
   addNodeView() {
-    return ({ node, updateAttributes, editor }) => {
+    return ({ node, getPos, editor }) => {
       const wrapper = document.createElement('div')
       wrapper.style.cssText = 'position:relative;display:block;max-width:100%;'
 
@@ -40,7 +40,7 @@ export const ResizableImage = Node.create({
       handle.addEventListener('mousedown', (e) => {
         e.preventDefault()
         e.stopPropagation()
-        
+
         const startX = e.clientX
         const startWidth = img.offsetWidth
         const parentWidth = wrapper.parentElement ? wrapper.parentElement.offsetWidth : 800
@@ -53,14 +53,21 @@ export const ResizableImage = Node.create({
           img.style.width = newWidth + 'px'
         }
 
-        const onMouseUp = (e) => {
+        const onMouseUp = () => {
           if (!isDragging) return
           isDragging = false
           const finalWidth = img.offsetWidth
           const pct = Math.round((finalWidth / parentWidth) * 100)
           img.style.width = pct + '%'
-          updateAttributes({ width: pct + '%' })
-          editor.commands.focus()
+
+          // Dispatch a proper transaction to trigger onUpdate
+          const pos = typeof getPos === 'function' ? getPos() : null
+          if (pos !== null) {
+            const { tr } = editor.state
+            tr.setNodeMarkup(pos, undefined, { ...node.attrs, width: pct + '%' })
+            editor.view.dispatch(tr)
+          }
+
           document.removeEventListener('mousemove', onMouseMove)
           document.removeEventListener('mouseup', onMouseUp)
         }
