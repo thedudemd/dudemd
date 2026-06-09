@@ -203,6 +203,7 @@ export default function ArticleContent({ article, slug, category, relatedArticle
       <LoginPromptModal />
       <ShareBar />
       <div className="article-body" style={{ fontSize: '16px', color: 'var(--color-charcoal)', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: article.content || '' }} />
+      <p style={{ fontSize: '11px', color: '#9a9085', marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)', lineHeight: 1.5 }}>For informational purposes only. This article is not a substitute for professional medical advice, diagnosis, or treatment.</p>
       {article.faq_items && article.faq_items.length > 0 && (
         <div style={{ marginTop: '3rem', padding: '2rem', backgroundColor: 'var(--color-cream)', borderRadius: '8px' }}>
           <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '1.5rem' }}>Frequently Asked Questions</h2>
