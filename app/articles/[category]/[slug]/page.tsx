@@ -172,9 +172,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </h1>
             )}
 
-            <p style={{ fontSize: '18px', color: 'var(--color-slate)', lineHeight: 1.65, marginBottom: '1.5rem', fontStyle: 'italic', borderLeft: '3px solid var(--color-gold)', paddingLeft: '1rem' }}>
-              {article.excerpt}
-            </p>
+            {(article.layout !== 'magazine' && article.layout !== 'longform') && (
+              <p style={{ fontSize: '18px', color: 'var(--color-slate)', lineHeight: 1.65, marginBottom: '1.5rem', fontStyle: 'italic', borderLeft: '3px solid var(--color-gold)', paddingLeft: '1rem' }}>
+                {article.excerpt}
+              </p>
+            )}
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--color-border)', marginBottom: '2rem' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
