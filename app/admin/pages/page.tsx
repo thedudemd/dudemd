@@ -399,7 +399,8 @@ export default function PagesAdmin() {
                   <label style={lbl}>Placement</label>
                   <select style={inp} value={editing.placement} onChange={e => setEditing({ ...editing, placement: e.target.value })}>
                     <option value="hidden">Hidden (direct URL only)</option>
-                    <option value="footer">Footer</option>
+                    <option value="footer_company">Footer — Company</option>
+                    <option value="footer_legal">Footer — Legal</option>
                     <option value="nav">Top Navigation</option>
                   </select>
                 </div>
