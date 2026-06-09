@@ -19,7 +19,7 @@ export default function RichTextEditor({ content, onChange }: { content: string,
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({ image: false }),
       Underline,
       Link.configure({ openOnClick: false, HTMLAttributes: { class: 'editor-link' } }),
       ResizableImage,
