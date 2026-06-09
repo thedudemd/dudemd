@@ -27,7 +27,6 @@ function NewArticleInner() {
   const [subcategories, setSubcategories] = useState<any[]>([])
   const [tagInput, setTagInput] = useState("")
   const tagInputRef = useRef<HTMLInputElement>(null)
-  const tagInputRef = useRef<HTMLInputElement>(null)
   const [authors, setAuthors] = useState<any[]>([])
   const [saving, setSaving] = useState(false)
   const [autoSaved, setAutoSaved] = useState('')
