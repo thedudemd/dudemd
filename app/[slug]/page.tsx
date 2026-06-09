@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
+import ContactPage from '@/components/ContactPage'
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
@@ -162,6 +163,10 @@ export default async function StaticPage({ params }: { params: Promise<{ slug: s
 
   const children = await getChildren(page.id)
   const hasBlocks = page.blocks && Array.isArray(page.blocks) && page.blocks.length > 0
+
+  if (slug === 'contact') {
+    return <ContactPage page={page} />
+  }
 
   return (
     <main style={{ minHeight: '70vh', backgroundColor: 'var(--color-cream)' }}>

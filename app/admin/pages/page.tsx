@@ -196,7 +196,7 @@ export default function PagesAdmin() {
   }
 
   function newPage(parentId = null) {
-    setEditing({ title: '', slug: '', content: '', blocks: [], parent_id: parentId, placement: 'hidden', published: true, indexable: true, meta_description: '' })
+    setEditing({ title: '', slug: '', content: '', blocks: [], parent_id: parentId, placement: 'hidden', published: true, indexable: true, meta_description: '', sort_order: 0 })
     setCreating(true)
     setEditorMode('rich')
   }
@@ -390,7 +390,11 @@ export default function PagesAdmin() {
                 </div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div>
+                  <label style={lbl}>Sort Order</label>
+                  <input style={inp} type="number" value={editing.sort_order || 0} onChange={e => setEditing({ ...editing, sort_order: parseInt(e.target.value) || 0 })} placeholder="0" />
+                </div>
                 <div>
                   <label style={lbl}>Placement</label>
                   <select style={inp} value={editing.placement} onChange={e => setEditing({ ...editing, placement: e.target.value })}>
