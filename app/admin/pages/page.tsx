@@ -1,6 +1,6 @@
 // @ts-nocheck
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
@@ -21,6 +21,37 @@ function defaultBlock(type: string) {
   if (type === 'stats') return { type, headline: '', stats: [{ number: '', label: '' }, { number: '', label: '' }, { number: '', label: '' }] }
   if (type === 'mission') return { type, headline: '', body: '', accent_color: '#c9b28f' }
   return { type }
+}
+
+
+function ImageUploadInput({ value, onChange, placeholder }: { value: string, onChange: (url: string) => void, placeholder?: string }) {
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const inp: any = { flex: 1, padding: '0.6rem 0.75rem', border: '1px solid #e8e4de', fontSize: '13px', outline: 'none', boxSizing: 'border-box', backgroundColor: '#fff', fontFamily: 'inherit' }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    const form = new FormData()
+    form.append('file', file)
+    try {
+      const res = await fetch('/api/upload-image', { method: 'POST', body: form })
+      const data = await res.json()
+      if (data.url) onChange(data.url)
+      else alert('Upload failed: ' + (data.error || 'Unknown error'))
+    } catch { alert('Upload failed') }
+    setUploading(false)
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
+  return (
+    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+      <input style={inp} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder || 'https://... or upload below'} />
+      <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} style={{ padding: '0.6rem 0.75rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontWeight: 700, fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '0.06em' }}>{uploading ? '...' : '↑ Upload'}</button>
+      <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUpload} />
+    </div>
+  )
 }
 
 function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown }: any) {
@@ -47,7 +78,7 @@ function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown }: any) {
             <label style={lbl}>Subheadline</label>
             <textarea style={ta} value={block.subheadline} onChange={e => onChange({ ...block, subheadline: e.target.value })} placeholder="One or two lines of supporting copy" />
             <label style={lbl}>Background Image URL (optional — leave blank for solid color)</label>
-            <input style={inp} value={block.image_url} onChange={e => onChange({ ...block, image_url: e.target.value })} placeholder="https://..." />
+            <ImageUploadInput value={block.image_url} onChange={url => onChange({ ...block, image_url: url })} placeholder="https://... or upload" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div>
                 <label style={lbl}>Background Color</label>
@@ -74,7 +105,7 @@ function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown }: any) {
         {block.type === 'two_column' && (
           <>
             <label style={lbl}>Image URL</label>
-            <input style={inp} value={block.image_url} onChange={e => onChange({ ...block, image_url: e.target.value })} placeholder="https://..." />
+            <ImageUploadInput value={block.image_url} onChange={url => onChange({ ...block, image_url: url })} placeholder="https://... or upload" />
             <label style={lbl}>Image Position</label>
             <select style={inp} value={block.image_side} onChange={e => onChange({ ...block, image_side: e.target.value })}>
               <option value="left">Image Left, Text Right</option>
@@ -103,7 +134,7 @@ function BlockEditor({ block, onChange, onDelete, onMoveUp, onMoveDown }: any) {
                 </div>
                 <input style={inp} value={m.name} onChange={e => { const ms = [...block.members]; ms[i] = { ...ms[i], name: e.target.value }; onChange({ ...block, members: ms }) }} placeholder="Full Name" />
                 <input style={inp} value={m.title} onChange={e => { const ms = [...block.members]; ms[i] = { ...ms[i], title: e.target.value }; onChange({ ...block, members: ms }) }} placeholder="Job Title" />
-                <input style={inp} value={m.photo_url} onChange={e => { const ms = [...block.members]; ms[i] = { ...ms[i], photo_url: e.target.value }; onChange({ ...block, members: ms }) }} placeholder="Photo URL (https://...)" />
+                <ImageUploadInput value={m.photo_url} onChange={url => { const ms = [...block.members]; ms[i] = { ...ms[i], photo_url: url }; onChange({ ...block, members: ms }) }} placeholder="Photo URL or upload" />
                 <textarea style={ta} value={m.bio} onChange={e => { const ms = [...block.members]; ms[i] = { ...ms[i], bio: e.target.value }; onChange({ ...block, members: ms }) }} placeholder="Short bio..." />
               </div>
             ))}

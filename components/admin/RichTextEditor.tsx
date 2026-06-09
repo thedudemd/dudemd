@@ -2,7 +2,7 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
-import Image from '@tiptap/extension-image'
+import { ResizableImage } from '@/lib/tiptap/ResizableImage'
 import Underline from '@tiptap/extension-underline'
 import Table from '@tiptap/extension-table'
 import TableRow from '@tiptap/extension-table-row'
@@ -22,7 +22,7 @@ export default function RichTextEditor({ content, onChange }: { content: string,
       StarterKit,
       Underline,
       Link.configure({ openOnClick: false, HTMLAttributes: { class: 'editor-link' } }),
-      Image.configure({ HTMLAttributes: { class: 'editor-image', style: 'max-width: 100%; height: auto; margin: 1rem 0;' } }),
+      ResizableImage,
       Table.configure({ resizable: true, HTMLAttributes: { class: 'editor-table' } }),
       TableRow,
       TableHeader,
@@ -45,7 +45,7 @@ export default function RichTextEditor({ content, onChange }: { content: string,
     const { error } = await supabase.storage.from('media').upload(path, file)
     if (!error) {
       const { data } = supabase.storage.from('media').getPublicUrl(path)
-      editor.chain().focus().setImage({ src: data.publicUrl }).run()
+      editor.chain().focus().insertContent({ type: 'image', attrs: { src: data.publicUrl } }).run()
     } else {
       alert('Upload failed: ' + error.message)
     }
