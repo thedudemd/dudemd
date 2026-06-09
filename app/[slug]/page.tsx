@@ -51,7 +51,7 @@ export default async function StaticPage({ params }: { params: Promise<{ slug: s
 
   return (
     <main style={{ minHeight: '70vh', backgroundColor: 'var(--color-cream)', padding: '3rem 0' }}>
-      <div style={{ maxWidth: '740px', margin: '0 auto', padding: '0 1.5rem' }}>
+      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 1.5rem' }}>
         <article style={{ backgroundColor: '#fff', padding: '3rem', border: '1px solid var(--color-border)' }}>
           <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '1.5rem' }}>{page.title}</h1>
           {children.length > 0 && (
