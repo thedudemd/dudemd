@@ -20,6 +20,16 @@ async function getArticle(slug: string) {
   return data
 }
 
+async function getClusterArticles(pillarId: string) {
+  const { data } = await supabase.from('articles').select('*, authors(name), categories!articles_category_id_fkey(name, slug)').eq('pillar_topic_id', pillarId).eq('published', true).order('title')
+  return data || []
+}
+
+async function getParentPillar(pillarId: string) {
+  const { data } = await supabase.from('articles').select('title, slug, categories!articles_category_id_fkey(slug)').eq('id', pillarId).eq('published', true).single()
+  return data || null
+}
+
 async function getRelated(categorySlug: string, currentSlug: string) {
   const { data: category } = await supabase
     .from('categories')
@@ -73,6 +83,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const article = await getArticle(slug)
   if (!article) notFound()
   const related = await getRelated(article.categories?.slug, slug)
+  const clusterArticles = article.is_pillar_content ? await getClusterArticles(article.id) : []
+  const parentPillar = article.pillar_topic_id ? await getParentPillar(article.pillar_topic_id) : null
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -197,6 +209,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
 
+            {parentPillar && parentPillar.categories?.slug && (
+              <div style={{ marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--color-border)' }}>
+                <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>
+                  Part of:{' '}
+                  <a href={'/articles/' + parentPillar.categories.slug + '/' + parentPillar.slug} style={{ color: 'var(--color-gold)', textDecoration: 'none', fontWeight: 600 }}>{parentPillar.title}</a>
+                </p>
+              </div>
+            )}
             <ArticleContent article={article} slug={slug} category={category} relatedArticles={related} />
           </article>
 
@@ -225,6 +245,30 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </aside>
         </div>
       </div>
+
+      {clusterArticles.length > 0 && (
+        <section style={{ borderTop: '1px solid var(--color-border)', padding: '3rem 0', backgroundColor: '#fff' }}>
+          <div className="container-content">
+            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.25rem', color: 'var(--color-navy)', marginBottom: '2rem' }}>Related Articles</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '2rem' }}>
+              {clusterArticles.map((a) => (
+                <article key={a.slug}>
+                  {a.cover_image_url && (
+                    <a href={'/articles/' + a.categories?.slug + '/' + a.slug}>
+                      <img src={a.cover_image_url} alt={a.title + ' thumbnail'} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block', marginBottom: '1rem' }} />
+                    </a>
+                  )}
+                  <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{a.categories?.name}</span>
+                  <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1.3, color: 'var(--color-navy)', marginTop: '0.4rem' }}>
+                    <a href={'/articles/' + a.categories?.slug + '/' + a.slug} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</a>
+                  </h3>
+                  {a.excerpt && <p style={{ fontSize: '13px', color: 'var(--color-slate)', lineHeight: 1.55, marginTop: '0.4rem' }}>{a.excerpt}</p>}
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {related.length > 0 && (
         <section style={{ borderTop: '1px solid var(--color-border)', padding: '3rem 0', backgroundColor: 'var(--color-cream)' }}>
