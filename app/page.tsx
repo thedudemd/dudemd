@@ -163,9 +163,6 @@ export default async function HomePage() {
         </div>
       
 
-      {/* WELLNESS BAND */}
-      <section style={{ backgroundColor: "var(--color-navy)", padding: "3rem 0" }} />
-
       {/* LATEST GRID */}
       <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container-content">
