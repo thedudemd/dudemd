@@ -618,7 +618,7 @@ function NewArticleInner() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
               {/* TITLE — always visible, sticky below toolbar */}
-              <div style={{ position: 'sticky' as const, top: '102px', zIndex: 30, backgroundColor: '#f7f4ee', paddingTop: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #ede8df' }}>
+              <div style={{ position: 'sticky' as const, top: '110px', zIndex: 30, backgroundColor: '#f7f4ee', paddingTop: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #ede8df' }}>
                 <label style={lbl}>Title</label>
                 <input name="title" value={form.title} onChange={handleTitleChange} placeholder="Article title..." style={{ ...inp, fontSize: '20px', fontWeight: 600 }} />
               </div>
@@ -700,7 +700,7 @@ function NewArticleInner() {
               {/* EDITOR — always visible */}
               <div>
                 <label style={lbl}>Content</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexWrap: 'wrap' as const, padding: '4px 12px', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#fff', position: 'sticky' as const, top: '57px', zIndex: 40, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexWrap: 'wrap' as const, padding: '4px 12px', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#fff', position: 'sticky' as const, top: '65px', zIndex: 40, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                   <ToolbarBtn active={!!editor?.isActive('bold')} onClick={() => editor?.chain().focus().toggleBold().run()} title="Bold"><b>B</b></ToolbarBtn>
                   <ToolbarBtn active={!!editor?.isActive('italic')} onClick={() => editor?.chain().focus().toggleItalic().run()} title="Italic"><i>I</i></ToolbarBtn>
                   <ToolbarBtn active={!!editor?.isActive('underline')} onClick={() => editor?.chain().focus().toggleUnderline().run()} title="Underline"><u>U</u></ToolbarBtn>
