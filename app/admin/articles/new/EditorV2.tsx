@@ -617,8 +617,8 @@ function NewArticleInner() {
             {/* LEFT COLUMN */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-              {/* TITLE — always visible */}
-              <div>
+              {/* TITLE — always visible, sticky below toolbar */}
+              <div style={{ position: 'sticky' as const, top: '45px', zIndex: 30, backgroundColor: '#f7f4ee', paddingTop: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #ede8df' }}>
                 <label style={lbl}>Title</label>
                 <input name="title" value={form.title} onChange={handleTitleChange} placeholder="Article title..." style={{ ...inp, fontSize: '20px', fontWeight: 600 }} />
               </div>
