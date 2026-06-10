@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import Nav from '@/components/layout/Nav'
+import SessionTracker from '@/components/SessionTracker'
 import GoogleOneTap from '@/components/auth/GoogleOneTap'
 import Footer from '@/components/layout/Footer'
 const inter = Inter({ subsets: ['latin'], variable: '--font-body', display: 'swap' })
@@ -105,6 +106,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]) }}
         />
         <Nav />
+        <SessionTracker />
         <GoogleOneTap />
         <main className="min-h-screen">{children}</main>
         <Footer />
