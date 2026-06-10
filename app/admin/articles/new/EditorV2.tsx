@@ -135,14 +135,22 @@ function NewArticleInner() {
   const [coverSearchQuery, setCoverSearchQuery] = useState('')
   const [coverSearchResults, setCoverSearchResults] = useState<any[]>([])
   const [coverSearchLoading, setCoverSearchLoading] = useState(false)
+  const [coverSearchPage, setCoverSearchPage] = useState(1)
+  const [coverSearchHasMore, setCoverSearchHasMore] = useState(false)
 
-  async function searchCoverUnsplash(q: string) {
+  async function searchCoverUnsplash(q: string, page = 1) {
     if (q.trim().length < 2) return
     setCoverSearchLoading(true)
     try {
-      const res = await fetch('/api/unsplash?query=' + encodeURIComponent(q) + '&page=1')
+      const res = await fetch('/api/unsplash?query=' + encodeURIComponent(q) + '&page=' + page)
       const data = await res.json()
-      setCoverSearchResults(data.results || [])
+      if (page === 1) {
+        setCoverSearchResults(data.results || [])
+      } else {
+        setCoverSearchResults(prev => [...prev, ...(data.results || [])])
+      }
+      setCoverSearchHasMore((data.results || []).length === 30)
+      setCoverSearchPage(page)
     } catch(e) {}
     setCoverSearchLoading(false)
   }
@@ -1277,8 +1285,8 @@ function NewArticleInner() {
                     >{coverSearchLoading ? '...' : 'Search'}</button>
                   </div>
                   {coverSearchResults.length > 0 && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.4rem', marginBottom: '0.5rem' }}>
-                      {coverSearchResults.slice(0, 9).map((photo: any) => (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                      {coverSearchResults.map((photo: any) => (
                         <div
                           key={photo.id}
                           onClick={() => {
@@ -1290,10 +1298,18 @@ function NewArticleInner() {
                           onMouseEnter={e => (e.currentTarget.style.border = '2px solid #c9b28f')}
                           onMouseLeave={e => (e.currentTarget.style.border = '2px solid transparent')}
                         >
-                          <img src={photo.thumb} alt={photo.alt_description || ''} style={{ width: '100%', height: '56px', objectFit: 'cover', display: 'block' }} />
+                          <img src={photo.thumb} alt={photo.alt_description || ''} style={{ width: '100%', height: '100px', objectFit: 'cover', display: 'block' }} />
                         </div>
                       ))}
                     </div>
+                  )}
+                  {coverSearchHasMore && (
+                    <button
+                      type='button'
+                      onClick={() => searchCoverUnsplash(coverSearchQuery, coverSearchPage + 1)}
+                      disabled={coverSearchLoading}
+                      style={{ width: '100%', padding: '0.5rem', backgroundColor: '#fff', color: '#0e1a2b', border: '1px solid #ede8df', fontWeight: 700, fontSize: '11px', cursor: 'pointer', marginBottom: '0.5rem' }}
+                    >{coverSearchLoading ? 'Loading...' : 'Load More'}</button>
                   )}
                   {coverSearchResults.length > 0 && (
                     <p style={{ fontSize: '10px', color: '#9a9085', margin: 0 }}>Click an image to set as cover · Photos by <a href='https://unsplash.com?utm_source=dudemd&utm_medium=referral' target='_blank' rel='noopener noreferrer' style={{ color: '#9a9085' }}>Unsplash</a></p>
