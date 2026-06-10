@@ -699,7 +699,7 @@ function NewArticleInner() {
                   {editor?.isActive('link') && <button type='button' onClick={() => editor.chain().focus().unsetLink().run()} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #c0392b', backgroundColor: '#fff', color: '#c0392b', cursor: 'pointer' }}>✕ Unlink</button>}
                   <input type='color' title='Text Color' defaultValue='#000000' onChange={e => editor?.chain().focus().setColor(e.target.value).run()} style={{ width: 28, height: 28, padding: 0, border: '1px solid #ede8df', cursor: 'pointer', borderRadius: 2 }} />
                 </div>
-                <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: fullscreen ? 'calc(100vh - 200px)' : '560px', padding: '1.5rem 2rem' }}>
+                <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: fullscreen ? 'calc(100vh - 200px)' : '500px', padding: '1rem' }}>
                   <EditorContent editor={editor} />
                 </div>
                 {/* Word count progress */}

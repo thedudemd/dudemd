@@ -2,6 +2,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
+import { supabaseServer } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import ArticleContent from '@/components/article/ArticleContent'
 import StandardLayout from '@/components/article/layouts/StandardLayout'
@@ -21,12 +22,12 @@ async function getArticle(slug: string) {
 }
 
 async function getClusterArticles(pillarId: string) {
-  const { data } = await supabase.from('articles').select('*, authors(name), categories!articles_category_id_fkey(name, slug)').eq('pillar_topic_id', pillarId).eq('published', true).order('title')
+  const { data } = await supabaseServer.from('articles').select('*, authors(name), categories!articles_category_id_fkey(name, slug)').eq('pillar_topic_id', pillarId).eq('published', true).order('title')
   return data || []
 }
 
 async function getParentPillar(pillarId: string) {
-  const { data } = await supabase.from('articles').select('title, slug, categories!articles_category_id_fkey(slug)').eq('id', pillarId).eq('published', true).single()
+  const { data } = await supabaseServer.from('articles').select('title, slug, categories!articles_category_id_fkey(slug)').eq('id', pillarId).eq('published', true).single()
   return data || null
 }
 
