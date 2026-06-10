@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import GoogleOneTap from "@/components/auth/GoogleOneTap"
 import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcome"
 import Link from 'next/link'
+import PersonalizedSection from '@/components/PersonalizedSection'
 import { supabaseServer as supabase } from '@/lib/supabase/server'
 
 export const metadata: Metadata = { title: "DudeMD — Modern Men's Wellness for Real Life" }
@@ -164,6 +165,8 @@ export default async function HomePage() {
       </section>
 
       
+
+      <PersonalizedSection />
 
       {/* LATEST GRID */}
       <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
