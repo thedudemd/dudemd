@@ -44,6 +44,13 @@ function NewsletterInner() {
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
         await supabase.from('profiles').upsert({ id: session.user.id, full_name: firstName, email, newsletter_subscribed: true })
+        try {
+          await fetch('/api/personalization/score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: session.user.id, token: session.access_token, event_type: 'newsletter_signup', category_slug: 'general' })
+          })
+        } catch(e) {}
       }
     } catch(e) {}
     setStatus('idle')
