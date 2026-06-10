@@ -594,7 +594,7 @@ function NewArticleInner() {
   return (
     <>
       <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee' }}>
-        <header style={{ backgroundColor: '#0e1a2b', padding: '1rem 0' }}>
+        <header style={{ backgroundColor: '#0e1a2b', padding: '1rem 0', position: 'sticky' as const, top: 0, zIndex: 50 }}>
           <div className="container-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <Link href="/admin" style={{ fontSize: '12px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none' }}>← Dashboard</Link>
@@ -618,7 +618,7 @@ function NewArticleInner() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
               {/* TITLE — always visible, sticky below toolbar */}
-              <div style={{ position: 'sticky' as const, top: '45px', zIndex: 30, backgroundColor: '#f7f4ee', paddingTop: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #ede8df' }}>
+              <div style={{ position: 'sticky' as const, top: '102px', zIndex: 30, backgroundColor: '#f7f4ee', paddingTop: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #ede8df' }}>
                 <label style={lbl}>Title</label>
                 <input name="title" value={form.title} onChange={handleTitleChange} placeholder="Article title..." style={{ ...inp, fontSize: '20px', fontWeight: 600 }} />
               </div>
@@ -700,7 +700,7 @@ function NewArticleInner() {
               {/* EDITOR — always visible */}
               <div>
                 <label style={lbl}>Content</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexWrap: 'wrap' as const, padding: '4px 12px', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#fff', position: 'sticky' as const, top: 0, zIndex: 40, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexWrap: 'wrap' as const, padding: '4px 12px', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#fff', position: 'sticky' as const, top: '57px', zIndex: 40, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                   <ToolbarBtn active={!!editor?.isActive('bold')} onClick={() => editor?.chain().focus().toggleBold().run()} title="Bold"><b>B</b></ToolbarBtn>
                   <ToolbarBtn active={!!editor?.isActive('italic')} onClick={() => editor?.chain().focus().toggleItalic().run()} title="Italic"><i>I</i></ToolbarBtn>
                   <ToolbarBtn active={!!editor?.isActive('underline')} onClick={() => editor?.chain().focus().toggleUnderline().run()} title="Underline"><u>U</u></ToolbarBtn>
