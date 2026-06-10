@@ -37,7 +37,8 @@
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-email-editor": "^1.8.0",
-    "resend": "^6.12.4"
+    "resend": "^6.12.4",
+    "svix": "^1.95.2"
   },
   "devDependencies": {
     "@types/node": "^20",
