@@ -210,15 +210,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
 
-            {parentPillar && parentPillar.categories?.slug && (
-              <div style={{ marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--color-border)' }}>
-                <p style={{ fontSize: '12px', color: '#9a9085', margin: 0 }}>
-                  Part of:{' '}
-                  <a href={'/articles/' + parentPillar.categories.slug + '/' + parentPillar.slug} style={{ color: 'var(--color-gold)', textDecoration: 'none', fontWeight: 600 }}>{parentPillar.title}</a>
-                </p>
-              </div>
-            )}
-            <ArticleContent article={article} slug={slug} category={category} relatedArticles={related} />
+            <ArticleContent article={article} slug={slug} category={category} relatedArticles={related} parentPillar={parentPillar} />
           </article>
 
           <aside className="article-sidebar">

@@ -26,7 +26,7 @@ function getAuthFromCookie() {
   return null
 }
 
-export default function ArticleContent({ article, slug, category, relatedArticles = [] }: { article: any, slug: string, category: string, relatedArticles?: any[] }) {
+export default function ArticleContent({ article, slug, category, relatedArticles = [], parentPillar }: { article: any, slug: string, category: string, relatedArticles?: any[], parentPillar?: any }) {
   const [copied, setCopied] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveLoading, setSaveLoading] = useState(false)
@@ -212,7 +212,13 @@ export default function ArticleContent({ article, slug, category, relatedArticle
       <LoginPromptModal />
       <ShareBar />
       <div className="article-body" style={{ fontSize: '16px', color: 'var(--color-charcoal)', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: article.content || '' }} />
-      <p style={{ fontSize: '11px', color: '#9a9085', marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)', lineHeight: 1.5 }}>For informational purposes only. This article is not a substitute for professional medical advice, diagnosis, or treatment.</p>
+      {parentPillar && parentPillar.categories?.slug && (
+        <p style={{ fontSize: '12px', color: '#9a9085', marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
+          Part of:{' '}
+          <a href={'/articles/' + parentPillar.categories.slug + '/' + parentPillar.slug} style={{ color: 'var(--color-gold)', textDecoration: 'none', fontWeight: 600 }}>{parentPillar.title}</a>
+        </p>
+      )}
+      <p style={{ fontSize: '11px', color: '#9a9085', marginTop: parentPillar && parentPillar.categories?.slug ? '0.75rem' : '2rem', paddingTop: parentPillar && parentPillar.categories?.slug ? '0' : '1rem', borderTop: parentPillar && parentPillar.categories?.slug ? 'none' : '1px solid var(--color-border)', lineHeight: 1.5 }}>For informational purposes only. This article is not a substitute for professional medical advice, diagnosis, or treatment.</p>
       {article.faq_items && article.faq_items.length > 0 && (
         <div style={{ marginTop: '3rem', padding: '2rem', backgroundColor: 'var(--color-cream)', borderRadius: '8px' }}>
           <h2 style={{ fontFamily: 'Georgia, serif', fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-navy)', marginBottom: '1.5rem' }}>Frequently Asked Questions</h2>
