@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import AdminShell from '@/components/admin/AdminShell'
 
-const TABS = ['All', 'Coming Soon', 'Reader Hub', 'Community', 'AI']
+const TABS = ['All', 'Coming Soon', 'ai', 'content', 'monetization', 'reader', 'social']
 
 export default function FlagsPage() {
   const [flags, setFlags] = useState<any[]>([])
