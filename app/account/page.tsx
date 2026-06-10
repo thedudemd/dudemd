@@ -48,6 +48,7 @@ const NAV: { id: Tab; label: string }[] = [
 
 export default function AccountPage() {
   const [profile, setProfile] = useState<any>(null)
+  const [userScores, setUserScores] = useState<any>(null)
   const [newEmail, setNewEmail] = useState('')
   const [emailSending, setEmailSending] = useState(false)
   const [emailMsg, setEmailMsg] = useState('')
@@ -112,6 +113,11 @@ export default function AccountPage() {
         headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
       }).then(r => r.json())
     ]).then(([events, scores, articles]) => {
+      // Fetch full engagement scores row separately for total_score/level/streak
+      fetch(`${SUPABASE_URL}/rest/v1/user_scores?select=total_score,level,streak_days&user_id=eq.${auth.uid}&limit=1`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      }).then(r => r.json()).then(d => { if (d?.[0]) setUserScores(d[0]) }).catch(() => {})
+
       const seen = new Set<string>()
       const slugs: string[] = []
       if (Array.isArray(events)) {
@@ -544,6 +550,25 @@ export default function AccountPage() {
                 <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-navy)' }}>{profile?.newsletter_subscribed !== false ? 'Active' : 'Off'}</span>
               </div>
             </div>
+
+            {/* Engagement stats */}
+            {userScores && (
+              <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '1.25rem' }}>
+                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9a9085', margin: '0 0 0.75rem' }}>Your Activity</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '12px', color: '#9a9085' }}>Level</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-navy)' }}>{userScores.level || 1}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '12px', color: '#9a9085' }}>Total Points</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-navy)' }}>{userScores.total_score || 0}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '12px', color: '#9a9085' }}>Reading Streak</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-navy)' }}>{userScores.streak_days || 0} {userScores.streak_days === 1 ? 'day' : 'days'}</span>
+                </div>
+              </div>
+            )}
 
             {/* Nav */}
             <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: 8, padding: '0.4rem' }}>
