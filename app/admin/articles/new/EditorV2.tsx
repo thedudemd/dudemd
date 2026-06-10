@@ -52,6 +52,26 @@ function ToolbarBtn({ active, onClick, title, children, disabled }: any) {
   )
 }
 
+function SidebarSection({ sectionKey, title, summary, children, openSections, toggleSection }: { sectionKey: string, title: string, summary?: string, children: React.ReactNode, openSections: Record<string, boolean>, toggleSection: (key: string) => void }) {
+  const isOpen = openSections[sectionKey]
+  return (
+    <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df' }}>
+      <button
+        type="button"
+        onClick={() => toggleSection(sectionKey)}
+        style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+      >
+        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#0e1a2b' }}>{title}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {!isOpen && summary && <span style={{ fontSize: '11px', color: '#9a9085', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{summary}</span>}
+          <span style={{ fontSize: '14px', color: '#9a9085', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', display: 'inline-block' }}>▾</span>
+        </div>
+      </button>
+      {isOpen && <div style={{ padding: '0 1.25rem 1.25rem' }}>{children}</div>}
+    </div>
+  )
+}
+
 function NewArticleInner() {
   const router = useRouter()
   const [categories, setCategories] = useState<any[]>([])
@@ -576,26 +596,6 @@ function NewArticleInner() {
   }
 
   // Collapsible sidebar section component
-  function SidebarSection({ sectionKey, title, summary, children }: { sectionKey: string, title: string, summary?: string, children: React.ReactNode }) {
-    const isOpen = openSections[sectionKey]
-    return (
-      <div style={{ backgroundColor: '#fff', border: '1px solid #ede8df' }}>
-        <button
-          type="button"
-          onClick={() => toggleSection(sectionKey)}
-          style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.875rem 1.25rem', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
-        >
-          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#0e1a2b' }}>{title}</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            {!isOpen && summary && <span style={{ fontSize: '11px', color: '#9a9085', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{summary}</span>}
-            <span style={{ fontSize: '14px', color: '#9a9085', transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s', display: 'inline-block' }}>▾</span>
-          </div>
-        </button>
-        {isOpen && <div style={{ padding: '0 1.25rem 1.25rem' }}>{children}</div>}
-      </div>
-    )
-  }
-
   const categoryName = categories.find(c => c.id === form.category_id)?.name
   const authorName = authors.find(a => a.id === form.author_id)?.name
 
@@ -868,7 +868,7 @@ function NewArticleInner() {
             <div style={{ display: fullscreen ? 'none' : 'flex', flexDirection: 'column', gap: '1rem', position: 'sticky', top: '1rem' }}>
 
               {/* STATUS — workflow */}
-              <SidebarSection sectionKey="status" title="Workflow Status" summary={STATUS_LABELS[form.status]?.label || 'Draft'}>
+              <SidebarSection openSections={openSections} toggleSection={toggleSection} sectionKey="status" title="Workflow Status" summary={STATUS_LABELS[form.status]?.label || 'Draft'}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.75rem' }}>
                   {Object.entries(STATUS_LABELS).map(([key, conf]) => (
                     <button key={key} type="button" onClick={() => setForm(f => ({ ...f, status: key }))} style={{ padding: '4px 10px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', border: '1px solid', borderColor: form.status === key ? conf.color : '#e8e4de', backgroundColor: form.status === key ? conf.bg : '#fff', color: form.status === key ? conf.color : '#9a9085', cursor: 'pointer', borderRadius: 3 }}>{conf.label}</button>
@@ -878,7 +878,7 @@ function NewArticleInner() {
               </SidebarSection>
 
               {/* SCORES — collapsed */}
-              <SidebarSection sectionKey="scores" title="Article Scores" summary={`SEO ${seoScore} · AEO ${aeoScore} · Read ${readabilityScore}`}>
+              <SidebarSection openSections={openSections} toggleSection={toggleSection} sectionKey="scores" title="Article Scores" summary={`SEO ${seoScore} · AEO ${aeoScore} · Read ${readabilityScore}`}>
                 {[{ label: 'SEO', score: seoScore }, { label: 'AEO', score: aeoScore }, { label: 'Readability', score: readabilityScore }].map(({ label, score }) => (
                   <div key={label} style={{ marginBottom: '1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
@@ -893,7 +893,7 @@ function NewArticleInner() {
               </SidebarSection>
 
               {/* MY DRAFTS — collapsed */}
-              <SidebarSection sectionKey="myDrafts" title="My Drafts" summary={recentDrafts.length > 0 ? `${recentDrafts.length} draft${recentDrafts.length > 1 ? 's' : ''}` : draftsLoading ? 'Loading...' : 'None'}>
+              <SidebarSection openSections={openSections} toggleSection={toggleSection} sectionKey="myDrafts" title="My Drafts" summary={recentDrafts.length > 0 ? `${recentDrafts.length} draft${recentDrafts.length > 1 ? 's' : ''}` : draftsLoading ? 'Loading...' : 'None'}>
                 {draftsLoading ? (
                   <p style={{ fontSize: '13px', color: '#9a9085', margin: 0 }}>Loading...</p>
                 ) : recentDrafts.length === 0 ? (
@@ -925,8 +925,7 @@ function NewArticleInner() {
               </SidebarSection>
 
               {/* ARTICLE STRUCTURE — collapsed */}
-              <SidebarSection
-                sectionKey="articleStructure"
+              <SidebarSection openSections={openSections} toggleSection={toggleSection}                 sectionKey="articleStructure"
                 title="Article Structure"
                 summary={
                   form.is_pillar_content
@@ -1068,8 +1067,7 @@ function NewArticleInner() {
               </SidebarSection>
 
               {/* INTERNAL LINKING — collapsed */}
-              <SidebarSection
-                sectionKey="internalLinking"
+              <SidebarSection openSections={openSections} toggleSection={toggleSection}                 sectionKey="internalLinking"
                 title="Internal Linking"
                 summary={
                   !form.is_pillar_content && !form.pillar_topic_id && !form.cornerstone_article_id
@@ -1212,7 +1210,7 @@ function NewArticleInner() {
               </SidebarSection>
 
               {/* SETTINGS (tags, category, author) — collapsed */}
-              <SidebarSection sectionKey="settings" title="Settings" summary={[categoryName, authorName, form.tags.length ? `${form.tags.length} tag${form.tags.length > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ') || undefined}>
+              <SidebarSection openSections={openSections} toggleSection={toggleSection} sectionKey="settings" title="Settings" summary={[categoryName, authorName, form.tags.length ? `${form.tags.length} tag${form.tags.length > 1 ? 's' : ''}` : ''].filter(Boolean).join(' · ') || undefined}>
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={lbl}>Tags</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap' as const, gap: '0.4rem', marginBottom: '0.5rem' }}>
@@ -1264,7 +1262,7 @@ function NewArticleInner() {
               </SidebarSection>
 
               {/* COVER IMAGE — collapsed, with Unsplash search above URL field */}
-              <SidebarSection sectionKey="coverImage" title="Cover Image" summary={form.cover_image_url ? 'Image set ✓' : 'No image'}>
+              <SidebarSection openSections={openSections} toggleSection={toggleSection} sectionKey="coverImage" title="Cover Image" summary={form.cover_image_url ? 'Image set ✓' : 'No image'}>
                 {/* Step B: Unsplash search for cover image */}
                 <div style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #ede8df' }}>
                   <label style={{ ...lbl, marginBottom: '0.5rem' }}>Search Unsplash</label>
