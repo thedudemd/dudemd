@@ -21,6 +21,37 @@ import CharacterCount from '@tiptap/extension-character-count'
 import { FontSize } from '@/lib/tiptap/FontSize'
 import { ResizableImage } from '@/lib/tiptap/ResizableImage'
 
+function ToolbarDivider() {
+  return <span style={{ width: 1, height: 20, backgroundColor: '#e8e4de', margin: '0 4px', flexShrink: 0 }} />
+}
+
+function ToolbarBtn({ active, onClick, title, children, disabled }: any) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      style={{
+        padding: '5px 8px',
+        fontSize: '12px',
+        fontWeight: 600,
+        backgroundColor: active ? '#0e1a2b' : 'transparent',
+        color: active ? '#f7f4ee' : '#4A5563',
+        border: 'none',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        borderRadius: 3,
+        lineHeight: 1,
+        opacity: disabled ? 0.4 : 1,
+        transition: 'background 0.1s',
+        whiteSpace: 'nowrap' as const,
+      }}
+    >
+      {children}
+    </button>
+  )
+}
+
 function NewArticleInner() {
   const router = useRouter()
   const [categories, setCategories] = useState<any[]>([])
@@ -669,35 +700,47 @@ function NewArticleInner() {
               {/* EDITOR — always visible */}
               <div>
                 <label style={lbl}>Content</label>
-                <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' as const, padding: '0.5rem', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#f7f4ee' }}>
-                  {[
-                    { l: 'B', a: () => editor?.chain().focus().toggleBold().run(), act: () => !!editor?.isActive('bold') },
-                    { l: 'I', a: () => editor?.chain().focus().toggleItalic().run(), act: () => !!editor?.isActive('italic') },
-                    { l: 'U', a: () => editor?.chain().focus().toggleUnderline().run(), act: () => !!editor?.isActive('underline') },
-                    { l: 'H1', a: () => editor?.chain().focus().toggleHeading({ level: 1 }).run(), act: () => !!editor?.isActive('heading', { level: 1 }) },
-                    { l: 'H2', a: () => editor?.chain().focus().toggleHeading({ level: 2 }).run(), act: () => !!editor?.isActive('heading', { level: 2 }) },
-                    { l: 'H3', a: () => editor?.chain().focus().toggleHeading({ level: 3 }).run(), act: () => !!editor?.isActive('heading', { level: 3 }) },
-                    { l: '• List', a: () => editor?.chain().focus().toggleBulletList().run(), act: () => !!editor?.isActive('bulletList') },
-                    { l: '1. List', a: () => editor?.chain().focus().toggleOrderedList().run(), act: () => !!editor?.isActive('orderedList') },
-                    { l: '" Quote', a: () => editor?.chain().focus().toggleBlockquote().run(), act: () => !!editor?.isActive('blockquote') },
-                    { l: 'Undo', a: () => editor?.chain().focus().undo().run(), act: () => false },
-                    { l: 'Redo', a: () => editor?.chain().focus().redo().run(), act: () => false },
-                    { l: '⬅ Img', a: () => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-right','float-none'); img.classList.add('float-left'); } }, act: () => false },
-                    { l: 'Img ➡', a: () => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-left','float-none'); img.classList.add('float-right'); } }, act: () => false },
-                    { l: '⊡ Img', a: () => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-left','float-right'); img.classList.add('float-none'); } }, act: () => false },
-                  ].map(({ l, a, act }) => (
-                    <button key={l} onClick={a} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: act() ? '#0e1a2b' : '#fff', color: act() ? '#fff' : '#0e1a2b', cursor: 'pointer' }}>{l}</button>
-                  ))}
-                  <select onChange={e => { if(e.target.value) (editor?.chain().focus() as any).setFontSize(e.target.value).run(); else (editor?.chain().focus() as any).unsetFontSize().run() }} style={{ padding: '0.3rem 0.4rem', fontSize: '12px', border: '1px solid #ede8df', backgroundColor: '#fff', cursor: 'pointer' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexWrap: 'wrap' as const, padding: '4px 12px', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#fff', position: 'sticky' as const, top: 0, zIndex: 40, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                  <ToolbarBtn active={!!editor?.isActive('bold')} onClick={() => editor?.chain().focus().toggleBold().run()} title="Bold"><b>B</b></ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('italic')} onClick={() => editor?.chain().focus().toggleItalic().run()} title="Italic"><i>I</i></ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('underline')} onClick={() => editor?.chain().focus().toggleUnderline().run()} title="Underline"><u>U</u></ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('strike')} onClick={() => editor?.chain().focus().toggleStrike().run()} title="Strikethrough"><s>S</s></ToolbarBtn>
+                  <ToolbarDivider />
+                  <ToolbarBtn active={!!editor?.isActive('heading', { level: 1 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()} title="Heading 1">H1</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('heading', { level: 2 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} title="Heading 2">H2</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('heading', { level: 3 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()} title="Heading 3">H3</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('paragraph')} onClick={() => editor?.chain().focus().setParagraph().run()} title="Paragraph">P</ToolbarBtn>
+                  <ToolbarDivider />
+                  <ToolbarBtn active={!!editor?.isActive('bulletList')} onClick={() => editor?.chain().focus().toggleBulletList().run()} title="Bullet List">• List</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('orderedList')} onClick={() => editor?.chain().focus().toggleOrderedList().run()} title="Numbered List">1. List</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('blockquote')} onClick={() => editor?.chain().focus().toggleBlockquote().run()} title="Quote">❝</ToolbarBtn>
+                  <ToolbarDivider />
+                  <ToolbarBtn active={false} onClick={() => editor?.chain().focus().undo().run()} title="Undo">↶</ToolbarBtn>
+                  <ToolbarBtn active={false} onClick={() => editor?.chain().focus().redo().run()} title="Redo">↷</ToolbarBtn>
+                  <ToolbarDivider />
+                  <ToolbarBtn active={false} onClick={() => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-right','float-none'); img.classList.add('float-left'); } }} title="Float image left">⬅ Img</ToolbarBtn>
+                  <ToolbarBtn active={false} onClick={() => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-left','float-none'); img.classList.add('float-right'); } }} title="Float image right">Img ➡</ToolbarBtn>
+                  <ToolbarBtn active={false} onClick={() => { const img = document.querySelector('.ProseMirror img.ProseMirror-selectednode') as HTMLImageElement; if(img){ img.classList.remove('float-left','float-right'); img.classList.add('float-none'); } }} title="Center image">⊡ Img</ToolbarBtn>
+                  <ToolbarDivider />
+                  <select onChange={e => { if(e.target.value) (editor?.chain().focus() as any).setFontSize(e.target.value).run(); else (editor?.chain().focus() as any).unsetFontSize().run() }} defaultValue="" style={{ fontSize: '11px', border: '1px solid #e8e4de', padding: '3px 4px', backgroundColor: '#fff', color: '#4A5563', cursor: 'pointer', borderRadius: 3 }}>
                     <option value=''>Size</option>
                     {['12','14','16','18','20','24','28','32','36'].map(s => <option key={s} value={s+'px'}>{s}</option>)}
                   </select>
+                  <input type='color' title='Text Color' defaultValue='#000000' onChange={e => editor?.chain().focus().setColor(e.target.value).run()} style={{ width: 24, height: 24, padding: 1, border: '1px solid #e8e4de', cursor: 'pointer', borderRadius: 3 }} />
+                  <ToolbarDivider />
+                  <ToolbarBtn active={!!editor?.isActive({ textAlign: 'left' })} onClick={() => editor?.chain().focus().setTextAlign('left').run()} title="Align Left">⬅</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive({ textAlign: 'center' })} onClick={() => editor?.chain().focus().setTextAlign('center').run()} title="Align Center">↔</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive({ textAlign: 'right' })} onClick={() => editor?.chain().focus().setTextAlign('right').run()} title="Align Right">➡</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('subscript')} onClick={() => editor?.chain().focus().toggleSubscript().run()} title="Subscript">x₂</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('superscript')} onClick={() => editor?.chain().focus().toggleSuperscript().run()} title="Superscript">x²</ToolbarBtn>
+                  <ToolbarDivider />
                   <input ref={imgInputRef} type='file' accept='image/jpeg,image/png,image/webp,image/gif' style={{ display: 'none' }} onChange={handleImageUpload} />
-                  <button type='button' onClick={() => imgInputRef.current?.click()} disabled={imgUploading} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #ede8df', backgroundColor: '#fff', color: '#0e1a2b', cursor: 'pointer' }}>{imgUploading ? 'Uploading...' : '📷 Image'}</button>
-                  <button type='button' onClick={() => setShowImgSearch(true)} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #0e1a2b', backgroundColor: '#0e1a2b', color: '#f7f4ee', cursor: 'pointer' }}>🔍 Search Images</button>
-                  <button type='button' onClick={() => { const prev = editor?.getAttributes('link').href || ''; setLinkUrl(prev); setLinkTab('internal'); setLinkSearch(''); setLinkResults([]); setShowLinkModal(true); }} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #0e1a2b', backgroundColor: editor?.isActive('link') ? '#c9b28f' : '#fff', color: '#0e1a2b', cursor: 'pointer' }}>🔗 {editor?.isActive('link') ? 'Edit Link' : 'Link'}</button>
-                  {editor?.isActive('link') && <button type='button' onClick={() => editor.chain().focus().unsetLink().run()} style={{ padding: '0.35rem 0.6rem', fontSize: '12px', fontWeight: 600, border: '1px solid #c0392b', backgroundColor: '#fff', color: '#c0392b', cursor: 'pointer' }}>✕ Unlink</button>}
-                  <input type='color' title='Text Color' defaultValue='#000000' onChange={e => editor?.chain().focus().setColor(e.target.value).run()} style={{ width: 28, height: 28, padding: 0, border: '1px solid #ede8df', cursor: 'pointer', borderRadius: 2 }} />
+                  <ToolbarBtn active={false} onClick={() => imgInputRef.current?.click()} disabled={imgUploading} title="Insert Image">{imgUploading ? '...' : '🖼 Image'}</ToolbarBtn>
+                  <ToolbarBtn active={false} onClick={() => setShowImgSearch(true)} title="Search Images">🔍 Search</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('link')} onClick={() => { const prev = editor?.getAttributes('link').href || ''; setLinkUrl(prev); setLinkTab('internal'); setLinkSearch(''); setLinkResults([]); setShowLinkModal(true); }} title="Link">🔗 {editor?.isActive('link') ? 'Edit Link' : 'Link'}</ToolbarBtn>
+                  {editor?.isActive('link') && <ToolbarBtn active={false} onClick={() => editor.chain().focus().unsetLink().run()} title="Remove Link">✕ Unlink</ToolbarBtn>}
+                  <ToolbarDivider />
+                  <span style={{ fontSize: '11px', color: '#9a9085', padding: '0 4px', whiteSpace: 'nowrap' as const }}>{getWordCount()} words</span>
                 </div>
                 <div onDragOver={e => e.preventDefault()} onDrop={handleDrop} style={{ border: '1px solid #ede8df', backgroundColor: '#fff', minHeight: fullscreen ? 'calc(100vh - 200px)' : '500px', padding: '1rem' }}>
                   <EditorContent editor={editor} />
