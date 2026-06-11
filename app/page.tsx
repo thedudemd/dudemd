@@ -19,17 +19,6 @@ async function getArticles() {
   return data || []
 }
 
-async function getEditorPicks() {
-  const { data } = await supabase
-    .from('articles')
-    .select('*, categories!articles_category_id_fkey(name, slug)')
-    .eq('is_editor_pick', true)
-    .eq('published', true)
-    .order('published_at', { ascending: false })
-    .limit(4)
-  return data || []
-}
-
 async function getCategories() {
   const { data } = await supabase
     .from('categories')
@@ -101,7 +90,6 @@ const organizationSchema = {
 export default async function HomePage() {
   const articles = await getArticles()
   const categories = await getCategories()
-  const editorPicks = await getEditorPicks()
   const featured = articles[0]
   const secondary = articles.slice(1, 3)
   const latest = articles.slice(3)
@@ -183,8 +171,6 @@ export default async function HomePage() {
       {/* LATEST GRID */}
       <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container-content">
-          <div style={{ display: 'grid', gridTemplateColumns: editorPicks.length > 0 ? '1fr 280px' : '1fr', gap: '3rem', alignItems: 'start' }}>
-          <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2rem', borderBottom: '2px solid var(--color-navy)', paddingBottom: '0.75rem' }}>
             <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-navy)', letterSpacing: '-0.01em' }}>Latest</h2>
             <Link href="/articles" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>All Articles →</Link>
@@ -212,24 +198,6 @@ export default async function HomePage() {
                 <p style={{ fontSize: '11px', color: '#9a9085' }}>By {a.authors?.name}</p>
               </article>
             ))}
-          </div>
-          </div>
-
-          {editorPicks.length > 0 && (
-            <aside>
-              <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1.25rem' }}>Editor's Picks</p>
-              {editorPicks.map((a) => (
-                <Link key={a.slug} href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ display: 'flex', gap: '0.75rem', textDecoration: 'none', marginBottom: '1.25rem', alignItems: 'start' }}>
-                  <img src={a.cover_image_url || '/placeholder-cover.jpg'} alt={`${a.title} thumbnail`} style={{ width: '72px', height: '54px', objectFit: 'cover', flexShrink: 0 }} />
-                  <div>
-                    <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.25rem' }}>{a.categories?.name}</p>
-                    <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', lineHeight: 1.3, margin: 0 }}>{a.title}</p>
-                  </div>
-                </Link>
-              ))}
-              {/* Ad space reserved below Editor's Picks */}
-            </aside>
-          )}
           </div>
         </div>
       </section>
