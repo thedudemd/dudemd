@@ -112,7 +112,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="min-h-screen">{children}</main>
         <Footer />
         <SpeedInsights />
-        <SpeedInsights />
       {/* <GoogleAnalytics gaId="G-FRVXC9JBB4" /> */}
     </body>
     </html>
