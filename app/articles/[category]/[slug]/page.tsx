@@ -263,26 +263,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </section>
       )}
 
-      {related.length > 0 && (
-        <section style={{ borderTop: '1px solid var(--color-border)', padding: '3rem 0', backgroundColor: 'var(--color-cream)' }}>
-          <div className="container-content">
-            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.25rem', color: 'var(--color-navy)', marginBottom: '2rem' }}>More to Read</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '2rem' }}>
-              {related.map((a) => (
-                <article key={a.slug}>
-                  <Link href={`/articles/${a.categories?.slug}/${a.slug}`}>
-                    <img src={a.cover_image_url} alt={`${a.title} thumbnail`} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block', marginBottom: '1rem' }} />
-                  </Link>
-                  <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{a.categories?.name}</span>
-                  <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1rem', lineHeight: 1.3, color: 'var(--color-navy)', marginTop: '0.4rem' }}>
-                    <Link href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
-                  </h3>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
     </main>
   )
 }
