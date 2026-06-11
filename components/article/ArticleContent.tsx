@@ -26,54 +26,6 @@ function getAuthFromCookie() {
   return null
 }
 
-function renderArticleBodyWithAds(html: string) {
-  if (!html) return null
-  const bodyStyle = { fontSize: '16px', color: 'var(--color-charcoal)', lineHeight: 1.8 } as const
-
-  // Split on H2 section boundaries
-  const parts = html.split(/(?=<h2)/i)
-
-  if (parts.length >= 4) {
-    // parts[0] = intro (before first H2). Skip intro + first H2 section before placing ads.
-    const ad1Index = 2
-    const ad2Index = Math.max(ad1Index + 1, Math.floor(parts.length * 2 / 3))
-    const chunks: { html: string }[] = []
-    let buffer = ''
-    const elements: React.ReactNode[] = []
-    parts.forEach((part, i) => {
-      buffer += part
-      if (i === ad1Index - 1 || (i === ad2Index - 1 && ad2Index !== ad1Index)) {
-        elements.push(<div key={`chunk-${i}`} className="article-body" style={bodyStyle} dangerouslySetInnerHTML={{ __html: buffer }} />)
-        elements.push(<InArticleAd key={`ad-${i}`} />)
-        buffer = ''
-      }
-    })
-    if (buffer) elements.push(<div key="chunk-last" className="article-body" style={bodyStyle} dangerouslySetInnerHTML={{ __html: buffer }} />)
-    return <>{elements}</>
-  }
-
-  // Fallback for short articles: split on paragraph boundaries into thirds
-  const paragraphs = html.split(/(?=<p>)/i).filter(Boolean)
-  if (paragraphs.length >= 6) {
-    const third = Math.floor(paragraphs.length / 3)
-    const chunk1 = paragraphs.slice(0, third).join('')
-    const chunk2 = paragraphs.slice(third, third * 2).join('')
-    const chunk3 = paragraphs.slice(third * 2).join('')
-    return (
-      <>
-        <div className="article-body" style={bodyStyle} dangerouslySetInnerHTML={{ __html: chunk1 }} />
-        <InArticleAd />
-        <div className="article-body" style={bodyStyle} dangerouslySetInnerHTML={{ __html: chunk2 }} />
-        <InArticleAd />
-        <div className="article-body" style={bodyStyle} dangerouslySetInnerHTML={{ __html: chunk3 }} />
-      </>
-    )
-  }
-
-  // Too short for ads
-  return <div className="article-body" style={bodyStyle} dangerouslySetInnerHTML={{ __html: html }} />
-}
-
 export default function ArticleContent({ article, slug, category, relatedArticles = [], parentPillar }: { article: any, slug: string, category: string, relatedArticles?: any[], parentPillar?: any }) {
   const [copied, setCopied] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -259,7 +211,7 @@ export default function ArticleContent({ article, slug, category, relatedArticle
     <>
       <LoginPromptModal />
       <ShareBar />
-      {renderArticleBodyWithAds(article.content || '')}
+      <div className="article-body" style={{ fontSize: '16px', color: 'var(--color-charcoal)', lineHeight: 1.8 }} dangerouslySetInnerHTML={{ __html: article.content || '' }} />
       {parentPillar && parentPillar.categories?.slug && (
         <p style={{ fontSize: '12px', color: '#9a9085', marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
           Part of:{' '}
