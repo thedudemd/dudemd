@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/next'
 import Nav from '@/components/layout/Nav'
 import SessionTracker from '@/components/SessionTracker'
 import GoogleOneTap from '@/components/auth/GoogleOneTap'
@@ -112,7 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="min-h-screen">{children}</main>
         <Footer />
         <SpeedInsights />
-        <SpeedInsights />
+        <Analytics />
       {/* <GoogleAnalytics gaId="G-FRVXC9JBB4" /> */}
     </body>
     </html>
