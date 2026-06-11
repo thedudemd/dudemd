@@ -603,15 +603,15 @@ function NewArticleInner() {
     <>
       <div style={{ minHeight: '100vh', backgroundColor: '#f7f4ee' }}>
         <header style={{ backgroundColor: '#0e1a2b', padding: '1rem 0', position: 'sticky' as const, top: 0, zIndex: 50 }}>
-          <div className="container-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="container-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' as const, rowGap: '0.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <Link href="/admin" style={{ fontSize: '12px', color: 'rgba(247,244,238,0.6)', textDecoration: 'none' }}>← Dashboard</Link>
               <span style={{ color: 'rgba(247,244,238,0.3)' }}>|</span>
               <span style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#c9b28f' }}>New Article</span>
               <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: STATUS_LABELS[form.status]?.color || '#9a9085', backgroundColor: STATUS_LABELS[form.status]?.bg || '#f0ede8', padding: '2px 8px', borderRadius: 3 }}>{STATUS_LABELS[form.status]?.label || 'Draft'}</span>
             </div>
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-              <span style={{ fontSize: '12px', color: 'rgba(247,244,238,0.5)' }}>{getWordCount()} words · {getReadTime()}</span>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' as const, rowGap: '0.5rem', justifyContent: 'flex-end' }}>
+              <span style={{ fontSize: '12px', color: 'rgba(247,244,238,0.5)', whiteSpace: 'nowrap' as const }}>{getWordCount()} words · {getReadTime()}</span>
               {autoSaved && <span style={{ fontSize: '11px', color: 'rgba(247,244,238,0.4)', fontStyle: 'italic' }}>{autoSaved} <span style={{ color: 'rgba(247,244,238,0.25)' }}>(local only)</span></span>}
               <button onClick={() => handleSave('draft')} disabled={saving} style={{ fontSize: '12px', fontWeight: 700, color: '#f7f4ee', backgroundColor: 'transparent', border: '1px solid rgba(247,244,238,0.3)', padding: '0.5rem 1rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Save Draft</button>
               <button onClick={() => handleSave('published')} disabled={saving} style={{ fontSize: '12px', fontWeight: 700, color: '#0e1a2b', backgroundColor: '#c9b28f', border: 'none', padding: '0.5rem 1rem', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{saving ? 'Publishing...' : 'Publish'}</button>
@@ -626,7 +626,7 @@ function NewArticleInner() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
               {/* TITLE — always visible, sticky below toolbar */}
-              <div style={{ position: 'sticky' as const, top: '118px', zIndex: 30, backgroundColor: '#f7f4ee', paddingTop: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #ede8df' }}>
+              <div style={{ position: 'sticky' as const, top: '145px', zIndex: 30, backgroundColor: '#f7f4ee', paddingTop: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid #ede8df' }}>
                 <label style={lbl}>Title</label>
                 <input name="title" value={form.title} onChange={handleTitleChange} placeholder="Article title..." style={{ ...inp, fontSize: '20px', fontWeight: 600 }} />
               </div>
@@ -708,7 +708,7 @@ function NewArticleInner() {
               {/* EDITOR — always visible */}
               <div>
                 <label style={lbl}>Content</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexWrap: 'wrap' as const, padding: '4px 12px', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#fff', position: 'sticky' as const, top: '73px', zIndex: 40, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexWrap: 'wrap' as const, padding: '4px 12px', border: '1px solid #ede8df', borderBottom: 'none', backgroundColor: '#fff', position: 'sticky' as const, top: '100px', zIndex: 40, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                   <ToolbarBtn active={!!editor?.isActive('bold')} onClick={() => editor?.chain().focus().toggleBold().run()} title="Bold"><b>B</b></ToolbarBtn>
                   <ToolbarBtn active={!!editor?.isActive('italic')} onClick={() => editor?.chain().focus().toggleItalic().run()} title="Italic"><i>I</i></ToolbarBtn>
                   <ToolbarBtn active={!!editor?.isActive('underline')} onClick={() => editor?.chain().focus().toggleUnderline().run()} title="Underline"><u>U</u></ToolbarBtn>
