@@ -92,7 +92,7 @@ function NewArticleInner({ slug }: { slug: string }) {
   const [seoScore, setSeoScore] = useState(0)
   const [aeoScore, setAeoScore] = useState(0)
   const [readabilityScore, setReadabilityScore] = useState(0)
-  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '', layout: 'standard', tags: [] as string[], show_hero: true, is_pillar_content: false, is_cornerstone: false, pillar_topic_id: '', cornerstone_article_id: '' })
+  const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '', layout: 'standard', tags: [] as string[], show_hero: true, is_pillar_content: false, is_cornerstone: false, pillar_topic_id: '', cornerstone_article_id: '', is_editor_pick: false })
   const [articleId, setArticleId] = useState('')
   const [canvaDesigns, setCanvaDesigns] = useState<any[]>([])
   const [showCanvaPicker, setShowCanvaPicker] = useState(false)
@@ -428,7 +428,7 @@ function NewArticleInner({ slug }: { slug: string }) {
         subcategory_id: article.subcategory_id || '', layout: article.layout || 'standard',
         tags: article.tags || [], show_hero: article.show_hero !== false,
         is_pillar_content: article.is_pillar_content || false, is_cornerstone: article.is_cornerstone || false,
-        pillar_topic_id: article.pillar_topic_id || '', cornerstone_article_id: article.cornerstone_article_id || ''
+        pillar_topic_id: article.pillar_topic_id || '', cornerstone_article_id: article.cornerstone_article_id || '', is_editor_pick: article.is_editor_pick || false
       })
       if (article.category_id) {
         const { data: subs } = await supabase.from('categories').select('*').eq('parent_id', article.category_id).eq('enabled', true).order('sort_order')
@@ -535,7 +535,7 @@ function NewArticleInner({ slug }: { slug: string }) {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) { router.push('/admin/login'); return }
     const cleanForm = { ...form, category_id: form.category_id || null, subcategory_id: form.subcategory_id || null, author_id: form.author_id || null }
-    const { error } = await supabase.from('articles').update({ ...cleanForm, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null, updated_at: new Date().toISOString(), is_pillar_content: form.is_pillar_content, is_cornerstone: form.is_cornerstone, pillar_topic_id: form.pillar_topic_id || null, cornerstone_article_id: form.cornerstone_article_id || null }).eq('id', articleId)
+    const { error } = await supabase.from('articles').update({ ...cleanForm, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null, updated_at: new Date().toISOString(), is_pillar_content: form.is_pillar_content, is_cornerstone: form.is_cornerstone, pillar_topic_id: form.pillar_topic_id || null, cornerstone_article_id: form.cornerstone_article_id || null, is_editor_pick: form.is_editor_pick }).eq('id', articleId)
     if (error) { alert('Error: ' + error.message); setSaving(false) }
     else { router.push('/admin') }
   }
@@ -942,6 +942,17 @@ function NewArticleInner({ slug }: { slug: string }) {
                     : 'Standard Article'
                 }
               >
+                {/* Editor's Pick toggle */}
+                <div style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #ede8df' }}>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={form.is_editor_pick} onChange={e => setForm(f => ({ ...f, is_editor_pick: e.target.checked }))} style={{ marginTop: '2px', accentColor: '#0e1a2b', width: 16, height: 16, flexShrink: 0 }} />
+                    <span>
+                      <span style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#0e1a2b' }}>⭐ Editor's Pick</span>
+                      <span style={{ display: 'block', fontSize: '12px', color: '#9a9085', marginTop: '0.15rem' }}>Show this article in the sidebar "Editor's Picks" on other article pages.</span>
+                    </span>
+                  </label>
+                </div>
+
                 {/* Pillar Content toggle */}
                 <div style={{ marginBottom: '1rem' }}>
                   <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer' }}>

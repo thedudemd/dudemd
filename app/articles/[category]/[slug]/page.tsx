@@ -32,19 +32,13 @@ async function getParentPillar(pillarId: string) {
 }
 
 async function getRelated(categorySlug: string, currentSlug: string) {
-  const { data: category } = await supabase
-    .from('categories')
-    .select('id')
-    .eq('slug', categorySlug)
-    .single()
-  if (!category) return []
   const { data } = await supabase
     .from('articles')
     .select('*, authors(name), categories!articles_category_id_fkey(name, slug)')
-    .eq('category_id', category.id)
+    .eq('is_editor_pick', true)
     .eq('published', true)
     .neq('slug', currentSlug)
-    .limit(3)
+    .limit(4)
   return data || []
 }
 
@@ -223,7 +217,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
             {related.length > 0 && (
               <div>
-                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1.25rem' }}>Related Articles</p>
+                <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1.25rem' }}>Editor's Picks</p>
                 {related.map((a) => (
                   <Link key={a.slug} href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ display: 'flex', gap: '0.75rem', textDecoration: 'none', marginBottom: '1.25rem', alignItems: 'start' }}>
                     <img src={a.cover_image_url} alt={`${a.title} thumbnail`} style={{ width: '72px', height: '54px', objectFit: 'cover', flexShrink: 0 }} />
