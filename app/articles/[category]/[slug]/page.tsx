@@ -1,6 +1,7 @@
 // @ts-nocheck
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import SidebarAd from '@/components/SidebarAd'
 import { supabase } from '@/lib/supabase/client'
 import { supabaseServer } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
@@ -214,6 +215,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <input type="email" placeholder="your@email.com" style={{ width: '100%', padding: '0.75rem', backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--color-cream)', outline: 'none', fontSize: '14px', marginBottom: '0.5rem', boxSizing: 'border-box' }} />
               <button style={{ width: '100%', padding: '0.75rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>Join Free</button>
             </div>
+
+            <SidebarAd />
 
             {related.length > 0 && (
               <div>
