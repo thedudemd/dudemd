@@ -28,6 +28,7 @@ const nav = [
       { label: 'Subscribers', href: '/admin/subscribers', icon: '◈' },
       { label: 'Analytics', href: '/admin/analytics', icon: '▲' },
       { label: 'Newsletter', href: '/admin/newsletter', icon: '◻' },
+      { label: 'System Emails', href: '/admin/system-emails', icon: '✉' },
     ]
   },
   {
