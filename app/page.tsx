@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import GoogleOneTap from "@/components/auth/GoogleOneTap"
 import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcome"
 import Link from 'next/link'
+import InFeedAd from '@/components/InFeedAd'
 import PersonalizedSection from '@/components/PersonalizedSection'
 import { supabaseServer as supabase } from '@/lib/supabase/server'
 
@@ -176,7 +177,9 @@ export default async function HomePage() {
             <Link href="/articles" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>All Articles →</Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2.5rem' }}>
-            {(latest.length > 0 ? latest : articles).map((a) => (
+            {(latest.length > 0 ? latest : articles).map((a, i) => (
+              <>
+              {i > 0 && i % 6 === 0 && <InFeedAd key={`ad-${i}`} />}
               <article key={a.slug}>
                 <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
@@ -197,6 +200,7 @@ export default async function HomePage() {
                 <p style={{ fontSize: '13px', color: 'var(--color-slate)', lineHeight: 1.55, marginBottom: '0.4rem' }}>{a.excerpt}</p>
                 <p style={{ fontSize: '11px', color: '#9a9085' }}>By {a.authors?.name}</p>
               </article>
+              </>
             ))}
           </div>
         </div>
