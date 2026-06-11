@@ -435,23 +435,6 @@ function NewArticleInner() {
     return () => clearTimeout(timer)
   }, [form, editor])
 
-  useEffect(() => {
-    async function loadDraft() {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) return
-      const draftKey = `draft_${session.user.id}`
-      const saved = localStorage.getItem(draftKey)
-      if (saved) {
-        const d = JSON.parse(saved)
-        setForm({ title: d.title||'', slug: d.slug||'', excerpt: d.excerpt||'', cover_image_url: d.cover_image_url||'', category_id: d.category_id||'', author_id: d.author_id||'', meta_title: d.meta_title||'', meta_description: d.meta_description||'', status: d.status||'draft', social_title: d.social_title||'', social_description: d.social_description||'', facebook_teaser_text: d.facebook_teaser_text||'', external_url: d.external_url||'', subcategory_id: d.subcategory_id||'', layout: d.layout||'standard', tags: d.tags||[], show_hero: d.show_hero !== false, is_pillar_content: d.is_pillar_content||false, is_cornerstone: d.is_cornerstone||false, pillar_topic_id: d.pillar_topic_id||'', cornerstone_article_id: d.cornerstone_article_id||'' })
-        if (editor && d.content) editor.commands.setContent(d.content)
-        setAutoSaved('Draft restored')
-        if (d.category_id) { supabase.from('categories').select('*').eq('parent_id', d.category_id).eq('enabled', true).order('sort_order').then(({data}) => setSubcategories(data||[])) }
-      }
-    }
-    if (editor) loadDraft()
-  }, [editor])
-
   async function handleChange(e: any) {
     const { name, value } = e.target
     if (name === 'excerpt') {
