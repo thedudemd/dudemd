@@ -7,7 +7,7 @@ const supabase = createClient(
 )
 
 export async function POST(req: NextRequest) {
-  const { articleId, content, token } = await req.json()
+  const { articleId, content, token, parentId } = await req.json()
 
   if (!articleId || !content || !token) {
     return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 })
@@ -25,6 +25,18 @@ export async function POST(req: NextRequest) {
   const { data: { user }, error: authError } = await supabase.auth.getUser(token)
   if (authError || !user) {
     return NextResponse.json({ error: 'You must be signed in to comment.' }, { status: 401 })
+  }
+
+  // Enforce one level of reply nesting: parentId must itself be a top-level comment
+  if (parentId) {
+    const { data: parent } = await supabase
+      .from('article_comments')
+      .select('parent_id')
+      .eq('id', parentId)
+      .single()
+    if (!parent || parent.parent_id) {
+      return NextResponse.json({ error: 'Replies can only be made to top-level comments.' }, { status: 400 })
+    }
   }
 
   // AI moderation via Claude
@@ -57,7 +69,7 @@ export async function POST(req: NextRequest) {
 
   const { data, error } = await supabase
     .from('article_comments')
-    .insert({ article_id: articleId, user_id: user.id, content: trimmed })
+    .insert({ article_id: articleId, user_id: user.id, content: trimmed, parent_id: parentId || null })
     .select()
     .single()
 

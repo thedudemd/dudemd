@@ -27,11 +27,13 @@ function getAuthFromCookie() {
 type Comment = {
   id: string
   user_id: string
+  parent_id?: string | null
   content: string
   created_at: string
   full_name?: string
   username?: string
   avatar_url?: string
+  replies?: Comment[]
 }
 
 const PAGE_SIZE = 10
@@ -46,6 +48,10 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   const [newComment, setNewComment] = useState('')
   const [posting, setPosting] = useState(false)
   const [postError, setPostError] = useState<string | null>(null)
+  const [replyingTo, setReplyingTo] = useState<string | null>(null)
+  const [replyText, setReplyText] = useState('')
+  const [replyPosting, setReplyPosting] = useState(false)
+  const [replyError, setReplyError] = useState<string | null>(null)
   const [auth, setAuth] = useState<{ uid?: string; token?: string; name?: string } | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
 
@@ -94,6 +100,33 @@ export default function CommentSection({ articleId }: { articleId: string }) {
         })
       }
 
+      // Fetch replies for these top-level comments
+      if (data.length > 0) {
+        const parentIds = data.map(c => c.id)
+        const repliesRes = await fetch(`${SUPABASE_URL}/rest/v1/article_comments?parent_id=in.(${parentIds.join(',')})&select=*&order=created_at.asc`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        })
+        const replies: Comment[] = await repliesRes.json()
+        if (replies.length > 0) {
+          const replyUserIds = Array.from(new Set(replies.map(r => r.user_id)))
+          const replyProfilesRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=in.(${replyUserIds.join(',')})&select=id,full_name,username,avatar_url`, {
+            headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+          })
+          const replyProfiles = await replyProfilesRes.json()
+          const replyProfileMap: Record<string, any> = {}
+          replyProfiles.forEach((p: any) => { replyProfileMap[p.id] = p })
+          replies.forEach(r => {
+            const p = replyProfileMap[r.user_id]
+            r.full_name = p?.full_name
+            r.username = p?.username
+            r.avatar_url = p?.avatar_url
+          })
+        }
+        data.forEach(parent => {
+          parent.replies = replies.filter(r => r.parent_id === parent.id)
+        })
+      }
+
       setComments(prev => startOffset === 0 ? data : [...prev, ...data])
       setHasMore(data.length === PAGE_SIZE)
       setOffset(startOffset + data.length)
@@ -125,6 +158,44 @@ export default function CommentSection({ articleId }: { articleId: string }) {
       setPostError('Something went wrong. Please try again.')
     }
     setPosting(false)
+  }
+
+  async function handleDelete(commentId: string) {
+    if (!auth?.token) return
+    if (!confirm('Delete this comment?')) return
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/article_comments?id=eq.${commentId}`, {
+        method: 'DELETE',
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+      })
+      if (res.ok) {
+        setComments(prev => prev.filter(c => c.id !== commentId))
+      }
+    } catch (e) {}
+  }
+
+  async function handleReply(parentId: string) {
+    if (!auth?.uid || !replyText.trim()) return
+    setReplyPosting(true)
+    setReplyError(null)
+    try {
+      const res = await fetch('/api/comments/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ articleId, content: replyText.trim(), token: auth.token, parentId })
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setReplyError(data.error || 'Something went wrong. Please try again.')
+      } else if (data.comment) {
+        setComments(prev => prev.map(c => c.id === parentId ? { ...c, replies: [...(c.replies || []), { ...data.comment, full_name: auth.name }] } : c))
+        setReplyText('')
+        setReplyingTo(null)
+      }
+    } catch (e) {
+      setReplyError('Something went wrong. Please try again.')
+    }
+    setReplyPosting(false)
   }
 
   function timeAgo(dateStr: string) {
@@ -185,8 +256,57 @@ export default function CommentSection({ articleId }: { articleId: string }) {
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'baseline', marginBottom: '0.25rem' }}>
                 <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--color-navy)' }}>{c.full_name || c.username || 'DudeMD Reader'}</span>
                 <span style={{ fontSize: '11px', color: '#9a9085' }}>{timeAgo(c.created_at)}</span>
+                {auth?.uid === c.user_id && (
+                  <button onClick={() => handleDelete(c.id)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#9a9085', fontSize: '11px', padding: 0, textDecoration: 'underline' }}>Delete</button>
+                )}
               </div>
               <p style={{ fontSize: '14px', color: 'var(--color-charcoal)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{c.content}</p>
+
+              {auth?.uid && (
+                <button onClick={() => { setReplyingTo(replyingTo === c.id ? null : c.id); setReplyText(''); setReplyError(null) }} style={{ marginTop: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-gold)', fontSize: '12px', fontWeight: 700, padding: 0, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  {replyingTo === c.id ? 'Cancel' : 'Reply'}
+                </button>
+              )}
+
+              {replyingTo === c.id && (
+                <div style={{ marginTop: '0.75rem' }}>
+                  <textarea
+                    value={replyText}
+                    onChange={e => setReplyText(e.target.value)}
+                    placeholder={`Reply to ${c.full_name || c.username || 'this comment'}...`}
+                    rows={2}
+                    style={{ width: '100%', padding: '0.6rem', border: '1px solid var(--color-border)', fontFamily: 'var(--font-body)', fontSize: '13px', color: 'var(--color-charcoal)', resize: 'vertical', boxSizing: 'border-box', outline: 'none' }}
+                  />
+                  {replyError && <p style={{ fontSize: '12px', color: '#c0392b', margin: '0.4rem 0 0' }}>{replyError}</p>}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.4rem' }}>
+                    <button onClick={() => handleReply(c.id)} disabled={replyPosting || !replyText.trim()} style={{ padding: '0.45rem 1.25rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: replyPosting || !replyText.trim() ? 'not-allowed' : 'pointer', opacity: replyPosting || !replyText.trim() ? 0.5 : 1 }}>
+                      {replyPosting ? 'Posting...' : 'Post Reply'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {c.replies && c.replies.length > 0 && (
+                <div style={{ marginTop: '1rem', paddingLeft: '1.25rem', borderLeft: '2px solid var(--color-border)' }}>
+                  {c.replies.map(r => (
+                    <div key={r.id} style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'var(--color-navy)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '12px', flexShrink: 0, overflow: 'hidden' }}>
+                        {r.avatar_url ? <img src={r.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (r.full_name || r.username || '?')[0]?.toUpperCase()}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'baseline', marginBottom: '0.25rem' }}>
+                          <span style={{ fontWeight: 700, fontSize: '12px', color: 'var(--color-navy)' }}>{r.full_name || r.username || 'DudeMD Reader'}</span>
+                          <span style={{ fontSize: '10px', color: '#9a9085' }}>{timeAgo(r.created_at)}</span>
+                          {auth?.uid === r.user_id && (
+                            <button onClick={() => handleDelete(r.id)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#9a9085', fontSize: '10px', padding: 0, textDecoration: 'underline' }}>Delete</button>
+                          )}
+                        </div>
+                        <p style={{ fontSize: '13px', color: 'var(--color-charcoal)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{r.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ))}
