@@ -60,6 +60,7 @@ const nav = [
     group: 'Platform',
     items: [
       { label: 'Feature Controls', href: '/admin/flags', icon: '⊛' },
+      { label: 'Launch Center', href: '/admin/launch', icon: '🚀' },
       { label: 'Writers & Roles', href: '/admin/writers', icon: '◈' },
       { label: 'Authors', href: '/admin/authors', icon: '◎' },
       { label: 'Settings', href: '/admin/settings', icon: '◎' },
