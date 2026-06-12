@@ -92,7 +92,7 @@ export default function OptinDesignerAdmin() {
 
   return (
     <AdminShell>
-      <div style={{ padding: '2rem 2.5rem', maxWidth: '1100px' }}>
+      <div style={{ padding: '2rem 2.5rem', maxWidth: activeId ? '1600px' : '1100px' }}>
         {!activeId && (
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>

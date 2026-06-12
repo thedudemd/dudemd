@@ -67,7 +67,7 @@ export default function SystemEmailsAdmin() {
 
   return (
     <AdminShell>
-      <div style={{ padding: '2rem 2.5rem', maxWidth: '1100px' }}>
+      <div style={{ padding: '2rem 2.5rem', maxWidth: activeKey ? '1600px' : '1100px' }}>
         <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.5rem' }}>System Emails</h1>
         <p style={{ fontSize: '13px', color: '#9a9085', marginBottom: '2rem' }}>Edit the transactional emails sent automatically by the platform.</p>
 
