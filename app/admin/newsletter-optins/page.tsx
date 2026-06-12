@@ -13,6 +13,7 @@ export default function OptinDesignerAdmin() {
   const [name, setName] = useState('')
   const [targetCategory, setTargetCategory] = useState('')
   const [enabled, setEnabled] = useState(false)
+  const [showOnHomepage, setShowOnHomepage] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [editorReady, setEditorReady] = useState(false)
@@ -41,6 +42,7 @@ export default function OptinDesignerAdmin() {
     setName(d?.name || '')
     setTargetCategory(d?.target_category || '')
     setEnabled(d?.enabled || false)
+    setShowOnHomepage(d?.show_on_homepage || false)
     setEditorReady(false)
   }
 
@@ -57,12 +59,12 @@ export default function OptinDesignerAdmin() {
     emailEditorRef.current.editor.exportHtml(async ({ design, html }) => {
       setSaving(true)
       const { error } = await supabase.from('optin_designs').update({
-        name, target_category: targetCategory || null, enabled, design, html
+        name, target_category: targetCategory || null, enabled, show_on_homepage: showOnHomepage, design, html
       }).eq('id', activeId)
       setSaving(false)
       if (error) { alert('Error: ' + error.message); return }
       setSaved(true)
-      setDesigns(prev => prev.map(d => d.id === activeId ? { ...d, name, target_category: targetCategory || null, enabled, design, html } : d))
+      setDesigns(prev => prev.map(d => d.id === activeId ? { ...d, name, target_category: targetCategory || null, enabled, show_on_homepage: showOnHomepage, design, html } : d))
       setTimeout(() => setSaved(false), 2500)
     })
   }
@@ -166,10 +168,14 @@ export default function OptinDesignerAdmin() {
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '0.6rem' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.25rem', paddingBottom: '0.6rem' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '13px', fontWeight: 600, color: '#0e1a2b' }}>
                   <input type="checkbox" checked={enabled} onChange={e => setEnabled(e.target.checked)} style={{ width: 16, height: 16, accentColor: '#0e1a2b' }} />
                   Enabled
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '13px', fontWeight: 600, color: '#0e1a2b' }}>
+                  <input type="checkbox" checked={showOnHomepage} onChange={e => setShowOnHomepage(e.target.checked)} style={{ width: 16, height: 16, accentColor: '#0e1a2b' }} />
+                  Show on Homepage
                 </label>
               </div>
             </div>
