@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import GoogleOneTap from "@/components/auth/GoogleOneTap"
 import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcome"
 import Link from 'next/link'
+import SidebarAd from '@/components/SidebarAd'
 import InFeedAd from '@/components/InFeedAd'
 import PersonalizedSection from '@/components/PersonalizedSection'
 import { supabaseServer as supabase } from '@/lib/supabase/server'
@@ -179,6 +180,7 @@ export default async function HomePage() {
                   <p style={{ fontSize: '12px', color: '#9a9085', marginTop: '0.35rem' }}>By {a.authors?.name}</p>
                 </div>
               ))}
+              <SidebarAd />
             </div>
 
           </div>
