@@ -14,6 +14,7 @@ export default function OptinDesignerAdmin() {
   const [targetCategory, setTargetCategory] = useState('')
   const [enabled, setEnabled] = useState(false)
   const [showOnHomepage, setShowOnHomepage] = useState(false)
+  const [displayType, setDisplayType] = useState('popup')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [editorReady, setEditorReady] = useState(false)
@@ -43,6 +44,7 @@ export default function OptinDesignerAdmin() {
     setTargetCategory(d?.target_category || '')
     setEnabled(d?.enabled || false)
     setShowOnHomepage(d?.show_on_homepage || false)
+    setDisplayType(d?.display_type || 'popup')
     setEditorReady(false)
   }
 
@@ -59,12 +61,12 @@ export default function OptinDesignerAdmin() {
     emailEditorRef.current.editor.exportHtml(async ({ design, html }) => {
       setSaving(true)
       const { error } = await supabase.from('optin_designs').update({
-        name, target_category: targetCategory || null, enabled, show_on_homepage: showOnHomepage, design, html
+        name, target_category: targetCategory || null, enabled, show_on_homepage: showOnHomepage, display_type: displayType, design, html
       }).eq('id', activeId)
       setSaving(false)
       if (error) { alert('Error: ' + error.message); return }
       setSaved(true)
-      setDesigns(prev => prev.map(d => d.id === activeId ? { ...d, name, target_category: targetCategory || null, enabled, show_on_homepage: showOnHomepage, design, html } : d))
+      setDesigns(prev => prev.map(d => d.id === activeId ? { ...d, name, target_category: targetCategory || null, enabled, show_on_homepage: showOnHomepage, display_type: displayType, design, html } : d))
       setTimeout(() => setSaved(false), 2500)
     })
   }
@@ -166,6 +168,13 @@ export default function OptinDesignerAdmin() {
                 <select value={targetCategory} onChange={e => setTargetCategory(e.target.value)} style={{ width: '100%', padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', boxSizing: 'border-box' as const }}>
                   <option value="">General (all pages)</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <div style={{ flex: 1, minWidth: '160px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#4A5563', marginBottom: '0.5rem' }}>Display Type</label>
+                <select value={displayType} onChange={e => setDisplayType(e.target.value)} style={{ width: '100%', padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', boxSizing: 'border-box' as const }}>
+                  <option value="popup">Popup</option>
+                  <option value="inline">Inline</option>
                 </select>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.25rem', paddingBottom: '0.6rem' }}>
