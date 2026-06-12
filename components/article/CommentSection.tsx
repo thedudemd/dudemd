@@ -139,7 +139,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
     <section ref={sectionRef} style={{ borderTop: '1px solid var(--color-border)', padding: '3rem 0' }}>
       <div className="container-content">
         <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.25rem', color: 'var(--color-navy)', marginBottom: '1.5rem' }}>
-          Comments {comments.length > 0 && `(${comments.length})`}
+          Join the Conversation {comments.length > 0 && `(${comments.length})`}
         </h2>
 
         {auth?.uid ? (
