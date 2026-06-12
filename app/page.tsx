@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import GoogleOneTap from "@/components/auth/GoogleOneTap"
 import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcome"
 import Link from 'next/link'
+import OptinDisplay from '@/components/OptinDisplay'
 import SidebarAd from '@/components/SidebarAd'
 import InFeedAd from '@/components/InFeedAd'
 import PersonalizedSection from '@/components/PersonalizedSection'
@@ -122,6 +123,8 @@ export default async function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
       <h1 className="sr-only">DudeMD — Modern Men's Wellness for Real Life</h1>
       <GoogleOneTap />
+      <OptinDisplay isHomepage />
+      <OptinDisplay isHomepage />
 
 
       {/* HERO — FEATURED + TWO SECONDARY */}
