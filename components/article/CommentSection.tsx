@@ -45,6 +45,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   const [offset, setOffset] = useState(0)
   const [newComment, setNewComment] = useState('')
   const [posting, setPosting] = useState(false)
+  const [postError, setPostError] = useState<string | null>(null)
   const [auth, setAuth] = useState<{ uid?: string; token?: string; name?: string } | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
 
@@ -106,18 +107,23 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   async function handlePost() {
     if (!auth?.uid || !newComment.trim()) return
     setPosting(true)
+    setPostError(null)
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/article_comments`, {
+      const res = await fetch('/api/comments/create', {
         method: 'POST',
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
-        body: JSON.stringify({ article_id: articleId, user_id: auth.uid, content: newComment.trim() })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ articleId, content: newComment.trim(), token: auth.token })
       })
       const data = await res.json()
-      if (data?.[0]) {
-        setComments(prev => [{ ...data[0], full_name: auth.name }, ...prev])
+      if (!res.ok) {
+        setPostError(data.error || 'Something went wrong. Please try again.')
+      } else if (data.comment) {
+        setComments(prev => [{ ...data.comment, full_name: auth.name }, ...prev])
         setNewComment('')
       }
-    } catch (e) {}
+    } catch (e) {
+      setPostError('Something went wrong. Please try again.')
+    }
     setPosting(false)
   }
 
@@ -151,6 +157,9 @@ export default function CommentSection({ articleId }: { articleId: string }) {
               rows={3}
               style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--color-border)', fontFamily: 'var(--font-body)', fontSize: '14px', color: 'var(--color-charcoal)', resize: 'vertical', boxSizing: 'border-box', outline: 'none' }}
             />
+            {postError && (
+              <p style={{ fontSize: '13px', color: '#c0392b', margin: '0.5rem 0 0' }}>{postError}</p>
+            )}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
               <button onClick={handlePost} disabled={posting || !newComment.trim()} style={{ padding: '0.6rem 1.5rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: posting || !newComment.trim() ? 'not-allowed' : 'pointer', opacity: posting || !newComment.trim() ? 0.5 : 1 }}>
                 {posting ? 'Posting...' : 'Post Comment'}
