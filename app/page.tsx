@@ -20,6 +20,23 @@ async function getArticles() {
   return data || []
 }
 
+async function getCategoryArticles(categorySlug, limit = 3) {
+  const { data: category } = await supabase
+    .from('categories')
+    .select('id')
+    .eq('slug', categorySlug)
+    .single()
+  if (!category) return []
+  const { data } = await supabase
+    .from('articles')
+    .select('*, authors!articles_author_id_fkey(name), categories!articles_category_id_fkey(name, slug)')
+    .eq('category_id', category.id)
+    .eq('published', true)
+    .order('published_at', { ascending: false })
+    .limit(limit)
+  return data || []
+}
+
 async function getCategories() {
   const { data } = await supabase
     .from('categories')
@@ -91,6 +108,9 @@ const organizationSchema = {
 export default async function HomePage() {
   const articles = await getArticles()
   const categories = await getCategories()
+  const mindArticles = await getCategoryArticles('mind', 3)
+  const lifestyleArticles = await getCategoryArticles('lifestyle', 3)
+  const recoveryArticles = await getCategoryArticles('recovery', 3)
   const featured = articles[0]
   const secondary = articles.slice(1, 3)
   const latest = articles.slice(3)
@@ -169,17 +189,15 @@ export default async function HomePage() {
 
       <PersonalizedSection />
 
-      {/* LATEST GRID */}
+      {mindArticles.length > 0 && (
       <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container-content">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2rem', borderBottom: '2px solid var(--color-navy)', paddingBottom: '0.75rem' }}>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-navy)', letterSpacing: '-0.01em' }}>Latest</h2>
-            <Link href="/articles" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>All Articles →</Link>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-navy)', letterSpacing: '-0.01em' }}>Latest in Mind</h2>
+            <Link href="/category/mind" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>View All →</Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2.5rem' }}>
-            {(latest.length > 0 ? latest : articles).map((a, i) => (
-              <>
-              {i > 0 && i % 6 === 0 && <InFeedAd key={`ad-${i}`} />}
+            {mindArticles.map((a) => (
               <article key={a.slug}>
                 <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
@@ -200,11 +218,80 @@ export default async function HomePage() {
                 <p style={{ fontSize: '13px', color: 'var(--color-slate)', lineHeight: 1.55, marginBottom: '0.4rem' }}>{a.excerpt}</p>
                 <p style={{ fontSize: '11px', color: '#9a9085' }}>By {a.authors?.name}</p>
               </article>
-              </>
             ))}
           </div>
         </div>
       </section>
+      )}
+      {lifestyleArticles.length > 0 && (
+      <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
+        <div className="container-content">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2rem', borderBottom: '2px solid var(--color-navy)', paddingBottom: '0.75rem' }}>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-navy)', letterSpacing: '-0.01em' }}>Latest in Lifestyle</h2>
+            <Link href="/category/lifestyle" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>View All →</Link>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2.5rem' }}>
+            {lifestyleArticles.map((a) => (
+              <article key={a.slug}>
+                <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
+                  <div style={{ width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
+                    <img
+                      src={a.cover_image_url || '/placeholder-cover.jpg'}
+                      alt={`${a.title} — ${a.categories?.name}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </div>
+                </Link>
+                <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <Link href={`/category/${a.categories?.slug}`} style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>{a.categories?.name}</Link>
+                  <span style={{ fontSize: '10px', color: '#9a9085' }}>{a.read_time}</span>
+                </div>
+                <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.3, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>
+                  <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
+                </h3>
+                <p style={{ fontSize: '13px', color: 'var(--color-slate)', lineHeight: 1.55, marginBottom: '0.4rem' }}>{a.excerpt}</p>
+                <p style={{ fontSize: '11px', color: '#9a9085' }}>By {a.authors?.name}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+      )}
+      <InFeedAd />
+      {recoveryArticles.length > 0 && (
+      <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
+        <div className="container-content">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2rem', borderBottom: '2px solid var(--color-navy)', paddingBottom: '0.75rem' }}>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.1rem', color: 'var(--color-navy)', letterSpacing: '-0.01em' }}>Latest in Recovery</h2>
+            <Link href="/category/recovery" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>View All →</Link>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2.5rem' }}>
+            {recoveryArticles.map((a) => (
+              <article key={a.slug}>
+                <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
+                  <div style={{ width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
+                    <img
+                      src={a.cover_image_url || '/placeholder-cover.jpg'}
+                      alt={`${a.title} — ${a.categories?.name}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </div>
+                </Link>
+                <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <Link href={`/category/${a.categories?.slug}`} style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>{a.categories?.name}</Link>
+                  <span style={{ fontSize: '10px', color: '#9a9085' }}>{a.read_time}</span>
+                </div>
+                <h3 style={{ fontFamily: 'Georgia, serif', fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.3, color: 'var(--color-navy)', marginBottom: '0.5rem' }}>
+                  <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>{a.title}</Link>
+                </h3>
+                <p style={{ fontSize: '13px', color: 'var(--color-slate)', lineHeight: 1.55, marginBottom: '0.4rem' }}>{a.excerpt}</p>
+                <p style={{ fontSize: '11px', color: '#9a9085' }}>By {a.authors?.name}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+      )}
 
       {/* CATEGORY BAND */}
       <section style={{ backgroundColor: 'var(--color-navy)', padding: '2.5rem 0' }}>
