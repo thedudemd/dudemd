@@ -14,8 +14,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**.supabase.in' },
       { protocol: 'https', hostname: 'www.dudemd.com' },
       { protocol: 'https', hostname: 'dudemd.com' },
-      { protocol: 'https', hostname: 'www.dudemd.com' },
       { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
   },
 }

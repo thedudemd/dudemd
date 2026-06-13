@@ -1,5 +1,6 @@
 // @ts-nocheck
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import GoogleOneTap from "@/components/auth/GoogleOneTap"
 import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcome"
 import Link from 'next/link'
@@ -107,6 +108,7 @@ const organizationSchema = {
   ]
 }
 
+
 export default async function HomePage() {
   const articles = await getArticles()
   const categories = await getCategories()
@@ -137,10 +139,13 @@ export default async function HomePage() {
               <div className="hero-featured">
                 <Link href={`/articles/${featured.categories?.slug}/${featured.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '1.25rem' }}>
-                    <img
+                    <Image
                       src={featured.cover_image_url || '/placeholder-cover.jpg'}
                       alt={`${featured.title} — ${featured.categories?.name}`}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}
+                      fill
+                      priority
+                      sizes="(min-width: 900px) 800px, 100vw"
+                      style={{ objectFit: 'cover' }}
                     />
                     <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(14,26,43,0.55) 0%, transparent 50%)' }} />
                   </div>
@@ -165,11 +170,13 @@ export default async function HomePage() {
               {secondary.map((a, i) => (
                 <div key={a.slug} style={{ paddingBottom: '1.5rem', marginBottom: '1.5rem', borderBottom: i < secondary.length - 1 ? '1px solid var(--color-border)' : 'none' }}>
                   <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-                    <div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '0.75rem' }}>
-                      <img
+                    <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', overflow: 'hidden', marginBottom: '0.75rem' }}>
+                      <Image
                         src={a.cover_image_url || '/placeholder-cover.jpg'}
                         alt={`${a.title} — ${a.categories?.name}`}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                        fill
+                        sizes="(min-width: 900px) 400px, 100vw"
+                        style={{ objectFit: 'cover' }}
                       />
                     </div>
                   </Link>
@@ -205,11 +212,13 @@ export default async function HomePage() {
             {mindArticles.map((a) => (
               <article key={a.slug}>
                 <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-                  <div style={{ width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
-                    <img
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
+                    <Image
                       src={a.cover_image_url || '/placeholder-cover.jpg'}
                       alt={`${a.title} — ${a.categories?.name}`}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      fill
+                      sizes="(min-width: 900px) 380px, 100vw"
+                      style={{ objectFit: 'cover' }}
                     />
                   </div>
                 </Link>
@@ -239,11 +248,13 @@ export default async function HomePage() {
             {lifestyleArticles.map((a) => (
               <article key={a.slug}>
                 <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-                  <div style={{ width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
-                    <img
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
+                    <Image
                       src={a.cover_image_url || '/placeholder-cover.jpg'}
                       alt={`${a.title} — ${a.categories?.name}`}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      fill
+                      sizes="(min-width: 900px) 380px, 100vw"
+                      style={{ objectFit: 'cover' }}
                     />
                   </div>
                 </Link>
@@ -274,11 +285,13 @@ export default async function HomePage() {
             {recoveryArticles.map((a) => (
               <article key={a.slug}>
                 <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
-                  <div style={{ width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
-                    <img
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
+                    <Image
                       src={a.cover_image_url || '/placeholder-cover.jpg'}
                       alt={`${a.title} — ${a.categories?.name}`}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      fill
+                      sizes="(min-width: 900px) 380px, 100vw"
+                      style={{ objectFit: 'cover' }}
                     />
                   </div>
                 </Link>
