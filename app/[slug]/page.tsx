@@ -1,6 +1,7 @@
 // @ts-nocheck
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import ContactPage from '@/components/ContactPage'
@@ -66,8 +67,8 @@ function BlockRenderer({ blocks }: { blocks: any[] }) {
         if (block.type === 'two_column') {
           const imageFirst = block.image_side === 'left'
           const imgEl = block.image_url ? (
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <img src={block.image_url} alt={block.headline || ''} style={{ width: '100%', height: '100%', minHeight: '300px', objectFit: 'cover', display: 'block' }} />
+            <div style={{ position: 'relative', flex: 1, minWidth: 0, minHeight: '300px' }}>
+              <Image src={block.image_url} alt={block.headline || ''} fill sizes="(min-width: 900px) 550px, 100vw" style={{ objectFit: 'cover' }} />
             </div>
           ) : null
           const textEl = (
@@ -94,7 +95,11 @@ function BlockRenderer({ blocks }: { blocks: any[] }) {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '2rem' }}>
                   {(block.members || []).map((m: any, j: number) => (
                     <div key={j} style={{ backgroundColor: '#fff', border: '1px solid #e8e4de', overflow: 'hidden' }}>
-                      {m.photo_url && <img src={m.photo_url} alt={m.name} style={{ width: '100%', aspectRatio: '1/1', objectFit: 'cover', display: 'block' }} />}
+                      {m.photo_url && (
+                        <div style={{ position: 'relative', width: '100%', aspectRatio: '1/1' }}>
+                          <Image src={m.photo_url} alt={m.name} fill sizes="(min-width: 900px) 340px, 100vw" style={{ objectFit: 'cover' }} />
+                        </div>
+                      )}
                       <div style={{ padding: '1.25rem' }}>
                         {m.name && <p style={{ fontSize: '15px', fontWeight: 700, color: '#0e1a2b', margin: '0 0 0.25rem' }}>{m.name}</p>}
                         {m.title && <p style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#c9b28f', margin: '0 0 0.75rem' }}>{m.title}</p>}
