@@ -1,6 +1,7 @@
 // @ts-nocheck
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase/client'
 import { notFound } from 'next/navigation'
 
@@ -96,8 +97,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               {articles.map((a) => (
                 <article key={a.slug}>
                   <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`}>
-                    <div style={{ width: '100%', aspectRatio: '16/10', overflow: 'hidden', marginBottom: '1rem' }}>
-                      <img src={a.cover_image_url} alt={`${a.title} — ${a.categories?.name}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <div style={{ position: 'relative', width: '100%', aspectRatio: '16/10', overflow: 'hidden', marginBottom: '1rem' }}>
+                      <Image src={a.cover_image_url || '/placeholder-cover.jpg'} alt={`${a.title} — ${a.categories?.name}`} fill sizes="(min-width: 900px) 380px, 100vw" style={{ objectFit: 'cover' }} />
                     </div>
                   </Link>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '0.5rem' }}>
