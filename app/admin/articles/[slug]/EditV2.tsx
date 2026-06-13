@@ -94,6 +94,7 @@ function NewArticleInner({ slug }: { slug: string }) {
   const [readabilityScore, setReadabilityScore] = useState(0)
   const [form, setForm] = useState({ title: '', slug: '', excerpt: '', cover_image_url: '', category_id: '', author_id: '', meta_title: '', meta_description: '', status: 'draft', social_title: '', social_description: '', facebook_teaser_text: '', external_url: '', subcategory_id: '', layout: 'standard', tags: [] as string[], show_hero: true, is_pillar_content: false, is_cornerstone: false, pillar_topic_id: '', cornerstone_article_id: '', is_editor_pick: false })
   const [articleId, setArticleId] = useState('')
+  const [originalStatus, setOriginalStatus] = useState('')
   const [canvaDesigns, setCanvaDesigns] = useState<any[]>([])
   const [showCanvaPicker, setShowCanvaPicker] = useState(false)
   const [imgUploading, setImgUploading] = useState(false)
@@ -418,6 +419,7 @@ function NewArticleInner({ slug }: { slug: string }) {
       const { data: article } = await (supabase.from as any)('articles').select('*').eq('slug', slug).single()
       if (!article) { router.push('/admin'); return }
       setArticleId(article.id)
+      setOriginalStatus(article.status || 'draft')
       setForm({
         title: article.title || '', slug: article.slug || '', excerpt: article.excerpt || '',
         cover_image_url: article.cover_image_url || '', category_id: article.category_id || '',
@@ -536,6 +538,11 @@ function NewArticleInner({ slug }: { slug: string }) {
     if (!session) { router.push('/admin/login'); return }
     const cleanForm = { ...form, category_id: form.category_id || null, subcategory_id: form.subcategory_id || null, author_id: form.author_id || null }
     const { error } = await supabase.from('articles').update({ ...cleanForm, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null, updated_at: new Date().toISOString(), is_pillar_content: form.is_pillar_content, is_cornerstone: form.is_cornerstone, pillar_topic_id: form.pillar_topic_id || null, cornerstone_article_id: form.cornerstone_article_id || null, is_editor_pick: form.is_editor_pick }).eq('id', articleId)
+
+    if (!error && status === 'published' && originalStatus !== 'published') {
+      setOriginalStatus('published')
+      fetch('/api/newsletter/notify-new-article', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ articleId }) }).catch(() => {})
+    }
     if (error) { alert('Error: ' + error.message); setSaving(false) }
     else { router.push('/admin') }
   }

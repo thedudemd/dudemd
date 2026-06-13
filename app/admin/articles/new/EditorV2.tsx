@@ -513,7 +513,11 @@ function NewArticleInner() {
       setForm(f => ({ ...f, slug: finalSlug }))
     }
     const cleanForm = { ...form, slug: finalSlug, category_id: form.category_id || null, subcategory_id: form.subcategory_id || null, author_id: form.author_id || null }
-    const { error } = await supabase.from('articles').insert({ ...cleanForm, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null, updated_at: new Date().toISOString(), updated_at: new Date().toISOString(), is_pillar_content: form.is_pillar_content, is_cornerstone: form.is_cornerstone, pillar_topic_id: form.pillar_topic_id || null, cornerstone_article_id: form.cornerstone_article_id || null, is_editor_pick: form.is_editor_pick })
+    const { data: insertedArticle, error } = await supabase.from('articles').insert({ ...cleanForm, content: editor?.getHTML() || '', read_time: getReadTime(), status, published: status === 'published', published_at: status === 'published' ? new Date().toISOString() : null, updated_at: new Date().toISOString(), is_pillar_content: form.is_pillar_content, is_cornerstone: form.is_cornerstone, pillar_topic_id: form.pillar_topic_id || null, cornerstone_article_id: form.cornerstone_article_id || null, is_editor_pick: form.is_editor_pick }).select('id').single()
+
+    if (!error && status === 'published' && insertedArticle?.id) {
+      fetch('/api/newsletter/notify-new-article', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ articleId: insertedArticle.id }) }).catch(() => {})
+    }
     if (error) { alert('Error: ' + error.message); setSaving(false) }
     else { localStorage.removeItem('draft_' + session.user.id); router.push('/admin') }
   }
