@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import InArticleAd from './InArticleAd'
+import Image from 'next/image'
 import CommentSection from './CommentSection'
 
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
@@ -190,7 +191,7 @@ export default function ArticleContent({ article, slug, category, relatedArticle
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1.25rem' }}>
           {relatedArticles.map((a: any, i: number) => (
             <a key={i} href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', backgroundColor: '#fff', border: '1px solid var(--color-border)', overflow: 'hidden' }}>
-              {a.cover_image_url && <img src={a.cover_image_url} alt={a.title} style={{ width: '100%', height: '140px', objectFit: 'cover', display: 'block' }} />}
+              {a.cover_image_url && (<div style={{ position: 'relative', width: '100%', height: '140px' }}><Image src={a.cover_image_url} alt={a.title} fill sizes="(min-width: 900px) 300px, 100vw" style={{ objectFit: 'cover' }} /></div>)}
               <div style={{ padding: '0.875rem' }}>
                 <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.35rem' }}>{a.categories?.name}</p>
                 <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-navy)', lineHeight: 1.4, margin: 0 }}>{a.title}</p>

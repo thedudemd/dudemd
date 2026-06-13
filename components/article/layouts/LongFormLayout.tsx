@@ -1,4 +1,6 @@
 // @ts-nocheck
+import Image from 'next/image'
+
 export default function LongFormLayout({ article, children }: any) {
   return (
     <>
@@ -9,7 +11,7 @@ export default function LongFormLayout({ article, children }: any) {
           {article.excerpt && <p style={{ fontSize: '18px', color: 'rgba(247,244,238,0.7)', lineHeight: 1.7, fontStyle: 'italic' }}>{article.excerpt}</p>}
         </div>
       </div>
-      {article.cover_image_url && <div style={{ width: '100%', overflow: 'hidden', aspectRatio: '16/9', maxHeight: '500px' }}><img src={article.cover_image_url} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /></div>}
+      {article.cover_image_url && <div style={{ position: 'relative', width: '100%', overflow: 'hidden', aspectRatio: '16/9', maxHeight: '500px' }}><Image src={article.cover_image_url} alt={article.title} fill priority sizes="100vw" style={{ objectFit: 'cover' }} /></div>}
       {children}
     </>
   )
