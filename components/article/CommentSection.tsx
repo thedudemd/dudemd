@@ -36,15 +36,19 @@ type Comment = {
   replies?: Comment[]
 }
 
-type ReactionData = { like: number; heart: number; care: number; userType: string | null }
+type ReactionType = 'like' | 'heart' | 'care' | 'wow' | 'sad'
+type ReactionData = { like: number; heart: number; care: number; wow: number; sad: number; userType: ReactionType | null }
 
 const PAGE_SIZE = 10
 const REPORT_REASONS = ['Spam', 'Harassment', 'Hate Speech', 'Other']
-const REACTION_TYPES: { key: 'like' | 'heart' | 'care'; emoji?: string; label: string }[] = [
-  { key: 'like', label: 'Like' },
-  { key: 'heart', emoji: '\u2764\uFE0F', label: 'Heart' },
-  { key: 'care', emoji: '\uD83E\uDD17', label: 'Care' },
+const REACTION_TYPES: { key: ReactionType; icon?: string; label: string; accent: string }[] = [
+  { key: 'like', label: 'Like', accent: '#1877F2' },
+  { key: 'heart', icon: '/icons/reaction-heart.svg', label: 'Heart', accent: '#DD2E44' },
+  { key: 'care', icon: '/icons/reaction-care.svg', label: 'Care', accent: '#F4900C' },
+  { key: 'wow', icon: '/icons/reaction-wow.svg', label: 'Wow', accent: '#F4900C' },
+  { key: 'sad', icon: '/icons/reaction-sad.svg', label: 'Sad', accent: '#5DADEC' },
 ]
+const EMPTY_REACTIONS: ReactionData = { like: 0, heart: 0, care: 0, wow: 0, sad: 0, userType: null }
 
 export default function CommentSection({ articleId }: { articleId: string }) {
   const [enabled, setEnabled] = useState(false)
@@ -64,6 +68,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   const [reportingFor, setReportingFor] = useState<string | null>(null)
   const [reportedIds, setReportedIds] = useState<Set<string>>(new Set())
   const [reactions, setReactions] = useState<Record<string, ReactionData>>({})
+  const [hoveredReaction, setHoveredReaction] = useState<string | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
 
   // Check feature flag on mount
@@ -96,9 +101,9 @@ export default function CommentSection({ articleId }: { articleId: string }) {
       })
       const rows: { comment_id: string; user_id: string; type: string }[] = await res.json()
       const map: Record<string, ReactionData> = {}
-      commentIds.forEach(id => { map[id] = { like: 0, heart: 0, care: 0, userType: null } })
+      commentIds.forEach(id => { map[id] = { ...EMPTY_REACTIONS } })
       rows.forEach(r => {
-        if (!map[r.comment_id]) map[r.comment_id] = { like: 0, heart: 0, care: 0, userType: null }
+        if (!map[r.comment_id]) map[r.comment_id] = { ...EMPTY_REACTIONS }
         if (r.type === 'like' || r.type === 'heart' || r.type === 'care') {
           map[r.comment_id][r.type]++
         }
@@ -190,7 +195,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
         setPostError(data.error || 'Something went wrong. Please try again.')
       } else if (data.comment) {
         setComments(prev => [{ ...data.comment, full_name: auth.name }, ...prev])
-        setReactions(prev => ({ ...prev, [data.comment.id]: { like: 0, heart: 0, care: 0, userType: null } }))
+        setReactions(prev => ({ ...prev, [data.comment.id]: { ...EMPTY_REACTIONS } }))
         setNewComment('')
       }
     } catch (e) {
@@ -228,7 +233,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
         setReplyError(data.error || 'Something went wrong. Please try again.')
       } else if (data.comment) {
         setComments(prev => prev.map(c => c.id === parentId ? { ...c, replies: [...(c.replies || []), { ...data.comment, full_name: auth.name }] } : c))
-        setReactions(prev => ({ ...prev, [data.comment.id]: { like: 0, heart: 0, care: 0, userType: null } }))
+        setReactions(prev => ({ ...prev, [data.comment.id]: { ...EMPTY_REACTIONS } }))
         setReplyText('')
         setReplyingTo(null)
       }
@@ -253,14 +258,14 @@ export default function CommentSection({ articleId }: { articleId: string }) {
     } catch (e) {}
   }
 
-  async function handleReaction(commentId: string, type: 'like' | 'heart' | 'care') {
+  async function handleReaction(commentId: string, type: ReactionType) {
     if (!auth?.token || !auth?.uid) return
-    const current = reactions[commentId] || { like: 0, heart: 0, care: 0, userType: null }
+    const current = reactions[commentId] || { ...EMPTY_REACTIONS }
     const prevType = current.userType
 
     // Optimistic update
     const next: ReactionData = { ...current }
-    if (prevType) next[prevType as 'like' | 'heart' | 'care'] = Math.max(0, next[prevType as 'like' | 'heart' | 'care'] - 1)
+    if (prevType) next[prevType] = Math.max(0, next[prevType] - 1)
     if (prevType === type) {
       next.userType = null
     } else {
@@ -330,30 +335,50 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   }
 
   function renderReactionBar(c: Comment, isReply: boolean) {
-    const r = reactions[c.id] || { like: 0, heart: 0, care: 0, userType: null }
-    const iconSize = isReply ? 14 : 16
+    const r = reactions[c.id] || { ...EMPTY_REACTIONS }
+    const iconSize = isReply ? 16 : 18
     return (
-      <div style={{ display: 'flex', gap: '0.9rem', marginTop: '0.5rem', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: '1.1rem', marginTop: '0.6rem', alignItems: 'center' }}>
         {REACTION_TYPES.map(rt => {
           const active = r.userType === rt.key
           const count = r[rt.key]
           const disabled = !auth?.uid
+          const hovered = hoveredReaction === `${c.id}-${rt.key}`
           return (
             <button
               key={rt.key}
               onClick={() => !disabled && handleReaction(c.id, rt.key)}
+              onMouseEnter={() => setHoveredReaction(`${c.id}-${rt.key}`)}
+              onMouseLeave={() => setHoveredReaction(null)}
               disabled={disabled}
               title={rt.label}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'none', border: 'none', cursor: disabled ? 'default' : 'pointer', padding: 0, fontSize: isReply ? '11px' : '12px', color: active ? 'var(--color-navy)' : '#9a9085', fontWeight: active ? 700 : 400 }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '0.3rem',
+                background: active ? `${rt.accent}1A` : 'none',
+                border: 'none', borderRadius: '12px',
+                padding: active ? '0.15rem 0.5rem' : '0.15rem 0.2rem',
+                cursor: disabled ? 'default' : 'pointer',
+                fontSize: isReply ? '11px' : '12px',
+                color: active ? rt.accent : '#9a9085',
+                fontWeight: active ? 700 : 400,
+                transition: 'background 0.15s ease'
+              }}
             >
-              {rt.key === 'like' ? (
-                <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill={active ? '#1877F2' : 'none'} stroke={active ? '#1877F2' : '#9a9085'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
-                  <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
-                </svg>
-              ) : (
-                <span style={{ fontSize: `${iconSize}px`, lineHeight: 1, filter: active ? 'none' : 'grayscale(1)', opacity: active ? 1 : 0.45 }}>{rt.emoji}</span>
-              )}
+              <span style={{
+                display: 'inline-flex',
+                transform: hovered ? 'scale(1.35) translateY(-3px)' : 'scale(1)',
+                transition: 'transform 0.15s ease',
+                transformOrigin: 'bottom center'
+              }}>
+                {rt.key === 'like' ? (
+                  <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="#1877F2" stroke="#1877F2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
+                    <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                  </svg>
+                ) : (
+                  <img src={rt.icon} alt={rt.label} width={iconSize} height={iconSize} style={{ display: 'block' }} />
+                )}
+              </span>
               {count > 0 && <span>{count}</span>}
             </button>
           )
