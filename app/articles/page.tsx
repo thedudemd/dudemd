@@ -1,6 +1,7 @@
 // @ts-nocheck
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase/client'
 
 export const metadata: Metadata = { title: 'Articles — DudeMD' }
@@ -24,8 +25,8 @@ export default async function ArticlesPage() {
         {all.map((a) => (
           <article key={a.slug}>
             <Link href={`/articles/${a.slug}`}>
-              <div style={{ width: '100%', aspectRatio: '16/10', overflow: 'hidden', marginBottom: '1rem' }}>
-                <img src={a.cover_image_url} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '16/10', overflow: 'hidden', marginBottom: '1rem' }}>
+                <Image src={a.cover_image_url || '/placeholder-cover.jpg'} alt={a.title} fill sizes="(min-width: 900px) 380px, 100vw" style={{ objectFit: 'cover' }} />
               </div>
             </Link>
             <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{a.categories?.name}</span>
