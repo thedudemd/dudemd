@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
@@ -284,7 +285,7 @@ export default function AccountPage() {
       <a href={href} style={{ display: 'block', textDecoration: 'none', color: 'inherit', borderBottom: '1px solid var(--color-border)', paddingBottom: '1.25rem', marginBottom: '1.25rem' }}>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
           {article.cover_image_url && (
-            <img src={article.cover_image_url} alt={article.title} style={{ width: 90, height: 66, objectFit: 'cover', flexShrink: 0, borderRadius: 3 }} />
+            <Image src={article.cover_image_url} alt={article.title} width={90} height={66} style={{ objectFit: 'cover', flexShrink: 0, borderRadius: 3 }} />
           )}
           <div style={{ flex: 1, minWidth: 0 }}>
             {cat?.name && <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-gold)', margin: '0 0 0.35rem' }}>{cat.name}</p>}
