@@ -86,20 +86,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         </div>
       </div>
 
-      {/* CATEGORY NAV */}
-      <div style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-cream)', padding: '1rem 0' }}>
-        <div className="container-content">
-          <div style={{ display: 'flex', gap: '2rem', overflowX: 'auto', paddingBottom: '2px' }}>
-            {allCategories.map((cat) => (
-              <Link key={cat.slug} href={`/category/${cat.slug}`}
-                style={{ flexShrink: 0, fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', whiteSpace: 'nowrap', paddingBottom: '4px', color: cat.slug === slug ? 'var(--color-navy)' : '#9a9085', borderBottom: cat.slug === slug ? '2px solid var(--color-gold)' : '2px solid transparent' }}>
-                {cat.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* ARTICLES GRID */}
       <section style={{ padding: '3rem 0' }}>
         <div className="container-content">
