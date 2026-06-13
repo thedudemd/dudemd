@@ -110,7 +110,7 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
 
       {status === 'success' ? (
         <div style={{ padding: '1.5rem', textAlign: 'center' }}>
-          <p style={{ fontSize: '14px', color: 'var(--color-navy)', fontWeight: 600, marginBottom: '1rem' }}>You're subscribed! Want full access to your account hub?</p>
+          <p style={{ fontSize: '14px', color: 'var(--color-navy)', fontWeight: 600, marginBottom: '1rem' }}>You're subscribed! Want to join our free community?</p>
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/join" style={{ padding: '0.6rem 1.5rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>Create Account</a>
             <button onClick={dismiss} style={{ padding: '0.6rem 1.5rem', background: 'none', border: '1px solid var(--color-navy)', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>No Thanks</button>

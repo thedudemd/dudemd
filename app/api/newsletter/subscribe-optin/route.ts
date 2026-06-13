@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     if (targetCategory) categories.add(targetCategory)
     await supabase.from('newsletter_subscribers').update({ subscribed_categories: Array.from(categories), status: 'active' }).eq('id', existing.id)
   } else {
-    const { error } = await supabase.from('newsletter_subscribers').insert({ email, subscribed_categories: targetCategory ? [targetCategory] : [] })
+    const { error } = await supabase.from('newsletter_subscribers').insert({ email, subscribed_categories: targetCategory ? [targetCategory] : [], source: 'optin_popup' })
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
