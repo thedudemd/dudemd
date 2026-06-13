@@ -6,15 +6,24 @@ import AdminShell from '@/components/admin/AdminShell'
 
 export default function Page() {
   const [subs, setSubs] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
   const [search, setSearch] = useState('')
   const [sourceFilter, setSourceFilter] = useState('all')
+  const [categoryFilter, setCategoryFilter] = useState('all')
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
-    supabase.from('subscribers').select('*').order('created_at', { ascending: false }).then(({ data }) => setSubs(data || []))
+    supabase.from('newsletter_subscribers').select('*').order('created_at', { ascending: false }).then(({ data }) => setSubs(data || []))
+    supabase.from('categories').select('id, name').order('name').then(({ data }) => setCategories(data || []))
   }, [])
+
+  const categoryMap = useMemo(() => {
+    const map: Record<string, string> = {}
+    categories.forEach(c => { map[c.id] = c.name })
+    return map
+  }, [categories])
 
   const sources = useMemo(() => {
     const set = new Set<string>()
@@ -31,13 +40,16 @@ export default function Page() {
     if (sourceFilter !== 'all') {
       result = result.filter(s => s.source === sourceFilter)
     }
+    if (categoryFilter !== 'all') {
+      result = result.filter(s => (s.subscribed_categories || []).includes(categoryFilter))
+    }
     result.sort((a, b) => {
       const da = new Date(a.created_at).getTime()
       const db = new Date(b.created_at).getTime()
       return sortOrder === 'newest' ? db - da : da - db
     })
     return result
-  }, [subs, search, sourceFilter, sortOrder])
+  }, [subs, search, sourceFilter, categoryFilter, sortOrder])
 
   function toggleSelect(id: string) {
     setSelected(prev => {
@@ -66,7 +78,7 @@ export default function Page() {
     if (!confirm(`Remove ${selected.size} subscriber${selected.size > 1 ? 's' : ''}? This cannot be undone.`)) return
     setDeleting(true)
     const ids = Array.from(selected)
-    const { error } = await supabase.from('subscribers').delete().in('id', ids)
+    const { error } = await supabase.from('newsletter_subscribers').delete().in('id', ids)
     if (error) {
       alert('Error: ' + error.message)
     } else {
@@ -78,7 +90,7 @@ export default function Page() {
 
   async function deleteOne(id: string) {
     if (!confirm('Remove this subscriber? This cannot be undone.')) return
-    const { error } = await supabase.from('subscribers').delete().eq('id', id)
+    const { error } = await supabase.from('newsletter_subscribers').delete().eq('id', id)
     if (error) {
       alert('Error: ' + error.message)
     } else {
@@ -88,7 +100,13 @@ export default function Page() {
   }
 
   function exportCsv() {
-    const rows = [['Email', 'Source', 'Date'], ...filtered.map(s => [s.email || '', s.source || '', new Date(s.created_at).toISOString()])]
+    const rows = [['Email', 'Categories', 'Source', 'Status', 'Date'], ...filtered.map(s => [
+      s.email || '',
+      (s.subscribed_categories || []).map((id: string) => categoryMap[id] || id).join('; '),
+      s.source || '',
+      s.status || '',
+      new Date(s.created_at).toISOString()
+    ])]
     const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
@@ -103,9 +121,9 @@ export default function Page() {
 
   return (
     <AdminShell>
-      <div style={{ padding: '2rem 2.5rem', maxWidth: '1000px' }}>
+      <div style={{ padding: '2rem 2.5rem', maxWidth: '1100px' }}>
         <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0e1a2b', marginBottom: '0.5rem' }}>Subscribers</h1>
-        <p style={{ fontSize: '13px', color: '#9a9085', marginBottom: '1.5rem' }}>{filtered.length} of {subs.length} subscribers{sourceFilter !== 'all' || search ? ' (filtered)' : ''}</p>
+        <p style={{ fontSize: '13px', color: '#9a9085', marginBottom: '1.5rem' }}>{filtered.length} of {subs.length} subscribers{sourceFilter !== 'all' || categoryFilter !== 'all' || search ? ' (filtered)' : ''}</p>
 
         {/* Controls */}
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap' as const }}>
@@ -116,6 +134,10 @@ export default function Page() {
             onChange={e => setSearch(e.target.value)}
             style={{ flex: '1 1 220px', padding: '0.6rem 0.85rem', border: '1px solid #e8e4de', fontSize: '13px', outline: 'none', backgroundColor: '#fff' }}
           />
+          <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} style={{ padding: '0.6rem 0.85rem', border: '1px solid #e8e4de', fontSize: '13px', backgroundColor: '#fff', cursor: 'pointer' }}>
+            <option value="all">All categories</option>
+            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
           <select value={sourceFilter} onChange={e => setSourceFilter(e.target.value)} style={{ padding: '0.6rem 0.85rem', border: '1px solid #e8e4de', fontSize: '13px', backgroundColor: '#fff', cursor: 'pointer' }}>
             <option value="all">All sources</option>
             {sources.map(src => <option key={src} value={src}>{src}</option>)}
@@ -133,17 +155,23 @@ export default function Page() {
         </div>
 
         <div style={{ backgroundColor: '#fff', border: '1px solid #e8e4de' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '32px 2fr 1fr 1fr 80px', gap: '1rem', padding: '0.75rem 1.5rem', borderBottom: '2px solid #e8e4de', backgroundColor: '#f7f4ee', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '32px 2fr 1.75fr 1fr 1fr 80px', gap: '1rem', padding: '0.75rem 1.5rem', borderBottom: '2px solid #e8e4de', backgroundColor: '#f7f4ee', alignItems: 'center' }}>
             <input type="checkbox" checked={allVisibleSelected} onChange={toggleSelectAll} style={{ cursor: 'pointer' }} />
             <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085' }}>Email</span>
+            <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085' }}>Categories</span>
             <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085' }}>Source</span>
             <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085' }}>Date</span>
             <span></span>
           </div>
           {filtered.length === 0 ? <p style={{ padding: '2rem', color: '#9a9085', textAlign: 'center' }}>No subscribers found.</p> : filtered.map((s, i) => (
-            <div key={s.id} style={{ display: 'grid', gridTemplateColumns: '32px 2fr 1fr 1fr 80px', gap: '1rem', padding: '0.875rem 1.5rem', borderBottom: i < filtered.length - 1 ? '1px solid #f0ede8' : 'none', alignItems: 'center' }}>
+            <div key={s.id} style={{ display: 'grid', gridTemplateColumns: '32px 2fr 1.75fr 1fr 1fr 80px', gap: '1rem', padding: '0.875rem 1.5rem', borderBottom: i < filtered.length - 1 ? '1px solid #f0ede8' : 'none', alignItems: 'center' }}>
               <input type="checkbox" checked={selected.has(s.id)} onChange={() => toggleSelect(s.id)} style={{ cursor: 'pointer' }} />
-              <span style={{ fontSize: '13px', color: '#0e1a2b' }}>{s.email}</span>
+              <span style={{ fontSize: '13px', color: '#0e1a2b' }}>{s.email}{s.user_id && <span title="Registered user" style={{ marginLeft: '0.4rem', fontSize: '10px', color: '#c9b28f' }}>●</span>}</span>
+              <span style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' as const }}>
+                {(s.subscribed_categories || []).length === 0 ? <span style={{ fontSize: '11px', color: '#9a9085' }}>—</span> : (s.subscribed_categories || []).map((id: string) => (
+                  <span key={id} style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' as const, backgroundColor: '#f0ede8', color: '#c9b28f', padding: '2px 6px' }}>{categoryMap[id] || '?'}</span>
+                ))}
+              </span>
               <span style={{ fontSize: '12px', color: '#9a9085' }}>{s.source || '—'}</span>
               <span style={{ fontSize: '12px', color: '#9a9085' }}>{new Date(s.created_at).toLocaleDateString()}</span>
               <button onClick={() => deleteOne(s.id)} style={{ fontSize: '11px', fontWeight: 700, color: '#c0392b', background: 'none', border: '1px solid #c0392b', padding: '0.3rem 0.6rem', cursor: 'pointer', letterSpacing: '0.04em' }}>Remove</button>
