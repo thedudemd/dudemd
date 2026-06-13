@@ -36,8 +36,15 @@ type Comment = {
   replies?: Comment[]
 }
 
+type ReactionData = { like: number; heart: number; care: number; userType: string | null }
+
 const PAGE_SIZE = 10
 const REPORT_REASONS = ['Spam', 'Harassment', 'Hate Speech', 'Other']
+const REACTION_TYPES: { key: 'like' | 'heart' | 'care'; emoji?: string; label: string }[] = [
+  { key: 'like', label: 'Like' },
+  { key: 'heart', emoji: '\u2764\uFE0F', label: 'Heart' },
+  { key: 'care', emoji: '\uD83E\uDD17', label: 'Care' },
+]
 
 export default function CommentSection({ articleId }: { articleId: string }) {
   const [enabled, setEnabled] = useState(false)
@@ -56,6 +63,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   const [auth, setAuth] = useState<{ uid?: string; token?: string; name?: string } | null>(null)
   const [reportingFor, setReportingFor] = useState<string | null>(null)
   const [reportedIds, setReportedIds] = useState<Set<string>>(new Set())
+  const [reactions, setReactions] = useState<Record<string, ReactionData>>({})
   const sectionRef = useRef<HTMLDivElement>(null)
 
   // Check feature flag on mount
@@ -78,6 +86,29 @@ export default function CommentSection({ articleId }: { articleId: string }) {
     observer.observe(sectionRef.current)
     return () => observer.disconnect()
   }, [enabled, loaded])
+
+  async function fetchReactions(commentIds: string[]) {
+    if (commentIds.length === 0) return
+    const currentUid = getAuthFromCookie()?.uid
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/comment_reactions?comment_id=in.(${commentIds.join(',')})&select=comment_id,user_id,type`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+      })
+      const rows: { comment_id: string; user_id: string; type: string }[] = await res.json()
+      const map: Record<string, ReactionData> = {}
+      commentIds.forEach(id => { map[id] = { like: 0, heart: 0, care: 0, userType: null } })
+      rows.forEach(r => {
+        if (!map[r.comment_id]) map[r.comment_id] = { like: 0, heart: 0, care: 0, userType: null }
+        if (r.type === 'like' || r.type === 'heart' || r.type === 'care') {
+          map[r.comment_id][r.type]++
+        }
+        if (currentUid && r.user_id === currentUid) {
+          map[r.comment_id].userType = r.type
+        }
+      })
+      setReactions(prev => ({ ...prev, ...map }))
+    } catch (e) {}
+  }
 
   async function loadComments(startOffset: number) {
     setLoading(true)
@@ -102,6 +133,8 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           c.avatar_url = p?.avatar_url
         })
       }
+
+      let allIds = data.map(c => c.id)
 
       // Fetch replies for these top-level comments
       if (data.length > 0) {
@@ -128,12 +161,14 @@ export default function CommentSection({ articleId }: { articleId: string }) {
         data.forEach(parent => {
           parent.replies = replies.filter(r => r.parent_id === parent.id)
         })
+        allIds = [...allIds, ...replies.map(r => r.id)]
       }
 
       setComments(prev => startOffset === 0 ? data : [...prev, ...data])
       setHasMore(data.length === PAGE_SIZE)
       setOffset(startOffset + data.length)
       setLoaded(true)
+      fetchReactions(allIds)
     } catch (e) {
       setLoaded(true)
     }
@@ -155,6 +190,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
         setPostError(data.error || 'Something went wrong. Please try again.')
       } else if (data.comment) {
         setComments(prev => [{ ...data.comment, full_name: auth.name }, ...prev])
+        setReactions(prev => ({ ...prev, [data.comment.id]: { like: 0, heart: 0, care: 0, userType: null } }))
         setNewComment('')
       }
     } catch (e) {
@@ -192,6 +228,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
         setReplyError(data.error || 'Something went wrong. Please try again.')
       } else if (data.comment) {
         setComments(prev => prev.map(c => c.id === parentId ? { ...c, replies: [...(c.replies || []), { ...data.comment, full_name: auth.name }] } : c))
+        setReactions(prev => ({ ...prev, [data.comment.id]: { like: 0, heart: 0, care: 0, userType: null } }))
         setReplyText('')
         setReplyingTo(null)
       }
@@ -212,6 +249,38 @@ export default function CommentSection({ articleId }: { articleId: string }) {
       if (res.ok) {
         setReportedIds(prev => new Set(prev).add(commentId))
         setReportingFor(null)
+      }
+    } catch (e) {}
+  }
+
+  async function handleReaction(commentId: string, type: 'like' | 'heart' | 'care') {
+    if (!auth?.token || !auth?.uid) return
+    const current = reactions[commentId] || { like: 0, heart: 0, care: 0, userType: null }
+    const prevType = current.userType
+
+    // Optimistic update
+    const next: ReactionData = { ...current }
+    if (prevType) next[prevType as 'like' | 'heart' | 'care'] = Math.max(0, next[prevType as 'like' | 'heart' | 'care'] - 1)
+    if (prevType === type) {
+      next.userType = null
+    } else {
+      next[type]++
+      next.userType = type
+    }
+    setReactions(prev => ({ ...prev, [commentId]: next }))
+
+    try {
+      if (prevType === type) {
+        await fetch(`${SUPABASE_URL}/rest/v1/comment_reactions?comment_id=eq.${commentId}&user_id=eq.${auth.uid}`, {
+          method: 'DELETE',
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}` }
+        })
+      } else {
+        await fetch(`${SUPABASE_URL}/rest/v1/comment_reactions?on_conflict=comment_id,user_id`, {
+          method: 'POST',
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates,return=minimal' },
+          body: JSON.stringify({ comment_id: commentId, user_id: auth.uid, type })
+        })
       }
     } catch (e) {}
   }
@@ -256,6 +325,39 @@ export default function CommentSection({ articleId }: { articleId: string }) {
             {reason}
           </button>
         ))}
+      </div>
+    )
+  }
+
+  function renderReactionBar(c: Comment, isReply: boolean) {
+    const r = reactions[c.id] || { like: 0, heart: 0, care: 0, userType: null }
+    const iconSize = isReply ? 14 : 16
+    return (
+      <div style={{ display: 'flex', gap: '0.9rem', marginTop: '0.5rem', alignItems: 'center' }}>
+        {REACTION_TYPES.map(rt => {
+          const active = r.userType === rt.key
+          const count = r[rt.key]
+          const disabled = !auth?.uid
+          return (
+            <button
+              key={rt.key}
+              onClick={() => !disabled && handleReaction(c.id, rt.key)}
+              disabled={disabled}
+              title={rt.label}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'none', border: 'none', cursor: disabled ? 'default' : 'pointer', padding: 0, fontSize: isReply ? '11px' : '12px', color: active ? 'var(--color-navy)' : '#9a9085', fontWeight: active ? 700 : 400 }}
+            >
+              {rt.key === 'like' ? (
+                <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill={active ? '#1877F2' : 'none'} stroke={active ? '#1877F2' : '#9a9085'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
+                  <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+                </svg>
+              ) : (
+                <span style={{ fontSize: `${iconSize}px`, lineHeight: 1, filter: active ? 'none' : 'grayscale(1)', opacity: active ? 1 : 0.45 }}>{rt.emoji}</span>
+              )}
+              {count > 0 && <span>{count}</span>}
+            </button>
+          )
+        })}
       </div>
     )
   }
@@ -309,6 +411,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
                 {renderActions(c, false)}
               </div>
               <p style={{ fontSize: '14px', color: 'var(--color-charcoal)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{c.content}</p>
+              {renderReactionBar(c, false)}
               {renderReportMenu(c)}
 
               {auth?.uid && (
@@ -349,6 +452,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
                           {renderActions(r, true)}
                         </div>
                         <p style={{ fontSize: '13px', color: 'var(--color-charcoal)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{r.content}</p>
+                        {renderReactionBar(r, true)}
                         {renderReportMenu(r)}
                       </div>
                     </div>
