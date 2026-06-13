@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase/client'
 import { supabaseServer } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import ArticleContent from '@/components/article/ArticleContent'
+import AdminEditButton from '@/components/admin/AdminEditButton'
 import StandardLayout from '@/components/article/layouts/StandardLayout'
 import MagazineLayout from '@/components/article/layouts/MagazineLayout'
 import LongFormLayout from '@/components/article/layouts/LongFormLayout'
@@ -137,6 +138,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <main>
+      <AdminEditButton href={`/admin/articles/${slug}`} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemas) }} />
       <style>{`
         .article-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
