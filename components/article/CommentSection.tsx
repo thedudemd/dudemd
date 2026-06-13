@@ -37,6 +37,7 @@ type Comment = {
 }
 
 const PAGE_SIZE = 10
+const REPORT_REASONS = ['Spam', 'Harassment', 'Hate Speech', 'Other']
 
 export default function CommentSection({ articleId }: { articleId: string }) {
   const [enabled, setEnabled] = useState(false)
@@ -53,6 +54,8 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   const [replyPosting, setReplyPosting] = useState(false)
   const [replyError, setReplyError] = useState<string | null>(null)
   const [auth, setAuth] = useState<{ uid?: string; token?: string; name?: string } | null>(null)
+  const [reportingFor, setReportingFor] = useState<string | null>(null)
+  const [reportedIds, setReportedIds] = useState<Set<string>>(new Set())
   const sectionRef = useRef<HTMLDivElement>(null)
 
   // Check feature flag on mount
@@ -198,6 +201,21 @@ export default function CommentSection({ articleId }: { articleId: string }) {
     setReplyPosting(false)
   }
 
+  async function handleReport(commentId: string, reason: string) {
+    if (!auth?.token || !auth?.uid) return
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/comment_reports`, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${auth.token}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ content_type: 'comment', content_id: commentId, reporter_id: auth.uid, reason })
+      })
+      if (res.ok) {
+        setReportedIds(prev => new Set(prev).add(commentId))
+        setReportingFor(null)
+      }
+    } catch (e) {}
+  }
+
   function timeAgo(dateStr: string) {
     const diff = Date.now() - new Date(dateStr).getTime()
     const mins = Math.floor(diff / 60000)
@@ -208,6 +226,38 @@ export default function CommentSection({ articleId }: { articleId: string }) {
     const days = Math.floor(hours / 24)
     if (days < 30) return `${days}d ago`
     return new Date(dateStr).toLocaleDateString()
+  }
+
+  function renderActions(c: Comment, isReply: boolean) {
+    const fontSize = isReply ? '10px' : '11px'
+    const isOwn = auth?.uid === c.user_id
+    const isReported = reportedIds.has(c.id)
+    return (
+      <>
+        {isOwn && (
+          <button onClick={() => handleDelete(c.id)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#9a9085', fontSize, padding: 0, textDecoration: 'underline' }}>Delete</button>
+        )}
+        {!isOwn && auth?.uid && !isReported && (
+          <button onClick={() => setReportingFor(reportingFor === c.id ? null : c.id)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#9a9085', fontSize, padding: 0, textDecoration: 'underline' }}>Report</button>
+        )}
+        {!isOwn && isReported && (
+          <span style={{ marginLeft: 'auto', color: '#9a9085', fontSize, fontStyle: 'italic' }}>Reported</span>
+        )}
+      </>
+    )
+  }
+
+  function renderReportMenu(c: Comment) {
+    if (reportingFor !== c.id) return null
+    return (
+      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
+        {REPORT_REASONS.map(reason => (
+          <button key={reason} onClick={() => handleReport(c.id, reason)} style={{ padding: '0.25rem 0.6rem', fontSize: '11px', border: '1px solid var(--color-border)', background: 'var(--color-cream)', color: 'var(--color-slate)', cursor: 'pointer' }}>
+            {reason}
+          </button>
+        ))}
+      </div>
+    )
   }
 
   if (!enabled) return null
@@ -256,11 +306,10 @@ export default function CommentSection({ articleId }: { articleId: string }) {
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'baseline', marginBottom: '0.25rem' }}>
                 <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--color-navy)' }}>{c.full_name || c.username || 'DudeMD Reader'}</span>
                 <span style={{ fontSize: '11px', color: '#9a9085' }}>{timeAgo(c.created_at)}</span>
-                {auth?.uid === c.user_id && (
-                  <button onClick={() => handleDelete(c.id)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#9a9085', fontSize: '11px', padding: 0, textDecoration: 'underline' }}>Delete</button>
-                )}
+                {renderActions(c, false)}
               </div>
               <p style={{ fontSize: '14px', color: 'var(--color-charcoal)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{c.content}</p>
+              {renderReportMenu(c)}
 
               {auth?.uid && (
                 <button onClick={() => { setReplyingTo(replyingTo === c.id ? null : c.id); setReplyText(''); setReplyError(null) }} style={{ marginTop: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-gold)', fontSize: '12px', fontWeight: 700, padding: 0, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -297,11 +346,10 @@ export default function CommentSection({ articleId }: { articleId: string }) {
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'baseline', marginBottom: '0.25rem' }}>
                           <span style={{ fontWeight: 700, fontSize: '12px', color: 'var(--color-navy)' }}>{r.full_name || r.username || 'DudeMD Reader'}</span>
                           <span style={{ fontSize: '10px', color: '#9a9085' }}>{timeAgo(r.created_at)}</span>
-                          {auth?.uid === r.user_id && (
-                            <button onClick={() => handleDelete(r.id)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#9a9085', fontSize: '10px', padding: 0, textDecoration: 'underline' }}>Delete</button>
-                          )}
+                          {renderActions(r, true)}
                         </div>
                         <p style={{ fontSize: '13px', color: 'var(--color-charcoal)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{r.content}</p>
+                        {renderReportMenu(r)}
                       </div>
                     </div>
                   ))}
