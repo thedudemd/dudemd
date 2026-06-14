@@ -8,18 +8,18 @@ function getAuthFromCookie() {
   try {
     const jar: Record<string, string> = {}
     document.cookie.split(';').forEach(c => {
-      const [k, ...v] = c.trim().split('=')
-      jar[k] = v.join('=')
+      const eq = c.indexOf('=')
+      jar[c.substring(0, eq).trim()] = c.substring(eq + 1).trim()
     })
-    const projectRef = SUPABASE_URL.match(/https:\/\/([^.]+)\./)?.[1]
-    const cookieName = `sb-${projectRef}-auth-token`
-    let raw = jar[`${cookieName}.0`]
-    let part1 = jar[`${cookieName}.1`]
-    if (!raw) return null
-    if (raw.startsWith('base64-')) raw = raw.slice(7)
-    let full = raw
-    if (part1) full += decodeURIComponent(part1)
-    const parsed = JSON.parse(atob(full))
+    let raw = ''
+    if (jar['sb-bicljoujevywrkzjeaoy-auth-token']) {
+      raw = jar['sb-bicljoujevywrkzjeaoy-auth-token'].replace('base64-', '')
+    } else {
+      const p0 = jar['sb-bicljoujevywrkzjeaoy-auth-token.0'] || ''
+      const p1 = jar['sb-bicljoujevywrkzjeaoy-auth-token.1'] || ''
+      raw = p0.replace('base64-', '') + decodeURIComponent(p1)
+    }
+    const parsed = JSON.parse(atob(raw))
     return { uid: parsed?.user?.id, token: parsed?.access_token, name: parsed?.user?.user_metadata?.full_name || parsed?.user?.email }
   } catch (e) { return null }
 }
