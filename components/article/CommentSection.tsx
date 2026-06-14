@@ -69,6 +69,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   const [reportedIds, setReportedIds] = useState<Set<string>>(new Set())
   const [reactions, setReactions] = useState<Record<string, ReactionData>>({})
   const [hoveredReaction, setHoveredReaction] = useState<string | null>(null)
+  const [currentUserAvatar, setCurrentUserAvatar] = useState<string | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
 
   // Check feature flag on mount
@@ -76,7 +77,15 @@ export default function CommentSection({ articleId }: { articleId: string }) {
     fetch(`${SUPABASE_URL}/rest/v1/feature_flags?key=eq.article_comments&select=enabled`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
     }).then(r => r.json()).then(data => setEnabled(!!data?.[0]?.enabled)).catch(() => setEnabled(false))
-    setAuth(getAuthFromCookie())
+    const authData = getAuthFromCookie()
+    setAuth(authData)
+    if (authData?.uid && authData?.token) {
+      fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${authData.uid}&select=avatar_url&limit=1`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${authData.token}` }
+      }).then(r => r.json()).then(data => {
+        if (data?.[0]?.avatar_url) setCurrentUserAvatar(data[0].avatar_url)
+      }).catch(() => {})
+    }
   }, [])
 
   // Lazy-load comments when section scrolls near view
@@ -194,7 +203,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
       if (!res.ok) {
         setPostError(data.error || 'Something went wrong. Please try again.')
       } else if (data.comment) {
-        setComments(prev => [{ ...data.comment, full_name: auth.name }, ...prev])
+        setComments(prev => [{ ...data.comment, full_name: auth.name, avatar_url: currentUserAvatar }, ...prev])
         setReactions(prev => ({ ...prev, [data.comment.id]: { ...EMPTY_REACTIONS } }))
         setNewComment('')
       }
@@ -232,7 +241,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
       if (!res.ok) {
         setReplyError(data.error || 'Something went wrong. Please try again.')
       } else if (data.comment) {
-        setComments(prev => prev.map(c => c.id === parentId ? { ...c, replies: [...(c.replies || []), { ...data.comment, full_name: auth.name }] } : c))
+        setComments(prev => prev.map(c => c.id === parentId ? { ...c, replies: [...(c.replies || []), { ...data.comment, full_name: auth.name, avatar_url: currentUserAvatar }] } : c))
         setReactions(prev => ({ ...prev, [data.comment.id]: { ...EMPTY_REACTIONS } }))
         setReplyText('')
         setReplyingTo(null)
