@@ -70,7 +70,18 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   const [reactions, setReactions] = useState<Record<string, ReactionData>>({})
   const [hoveredReaction, setHoveredReaction] = useState<string | null>(null)
   const [currentUserAvatar, setCurrentUserAvatar] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
+
+  // Scroll to comments if #comments in URL
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#comments') {
+      setTimeout(() => {
+        const el = document.getElementById('comments')
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 800)
+    }
+  }, [])
 
   // Check feature flag on mount
   useEffect(() => {
@@ -433,7 +444,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           </div>
         )}
 
-        {comments.map(c => (
+        {(expanded ? comments : comments.slice(0, 2)).map(c => (
           <div key={c.id} style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', alignItems: 'flex-start' }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--color-navy)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', flexShrink: 0, overflow: 'hidden' }}>
               {c.avatar_url ? <img src={c.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (c.full_name || c.username || '?')[0]?.toUpperCase()}
@@ -510,8 +521,15 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           <p style={{ fontSize: '14px', color: '#9a9085', textAlign: 'center', padding: '1rem 0' }}>No comments yet. Be the first to share your thoughts.</p>
         )}
 
-        {hasMore && comments.length > 0 && (
-          <div style={{ textAlign: 'center' }}>
+        {!expanded && comments.length > 2 && (
+          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+            <button onClick={() => setExpanded(true)} style={{ padding: '0.6rem 1.5rem', backgroundColor: 'transparent', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: '1px solid var(--color-navy)', cursor: 'pointer' }}>
+              Read More Comments ({comments.length - 2} more)
+            </button>
+          </div>
+        )}
+        {expanded && hasMore && (
+          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
             <button onClick={() => loadComments(offset)} disabled={loading} style={{ padding: '0.6rem 1.5rem', backgroundColor: 'transparent', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: '1px solid var(--color-navy)', cursor: 'pointer' }}>
               {loading ? 'Loading...' : 'Load More Comments'}
             </button>

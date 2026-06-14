@@ -264,7 +264,6 @@ export default function ArticleContent({ article, slug, category, relatedArticle
       <ShareBar />
       {renderArticleBodyWithAds(article.content || '')}
 
-      <CommentSection articleId={article.id} />
       {parentPillar && parentPillar.categories?.slug && (
         <p style={{ fontSize: '12px', color: '#9a9085', marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
           Part of:{' '}
@@ -301,6 +300,7 @@ export default function ArticleContent({ article, slug, category, relatedArticle
           {article.authors?.website && <a href={article.authors.website} target="_blank" rel="noopener noreferrer" title="Website" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 34, height: 34, backgroundColor: 'var(--color-gold)', borderRadius: '50%', color: 'var(--color-navy)' }}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></a>}
         </div>
       </div>
+      <CommentSection articleId={article.id} />
     </>
   )
 }
