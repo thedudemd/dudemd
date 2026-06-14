@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import PrivacySettingsButton from '@/components/layout/PrivacySettingsButton'
 import { supabaseServer } from '@/lib/supabase/server'
 
 export default async function Footer() {
@@ -55,7 +56,7 @@ export default async function Footer() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <p style={{ fontSize: '11px', color: 'rgba(247,244,238,0.3)', margin: 0 }}>© {new Date().getFullYear()} DudeMD. All rights reserved.</p>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}><p style={{ fontSize: '11px', color: 'rgba(247,244,238,0.3)', margin: 0 }}>© {new Date().getFullYear()} DudeMD. All rights reserved.</p><PrivacySettingsButton /></div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ margin: '0 0 -28px 0', textAlign: 'center', fontSize: '9px', fontWeight: 400, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(247,244,238,0.4)' }}>A publication of</p>
               <svg viewBox="0 0 1536 1024" style={{ height: '100px', width: 'auto', display: 'inline-block', opacity: 0.7 }} role="img" aria-label="Rise Media Network">
