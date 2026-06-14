@@ -277,9 +277,9 @@ export default function Nav() {
                 {!session && <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Sign In</Link>}
                 {!session && <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>}
                 {!session && <Link href="/join" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Subscribe</Link>}
-                {session && <Link href="/account" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>My Account</Link>}
-                <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>
                 <a href={session ? `/circles?from=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}` : `/signin?redirect=/circles`} style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Circles</a>
+                <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>
+                {session && <Link href="/account" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>My Account</Link>}
               </div>
             </div>
           </div>
