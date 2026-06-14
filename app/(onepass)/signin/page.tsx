@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { signInWithGoogle, signInWithFacebook, signInWithEmailPassword } from '@/lib/auth/supabase-auth'
 import { supabase } from '@/lib/supabase/client'
 
@@ -63,7 +64,8 @@ export default function SignInPage() {
     try {
       setLoading('magic'); setError(null)
       await signInWithEmailPassword(email, password)
-      window.location.href = '/'
+      const params = new URLSearchParams(window.location.search)
+      window.location.href = params.get('redirect') || '/'
     } catch (err: any) {
       setError(err.message || 'Sign in failed.')
     } finally { setLoading(null) }

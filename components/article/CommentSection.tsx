@@ -427,8 +427,8 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           <div style={{ backgroundColor: 'var(--color-cream)', border: '1px solid var(--color-border)', padding: '1.5rem', marginBottom: '2rem', textAlign: 'center' }}>
             <p style={{ fontSize: '14px', color: 'var(--color-slate)', marginBottom: '1rem' }}>Sign in to join the conversation.</p>
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <a href="/join" style={{ padding: '0.6rem 1.5rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>Join Free</a>
-              <a href="/signin" style={{ padding: '0.6rem 1.5rem', backgroundColor: 'transparent', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', border: '1px solid var(--color-navy)' }}>Sign In</a>
+              <a href={`/join?from=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname + '#comments' : '/') }`} style={{ padding: '0.6rem 1.5rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none' }}>Join Free</a>
+              <a href={`/signin?redirect=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname + '#comments' : '/') }`} style={{ padding: '0.6rem 1.5rem', backgroundColor: 'transparent', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', border: '1px solid var(--color-navy)' }}>Sign In</a>
             </div>
           </div>
         )}
