@@ -71,6 +71,8 @@ export default function CommentSection({ articleId }: { articleId: string }) {
   const [hoveredReaction, setHoveredReaction] = useState<string | null>(null)
   const [currentUserAvatar, setCurrentUserAvatar] = useState<string | null>(null)
   const [expanded, setExpanded] = useState(false)
+  const [totalCount, setTotalCount] = useState(0)
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set())
   const sectionRef = useRef<HTMLDivElement>(null)
 
   // Scroll to comments if #comments in URL
@@ -88,14 +90,22 @@ export default function CommentSection({ articleId }: { articleId: string }) {
     fetch(`${SUPABASE_URL}/rest/v1/feature_flags?key=eq.article_comments&select=enabled`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
     }).then(r => r.json()).then(data => setEnabled(!!data?.[0]?.enabled)).catch(() => setEnabled(false))
-    const authData = getAuthFromCookie()
-    setAuth(authData)
-    if (authData?.uid && authData?.token) {
-      fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${authData.uid}&select=avatar_url&limit=1`, {
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${authData.token}` }
-      }).then(r => r.json()).then(data => {
-        if (data?.[0]?.avatar_url) setCurrentUserAvatar(data[0].avatar_url)
-      }).catch(() => {})
+    function tryLoadAuth() {
+      const authData = getAuthFromCookie()
+      if (authData?.uid && authData?.token) {
+        setAuth(authData)
+        fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${authData.uid}&select=avatar_url&limit=1`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${authData.token}` }
+        }).then(r => r.json()).then(data => {
+          if (data?.[0]?.avatar_url) setCurrentUserAvatar(data[0].avatar_url)
+        }).catch(() => {})
+        return true
+      }
+      return false
+    }
+    if (!tryLoadAuth()) {
+      const t = setTimeout(() => tryLoadAuth(), 1000)
+      return () => clearTimeout(t)
     }
   }, [])
 
@@ -194,6 +204,11 @@ export default function CommentSection({ articleId }: { articleId: string }) {
       setOffset(startOffset + data.length)
       setLoaded(true)
       fetchReactions(allIds)
+      if (startOffset === 0) {
+        fetch(`${SUPABASE_URL}/rest/v1/article_comments?article_id=eq.${articleId}&parent_id=is.null&select=id`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        }).then(r => r.json()).then(d => { if (Array.isArray(d)) setTotalCount(d.length) }).catch(() => {})
+      }
     } catch (e) {
       setLoaded(true)
     }
@@ -413,7 +428,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
     <section id="comments" ref={sectionRef} style={{ borderTop: '1px solid var(--color-border)', padding: '3rem 0' }}>
       <div className="container-content">
         <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '1.25rem', color: 'var(--color-navy)', marginBottom: '1.5rem' }}>
-          Join the Conversation {comments.length > 0 && `(${comments.length})`}
+          Join the Conversation {totalCount > 0 && `(${totalCount})`}
         </h2>
 
         {auth?.uid ? (
@@ -444,7 +459,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           </div>
         )}
 
-        {(expanded ? comments : comments.slice(0, 2)).map(c => (
+        {(expanded ? comments : comments.slice(0, 5)).map(c => (
           <div key={c.id} style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', alignItems: 'flex-start' }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--color-navy)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', flexShrink: 0, overflow: 'hidden' }}>
               {c.avatar_url ? <img src={c.avatar_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (c.full_name || c.username || '?')[0]?.toUpperCase()}
@@ -484,7 +499,12 @@ export default function CommentSection({ articleId }: { articleId: string }) {
               )}
 
               {c.replies && c.replies.length > 0 && (
-                <div style={{ marginTop: '1rem', paddingLeft: '1.25rem', borderLeft: '2px solid var(--color-border)' }}>
+                <div style={{ marginTop: '0.5rem' }}>
+                  <button onClick={() => setExpandedReplies(prev => { const s = new Set(prev); s.has(c.id) ? s.delete(c.id) : s.add(c.id); return s })} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '12px', color: 'var(--color-slate)', fontWeight: 600, padding: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: expandedReplies.has(c.id) ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}><polyline points="6 9 12 15 18 9"/></svg>
+                    {expandedReplies.has(c.id) ? 'Hide' : c.replies.length === 1 ? '1 reply' : `${c.replies.length} replies`}
+                  </button>
+                  {expandedReplies.has(c.id) && <div style={{ marginTop: '0.75rem', paddingLeft: '1.25rem', borderLeft: '2px solid var(--color-border)' }}>
                   {c.replies.map(r => (
                     <div key={r.id} style={{ display: 'flex', gap: '0.6rem', marginBottom: '1rem', alignItems: 'flex-start' }}>
                       <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'var(--color-navy)', color: 'var(--color-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '12px', flexShrink: 0, overflow: 'hidden' }}>
@@ -511,6 +531,7 @@ export default function CommentSection({ articleId }: { articleId: string }) {
                       </div>
                     </div>
                   ))}
+                  </div>}
                 </div>
               )}
             </div>
@@ -521,10 +542,10 @@ export default function CommentSection({ articleId }: { articleId: string }) {
           <p style={{ fontSize: '14px', color: '#9a9085', textAlign: 'center', padding: '1rem 0' }}>No comments yet. Be the first to share your thoughts.</p>
         )}
 
-        {!expanded && comments.length > 2 && (
+        {!expanded && totalCount > 5 && (
           <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-            <button onClick={() => setExpanded(true)} style={{ padding: '0.6rem 1.5rem', backgroundColor: 'transparent', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: '1px solid var(--color-navy)', cursor: 'pointer' }}>
-              Read More Comments ({comments.length - 2} more)
+            <button onClick={() => { setExpanded(true); if (comments.length <= 5) loadComments(offset) }} style={{ padding: '0.6rem 1.5rem', backgroundColor: 'transparent', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: '1px solid var(--color-navy)', cursor: 'pointer' }}>
+              Read More Comments ({totalCount - 5} more)
             </button>
           </div>
         )}
