@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export default function CirclesPage() {
   const [countdown, setCountdown] = useState(6)
-  const [from, setFrom] = useState('/')
+  const [from, setFrom] = useState<string | null>(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -15,6 +15,7 @@ export default function CirclesPage() {
   }, [])
 
   useEffect(() => {
+    if (from === null) return
     if (countdown <= 0) {
       window.location.href = from
       return
