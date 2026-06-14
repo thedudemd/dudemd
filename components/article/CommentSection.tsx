@@ -488,6 +488,16 @@ export default function CommentSection({ articleId }: { articleId: string }) {
                         <p style={{ fontSize: '13px', color: 'var(--color-charcoal)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-wrap' }}>{r.content}</p>
                         {renderReactionBar(r, true)}
                         {renderReportMenu(r)}
+                        {auth?.uid && (
+                          <button onClick={() => {
+                            const name = r.full_name || r.username || 'user'
+                            setReplyingTo(c.id)
+                            setReplyText(`@${name} `)
+                            setReplyError(null)
+                          }} style={{ marginTop: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-gold)', fontSize: '11px', fontWeight: 700, padding: 0, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                            Reply
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}

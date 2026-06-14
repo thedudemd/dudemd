@@ -35,11 +35,16 @@ export default function NotificationBell() {
     const a = getAuth()
     if (!a?.uid) return
     setAuth(a)
-    fetch(`${SUPABASE_URL}/rest/v1/notifications?select=*&user_id=eq.${a.uid}&order=created_at.desc&limit=10`, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${a.token}` }
-    }).then(r => r.json()).then(data => {
-      if (Array.isArray(data)) setNotifications(data)
-    }).catch(() => {})
+    function fetchNotifications(uid: string, token: string) {
+      fetch(`${SUPABASE_URL}/rest/v1/notifications?select=*&user_id=eq.${uid}&order=created_at.desc&limit=10`, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${token}` }
+      }).then(r => r.json()).then(data => {
+        if (Array.isArray(data)) setNotifications(data)
+      }).catch(() => {})
+    }
+    fetchNotifications(a.uid, a.token)
+    const interval = setInterval(() => fetchNotifications(a.uid, a.token), 30000)
+    return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
