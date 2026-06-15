@@ -1,5 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+import { supabase } from '@/lib/supabase/client'
 import { MetadataRoute } from 'next'
 
 const BATCH_SIZE = 1000
@@ -10,7 +9,7 @@ async function fetchAllPublishedArticles() {
   while (true) {
     const { data, error } = await supabase
       .from('articles')
-      .select('slug, published_at, updated_at, author_id, categories(slug)')
+      .select('slug, published_at, updated_at, author_id, categories!articles_category_id_fkey(slug)')
       .eq('published', true)
       .order('id')
       .range(batch * BATCH_SIZE, batch * BATCH_SIZE + BATCH_SIZE - 1)
