@@ -105,6 +105,7 @@ function NewArticleInner() {
   const [linkResults, setLinkResults] = useState<any[]>([])
   const [linkSearching, setLinkSearching] = useState(false)
   const [linkTab, setLinkTab] = useState<'internal'|'external'>('internal')
+  const [isAffiliate, setIsAffiliate] = useState(false)
   const [imgSearchQuery, setImgSearchQuery] = useState('')
   const [imgSearchResults, setImgSearchResults] = useState<any[]>([])
   const [imgSearchLoading, setImgSearchLoading] = useState(false)
@@ -733,7 +734,7 @@ function NewArticleInner() {
                   <input ref={imgInputRef} type='file' accept='image/jpeg,image/png,image/webp,image/gif' style={{ display: 'none' }} onChange={handleImageUpload} />
                   <ToolbarBtn active={false} onClick={() => imgInputRef.current?.click()} disabled={imgUploading} title="Insert Image">{imgUploading ? '...' : '🖼 Image'}</ToolbarBtn>
                   <ToolbarBtn active={false} onClick={() => setShowImgSearch(true)} title="Search Images">🔍 Search</ToolbarBtn>
-                  <ToolbarBtn active={!!editor?.isActive('link')} onClick={() => { const prev = editor?.getAttributes('link').href || ''; setLinkUrl(prev); setLinkTab('internal'); setLinkSearch(''); setLinkResults([]); setShowLinkModal(true); }} title="Link">🔗 {editor?.isActive('link') ? 'Edit Link' : 'Link'}</ToolbarBtn>
+                  <ToolbarBtn active={!!editor?.isActive('link')} onClick={() => { const prev = editor?.getAttributes('link').href || ''; const attrs = editor?.getAttributes('link') || {}; setLinkUrl(attrs.href || prev); setIsAffiliate(attrs['data-affiliate'] === 'true'); setLinkTab('internal'); setLinkSearch(''); setLinkResults([]); setShowLinkModal(true); }} title="Link">🔗 {editor?.isActive('link') ? 'Edit Link' : 'Link'}</ToolbarBtn>
                   {editor?.isActive('link') && <ToolbarBtn active={false} onClick={() => editor.chain().focus().unsetLink().run()} title="Remove Link">✕ Unlink</ToolbarBtn>}
                   <ToolbarDivider />
                   <span style={{ fontSize: '11px', color: '#9a9085', padding: '0 4px', whiteSpace: 'nowrap' as const }}>{getWordCount()} words</span>
@@ -1434,7 +1435,7 @@ function NewArticleInner() {
           <div style={{ backgroundColor: '#fff', width: '100%', maxWidth: '500px', padding: '1.5rem', position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <p style={{ fontWeight: 700, fontSize: '14px', color: '#0e1a2b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Insert Link</p>
-              <button onClick={() => setShowLinkModal(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#4A5563' }}>✕</button>
+              <button onClick={() => { setShowLinkModal(false); setIsAffiliate(false); }} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#4A5563' }}>✕</button>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
               <button onClick={() => setLinkTab('internal')} style={{ flex: 1, padding: '0.5rem', fontWeight: 700, fontSize: '12px', border: '1px solid #ede8df', backgroundColor: linkTab === 'internal' ? '#0e1a2b' : '#fff', color: linkTab === 'internal' ? '#fff' : '#0e1a2b', cursor: 'pointer', letterSpacing: '0.06em', textTransform: 'uppercase' as const }}>Internal Article</button>
@@ -1461,7 +1462,12 @@ function NewArticleInner() {
             ) : (
               <div>
                 <input autoFocus value={linkUrl} onChange={e => setLinkUrl(e.target.value)} placeholder='https://example.com' style={{ width: '100%', padding: '0.6rem', border: '1px solid #ede8df', fontSize: '13px', outline: 'none', boxSizing: 'border-box' as const, marginBottom: '0.75rem' }} />
-                <button onClick={() => { if (linkUrl) { editor?.chain().focus().setLink({ href: linkUrl, target: '_blank' }).run(); setShowLinkModal(false); } }} style={{ width: '100%', padding: '0.75rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '13px', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>Insert Link</button>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', cursor: 'pointer' }}>
+                  <input type="checkbox" checked={isAffiliate} onChange={e => setIsAffiliate(e.target.checked)} style={{ accentColor: '#c9b28f', width: 14, height: 14 }} />
+                  <span style={{ fontSize: '12px', color: '#4A5563', fontWeight: 600 }}>Affiliate / Sponsored</span>
+                  {isAffiliate && <span style={{ fontSize: '10px', fontWeight: 700, backgroundColor: '#c9b28f', color: '#0e1a2b', padding: '1px 6px' }}>SPONSORED</span>}
+                </label>
+                <button onClick={() => { if (linkUrl) { editor?.chain().focus().setLink(isAffiliate ? { href: linkUrl, target: '_blank', rel: 'sponsored nofollow', 'data-affiliate': 'true' } : { href: linkUrl, target: '_blank' }).run(); setIsAffiliate(false); setShowLinkModal(false); } }} style={{ width: '100%', padding: '0.75rem', backgroundColor: '#0e1a2b', color: '#fff', border: 'none', fontWeight: 700, fontSize: '13px', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>Insert Link</button>
               </div>
             )}
           </div>
