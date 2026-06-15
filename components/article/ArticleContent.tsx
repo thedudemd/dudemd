@@ -1,9 +1,31 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { getOfferByKey, buildAffiliateUrl } from '@/lib/affiliate/offers'
 import InArticleAd from './InArticleAd'
 import Image from 'next/image'
 import CommentSection from './CommentSection'
+
+function renderAffiliateCtas(html) {
+  return html.replace(/<div[^>]*data-affiliate-cta="true"[^>]*data-offer-key="([^"]*)"[^>]*data-variant="([^"]*)"[^>]*>[\s\S]*?<\/div>/g, function(_, offerKey, variant) {
+    const offer = getOfferByKey(offerKey)
+    if (!offer) return ''
+    const url = buildAffiliateUrl(offer)
+    const desc = offer.description ? '<p style="margin:0 0 1rem;font-size:14px;color:rgba(247,244,238,0.75);">' + offer.description + '</p>' : ''
+    const btn = '<a href="' + url + '" target="_blank" rel="sponsored nofollow" style="display:inline-block;padding:0.75rem 2rem;background:#c9b28f;color:#0e1a2b;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;">' + offer.buttonText + '</a>'
+    if (variant === 'inline') {
+      const descI = offer.description ? '<p style="margin:0;font-size:13px;color:#4A5563;">' + offer.description + '</p>' : ''
+      const btnI = '<a href="' + url + '" target="_blank" rel="sponsored nofollow" style="padding:0.6rem 1.25rem;background:#0e1a2b;color:#f7f4ee;font-weight:700;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;white-space:nowrap;">' + offer.buttonText + '</a>'
+      return '<div style="margin:1.5rem 0;padding:1rem 1.25rem;border-left:3px solid #c9b28f;background:#faf8f4;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;"><div><p style="margin:0 0 0.25rem;font-weight:700;font-size:15px;color:#0e1a2b;">' + offer.headline + '</p>' + descI + '</div>' + btnI + '</div>'
+    }
+    if (variant === 'card') {
+      const descC = offer.description ? '<p style="margin:0 0 1rem;font-size:14px;color:#4A5563;">' + offer.description + '</p>' : ''
+      const btnC = '<a href="' + url + '" target="_blank" rel="sponsored nofollow" style="display:inline-block;padding:0.75rem 2rem;background:#c9b28f;color:#0e1a2b;font-weight:700;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;">' + offer.buttonText + '</a>'
+      return '<div style="margin:2rem 0;padding:1.5rem;border:1px solid #ede8df;background:#faf8f4;text-align:center;"><p style="margin:0 0 0.5rem;font-weight:700;font-size:18px;color:#0e1a2b;">' + offer.headline + '</p>' + descC + btnC + '</div>'
+    }
+    return '<div style="margin:2rem 0;padding:1.5rem;background:#0e1a2b;text-align:center;"><p style="margin:0 0 0.5rem;font-weight:700;font-size:18px;color:#f7f4ee;">' + offer.headline + '</p>' + desc + btn + '</div>'
+  })
+}
 
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
@@ -30,6 +52,7 @@ function getAuthFromCookie() {
 }
 
 function renderArticleBodyWithAds(html: string) {
+  html = renderAffiliateCtas(html)
   if (!html) return null
   const bodyStyle = { fontSize: '16px', color: 'var(--color-charcoal)', lineHeight: 1.8 } as const
 
