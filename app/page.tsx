@@ -10,7 +10,7 @@ import InFeedAd from '@/components/InFeedAd'
 import PersonalizedSection from '@/components/PersonalizedSection'
 import { supabaseServer as supabase } from '@/lib/supabase/server'
 
-export const metadata: Metadata = { title: "DudeMD — Modern Men's Wellness for Real Life" }
+export const metadata: Metadata = { title: "DudeMD — Modern Men's Wellness for Real Life", alternates: { canonical: "https://www.dudemd.com" } }
 
 export const revalidate = 60
 

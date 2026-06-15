@@ -34,8 +34,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = getSupabase()
   let articles: any[] = []
   try { articles = await fetchAllArticles() } catch (e) { console.error('Sitemap articles error', e) }
+  // Only include categories that have at least one published article
   let categories: any[] = []
-  try { const { data } = await supabase.from('categories').select('slug, parent_id').eq('enabled', true); categories = data || [] } catch (e) {}
+  try {
+    const { data: artCats } = await supabase
+      .from('articles')
+      .select('categories!articles_category_id_fkey(slug, parent_id)')
+      .eq('published', true)
+    const seen = new Set<string>()
+    const catList: any[] = []
+    ;(artCats || []).forEach((a: any) => {
+      const cat = a.categories
+      if (cat?.slug && !seen.has(cat.slug)) {
+        seen.add(cat.slug)
+        catList.push(cat)
+      }
+    })
+    categories = catList
+  } catch (e) { console.error('Sitemap categories error', e) }
   let pages: any[] = []
   try { const { data } = await supabase.from('static_pages').select('slug, updated_at').eq('published', true); pages = data || [] } catch (e) {}
 
