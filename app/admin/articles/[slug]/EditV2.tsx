@@ -146,7 +146,8 @@ function NewArticleInner({ slug }: { slug: string }) {
 
   // Step A: sidebar section collapse state
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    coverImage: false, settings: false, seo: false, social: false, aiSuggestions: false, scores: false,
+    status: true, settings: true, coverImage: true,
+    seo: false, social: false, aiSuggestions: false, scores: false,
     slugExcerpt: false, layout: false, myDrafts: false, articleStructure: false, internalLinking: false,
   })
   function toggleSection(key: string) {
