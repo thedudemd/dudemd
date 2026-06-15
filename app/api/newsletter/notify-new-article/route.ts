@@ -72,5 +72,11 @@ export async function POST(req: NextRequest) {
     } catch (e) {}
   }
 
+  // Ping Google Search Console sitemap
+  fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "https://www.dudemd.com"}/api/gsc-ping`, { method: "POST" }).catch(() => {})
+  // Ping Google Search Console sitemap
+  fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "https://www.dudemd.com"}/api/gsc-ping`, { method: "POST" }).catch(() => {})
+  // Ping Google Search Console sitemap
+  fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "https://www.dudemd.com"}/api/gsc-ping`, { method: "POST" }).catch(() => {})
   return NextResponse.json({ sent })
 }
