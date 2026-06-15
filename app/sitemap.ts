@@ -9,7 +9,7 @@ async function fetchAllPublishedArticles() {
   while (true) {
     const { data, error } = await supabase
       .from('articles')
-      .select('slug, published_at, updated_at, author_id, categories!articles_category_id_fkey(slug)')
+      .select('slug, published_at, updated_at, author_id, categories(slug)')
       .eq('published', true)
       .order('id')
       .range(batch * BATCH_SIZE, batch * BATCH_SIZE + BATCH_SIZE - 1)
