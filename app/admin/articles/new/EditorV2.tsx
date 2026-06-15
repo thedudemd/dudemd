@@ -106,6 +106,10 @@ function NewArticleInner() {
   const [linkSearching, setLinkSearching] = useState(false)
   const [linkTab, setLinkTab] = useState<'internal'|'external'>('internal')
   const [isAffiliate, setIsAffiliate] = useState(false)
+  const [showCtaModal, setShowCtaModal] = useState(false)
+  const [ctaOfferKey, setCtaOfferKey] = useState('')
+  const [ctaVariant, setCtaVariant] = useState('banner')
+  const [dbOffers, setDbOffers] = useState<any[]>([])
   const [imgSearchQuery, setImgSearchQuery] = useState('')
   const [imgSearchResults, setImgSearchResults] = useState<any[]>([])
   const [imgSearchLoading, setImgSearchLoading] = useState(false)
@@ -410,6 +414,8 @@ function NewArticleInner() {
       }
       setDraftsLoading(false)
     }
+    // Load affiliate offers from DB
+    supabase.from('affiliate_offers').select('*').eq('status', 'active').order('name').then(({ data }) => setDbOffers(data || []))
     init()
   }, [])
 
@@ -736,6 +742,8 @@ function NewArticleInner() {
                   <ToolbarBtn active={false} onClick={() => setShowImgSearch(true)} title="Search Images">🔍 Search</ToolbarBtn>
                   <ToolbarBtn active={!!editor?.isActive('link')} onClick={() => { const prev = editor?.getAttributes('link').href || ''; const attrs = editor?.getAttributes('link') || {}; setLinkUrl(attrs.href || prev); setIsAffiliate(attrs['data-affiliate'] === 'true'); setLinkTab('internal'); setLinkSearch(''); setLinkResults([]); setShowLinkModal(true); }} title="Link">🔗 {editor?.isActive('link') ? 'Edit Link' : 'Link'}</ToolbarBtn>
                   {editor?.isActive('link') && <ToolbarBtn active={false} onClick={() => editor.chain().focus().unsetLink().run()} title="Remove Link">✕ Unlink</ToolbarBtn>}
+                  <ToolbarDivider />
+                  <ToolbarBtn active={false} onClick={() => { setCtaOfferKey(dbOffers[0]?.key || ''); setCtaVariant('banner'); setShowCtaModal(true); }} title="Insert Affiliate CTA">📦 CTA</ToolbarBtn>
                   <ToolbarDivider />
                   <span style={{ fontSize: '11px', color: '#9a9085', padding: '0 4px', whiteSpace: 'nowrap' as const }}>{getWordCount()} words</span>
                 </div>
@@ -1346,6 +1354,44 @@ function NewArticleInner() {
           </div>
         </div>
       </div>
+
+      {showCtaModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+          <div style={{ backgroundColor: '#fff', width: '100%', maxWidth: '440px', padding: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <p style={{ fontWeight: 700, fontSize: '14px', color: '#0e1a2b', margin: 0, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Insert Affiliate CTA</p>
+              <button onClick={() => setShowCtaModal(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#4A5563' }}>✕</button>
+            </div>
+            {dbOffers.length === 0 ? (
+              <p style={{ fontSize: '13px', color: '#9a9085', textAlign: 'center', padding: '1rem 0' }}>No active affiliate offers found. Add offers in the <a href="/admin/affiliates" style={{ color: '#c9b28f' }}>Affiliates</a> section.</p>
+            ) : (
+              <>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#4A5563', marginBottom: '0.5rem' }}>Offer</label>
+                  <select value={ctaOfferKey} onChange={e => { setCtaOfferKey(e.target.value); setCtaVariant(dbOffers.find(o => o.key === e.target.value)?.variants?.[0] || 'banner') }} style={{ width: '100%', padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', outline: 'none', boxSizing: 'border-box' as const, backgroundColor: '#fff' }}>
+                    {dbOffers.map(o => <option key={o.key} value={o.key}>{o.name} ({o.category})</option>)}
+                  </select>
+                </div>
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: '#4A5563', marginBottom: '0.5rem' }}>Variant</label>
+                  <select value={ctaVariant} onChange={e => setCtaVariant(e.target.value)} style={{ width: '100%', padding: '0.75rem', border: '1px solid #ede8df', fontSize: '14px', outline: 'none', boxSizing: 'border-box' as const, backgroundColor: '#fff' }}>
+                    {(dbOffers.find(o => o.key === ctaOfferKey)?.variants || ['banner']).map(v => <option key={v} value={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</option>)}
+                  </select>
+                </div>
+                <button onClick={() => {
+                  if (!ctaOfferKey || !editor) return
+                  const offer = dbOffers.find(o => o.key === ctaOfferKey)
+                  if (!offer) return
+                  editor.chain().focus().insertContent(
+                    '<div data-affiliate-cta="true" data-offer-key="' + ctaOfferKey + '" data-variant="' + ctaVariant + '" contenteditable="false" style="border:2px dashed #c9b28f;padding:1rem;margin:1rem 0;background:#faf8f4;border-radius:4px;font-family:inherit;user-select:none;">📦 <strong>Affiliate CTA</strong>: ' + offer.name + ' [' + ctaVariant + ']</div>'
+                  ).run()
+                  setShowCtaModal(false)
+                }} style={{ width: '100%', padding: '0.875rem', backgroundColor: '#0e1a2b', color: '#f7f4ee', border: 'none', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase' as const, cursor: 'pointer' }}>Insert CTA</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {showImgSearch && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>

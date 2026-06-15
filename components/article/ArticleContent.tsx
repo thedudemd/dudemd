@@ -1,14 +1,14 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { getOfferByKey, buildAffiliateUrl } from '@/lib/affiliate/offers'
+import { buildAffiliateUrl } from '@/lib/affiliate/offers'
 import InArticleAd from './InArticleAd'
 import Image from 'next/image'
 import CommentSection from './CommentSection'
 
-function renderAffiliateCtas(html) {
+function renderAffiliateCtas(html, offers) {
   return html.replace(/<div[^>]*data-affiliate-cta="true"[^>]*data-offer-key="([^"]*)"[^>]*data-variant="([^"]*)"[^>]*>[\s\S]*?<\/div>/g, function(_, offerKey, variant) {
-    const offer = getOfferByKey(offerKey)
+    const offer = (offers || []).find(o => o.key === offerKey)
     if (!offer) return ''
     const url = buildAffiliateUrl(offer)
     const desc = offer.description ? '<p style="margin:0 0 1rem;font-size:14px;color:rgba(247,244,238,0.75);">' + offer.description + '</p>' : ''
@@ -51,8 +51,8 @@ function getAuthFromCookie() {
   return null
 }
 
-function renderArticleBodyWithAds(html: string) {
-  html = renderAffiliateCtas(html)
+function renderArticleBodyWithAds(html: string, affiliateOffers: any[] = []) {
+  html = renderAffiliateCtas(html, affiliateOffers)
   if (!html) return null
   const bodyStyle = { fontSize: '16px', color: 'var(--color-charcoal)', lineHeight: 1.8 } as const
 
