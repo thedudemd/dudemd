@@ -19,5 +19,10 @@ export function getOfferByKey(key: string, offers: AffiliateOffer[]): AffiliateO
 }
 
 export function buildAffiliateUrl(offer: AffiliateOffer): string {
-  return offer.url + (offer.tracking_params || '')
+  const base = offer.url.trim()
+  if (!base.startsWith('http://') && !base.startsWith('https://')) return ''
+  const params = (offer.tracking_params || '').trim().replace(/^[?&]+/, '')
+  if (!params) return base
+  const separator = base.includes('?') ? '&' : '?'
+  return base + separator + params
 }
