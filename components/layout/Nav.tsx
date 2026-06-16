@@ -161,7 +161,7 @@ export default function Nav() {
   const firstName = profile?.full_name?.split(' ')[0] || ''
 
   function UserSection() {
-    if (session === undefined) return <div style={{width: 32, height: 32}} />
+    if (session === undefined) return <Link href="/signin" className="icon-btn" title="Sign In" style={{opacity:0,pointerEvents:"none"}}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></Link>
     if (session === null) return (
       <Link href="/signin" className="icon-btn" title="Sign In">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
