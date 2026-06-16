@@ -52,7 +52,7 @@ export default function PersonalizedSection() {
     load().catch(() => {})
   }, [])
 
-  if (articles.length === 0 || !topCategory) return null
+  if (articles.length === 0 || !topCategory) return <div style={{ minHeight: "320px" }} />
 
   return (
     <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)', backgroundColor: '#fff' }}>
