@@ -1,4 +1,6 @@
 @tailwind base;
+
+body { overflow-x: hidden; }
 @tailwind components;
 @tailwind utilities;
 
