@@ -2,7 +2,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import OptinDisplay from '@/components/OptinDisplay'
-import SidebarAd from '@/components/SidebarAd'
 import { supabase } from '@/lib/supabase/client'
 import { supabaseServer } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
@@ -221,7 +220,6 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <button style={{ width: '100%', padding: '0.75rem', backgroundColor: 'var(--color-gold)', color: 'var(--color-navy)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer' }}>Join Free</button>
             </div>
 
-            <SidebarAd />
 
             {related.length > 0 && (
               <div>

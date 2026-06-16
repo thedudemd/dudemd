@@ -5,8 +5,6 @@ import GoogleOneTap from "@/components/auth/GoogleOneTap"
 import PersonalizedWelcome from "@/components/personalization/PersonalizedWelcome"
 import Link from 'next/link'
 import OptinDisplay from '@/components/OptinDisplay'
-import SidebarAd from '@/components/SidebarAd'
-import InFeedAd from '@/components/InFeedAd'
 import PersonalizedSection from '@/components/PersonalizedSection'
 import { supabaseServer as supabase } from '@/lib/supabase/server'
 
@@ -190,7 +188,6 @@ export default async function HomePage() {
                   <p style={{ fontSize: '12px', color: '#9a9085', marginTop: '0.35rem' }}>By {a.authors?.name}</p>
                 </div>
               ))}
-              <SidebarAd />
             </div>
 
           </div>
@@ -273,7 +270,6 @@ export default async function HomePage() {
         </div>
       </section>
       )}
-      <InFeedAd />
       {recoveryArticles.length > 0 && (
       <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container-content">

@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { buildAffiliateUrl } from '@/lib/affiliate/offers'
-import InArticleAd from './InArticleAd'
 import Image from 'next/image'
 import CommentSection from './CommentSection'
 
@@ -70,7 +69,6 @@ function renderArticleBodyWithAds(html: string, affiliateOffers: any[] = []) {
       buffer += part
       if (i === ad1Index - 1 || (i === ad2Index - 1 && ad2Index !== ad1Index)) {
         elements.push(<div key={`chunk-${i}`} className="article-body" style={bodyStyle} dangerouslySetInnerHTML={{ __html: buffer }} />)
-        elements.push(<InArticleAd key={`ad-${i}`} />)
         buffer = ''
       }
     })
@@ -88,9 +86,7 @@ function renderArticleBodyWithAds(html: string, affiliateOffers: any[] = []) {
     return (
       <>
         <div className="article-body" style={bodyStyle} dangerouslySetInnerHTML={{ __html: chunk1 }} />
-        <InArticleAd />
         <div className="article-body" style={bodyStyle} dangerouslySetInnerHTML={{ __html: chunk2 }} />
-        <InArticleAd />
         <div className="article-body" style={bodyStyle} dangerouslySetInnerHTML={{ __html: chunk3 }} />
       </>
     )
