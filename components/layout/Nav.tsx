@@ -183,7 +183,7 @@ export default function Nav({ initialNavItems = [] }: { initialNavItems?: any[] 
         @media (min-width: 900px) { .desktop-nav { display: flex !important; } }
       `}</style>
 
-      <header style={{ backgroundColor: 'var(--color-navy)', position: 'sticky', top: 0, zIndex: 20 }}>
+      <header suppressHydrationWarning style={{ backgroundColor: 'var(--color-navy)', position: 'sticky', top: 0, zIndex: 20 }}>
         <div className="container-content">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 0' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
