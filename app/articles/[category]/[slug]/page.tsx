@@ -160,7 +160,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           <div />
         </LongFormLayout>
       ) : (
-        <>{article.show_hero !== false && article.cover_image_url && (<div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', backgroundColor: '#f0ede8' }}><img src={article.cover_image_url} alt={`Cover image for ${article.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', display: 'block' }} /></div>)}<OptinDisplay categoryId={article.category_id} /></>
+        <>{article.show_hero !== false && article.cover_image_url && (<div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', backgroundColor: '#f0ede8' }}><img src={article.cover_image_url} alt={`Cover image for ${article.title}`} fetchPriority="high" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center center', display: 'block' }} /></div>)}<OptinDisplay categoryId={article.category_id} /></>
       )}
 
       <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
@@ -194,7 +194,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--color-border)', marginBottom: '2rem' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {article.authors?.avatar_url ? (
-                    <img src={article.authors.avatar_url} alt={article.authors.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                    <img src={article.authors.avatar_url} alt={article.authors.name} width={40} height={40} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                   ) : (
                     <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-gold)' }}>{article.authors?.name?.charAt(0)}</span>
                   )}
@@ -228,7 +228,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9a9085', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem', marginBottom: '1.25rem' }}>Editor's Picks</p>
                 {related.map((a) => (
                   <Link key={a.slug} href={`/articles/${a.categories?.slug}/${a.slug}`} style={{ display: 'flex', gap: '0.75rem', textDecoration: 'none', marginBottom: '1.25rem', alignItems: 'start' }}>
-                    <img src={a.cover_image_url} alt={`${a.title} thumbnail`} style={{ width: '72px', height: '54px', objectFit: 'cover', flexShrink: 0 }} />
+                    <img src={a.cover_image_url} alt={`${a.title} thumbnail`} width={72} height={54} style={{ width: '72px', height: '54px', objectFit: 'cover', flexShrink: 0 }} />
                     <div>
                       <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)', marginBottom: '0.25rem' }}>{a.categories?.name}</p>
                       <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-navy)', lineHeight: 1.3, margin: 0 }}>{a.title}</p>
@@ -250,7 +250,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
                 <article key={a.slug}>
                   {a.cover_image_url && (
                     <a href={'/articles/' + a.categories?.slug + '/' + a.slug}>
-                      <img src={a.cover_image_url} alt={a.title + ' thumbnail'} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block', marginBottom: '1rem' }} />
+                      <img src={a.cover_image_url} alt={a.title + ' thumbnail'} width={400} height={250} style={{ width: '100%', aspectRatio: '16/10', objectFit: 'cover', display: 'block', marginBottom: '1rem' }} />
                     </a>
                   )}
                   <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-gold)' }}>{a.categories?.name}</span>
