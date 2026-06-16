@@ -8,8 +8,8 @@ import Nav from '@/components/layout/Nav'
 import SessionTracker from '@/components/SessionTracker'
 import GoogleOneTap from '@/components/auth/GoogleOneTap'
 import Footer from '@/components/layout/Footer'
-const inter = Inter({ subsets: ['latin'], variable: '--font-body', display: 'optional' })
-const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display', display: 'optional', style: ['normal', 'italic'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-body', display: 'swap' })
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display', display: 'swap', style: ['normal', 'italic'] })
 export const viewport = {
   width: "device-width",
   initialScale: 1,
@@ -87,7 +87,7 @@ const websiteSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
           <script dangerouslySetInnerHTML={{ __html: `
             window.dataLayer = window.dataLayer || [];
