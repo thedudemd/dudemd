@@ -13,10 +13,10 @@ export default function SidebarAd() {
   }, [])
 
   return (
-    <div style={{ marginBottom: '2rem', maxWidth: '100%', overflow: 'hidden' }}>
+    <div style={{ marginBottom: '2rem' }}>
       <ins
         className="adsbygoogle"
-        style={{ display: 'block', width: '100%', maxWidth: '100%' }}
+        style={{ display: 'block' }}
         data-ad-client="ca-pub-9224150605844856"
         data-ad-slot="2203495652"
         data-ad-format="auto"
