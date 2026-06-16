@@ -18,7 +18,7 @@ async function fetchAllArticles() {
   while (true) {
     const { data, error } = await supabase
       .from('articles')
-      .select('slug, published_at, updated_at, categories!articles_category_id_fkey(slug)')
+      .select('slug, published_at, updated_at, author_id, categories!articles_category_id_fkey(slug)')
       .eq('published', true)
       .order('id')
       .range(batch * BATCH_SIZE, batch * BATCH_SIZE + BATCH_SIZE - 1)
@@ -81,11 +81,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }))
 
+  // Fetch authors with published articles
+  let authors: any[] = []
+  try {
+    const authorIds = Array.from(new Set(articles.map((a:any) => a.author_id).filter(Boolean)))
+    if (authorIds.length > 0) {
+      const { data } = await supabase.from('authors').select('slug').in('id', authorIds).not('slug', 'is', null)
+      authors = data || []
+    }
+  } catch (e) {}
+
+  const authorUrls: MetadataRoute.Sitemap = authors
+    .filter((a:any) => a.slug)
+    .map((a:any) => ({ url: SITE_URL + '/authors/' + a.slug, changeFrequency: 'monthly' as const, priority: 0.5 }))
+
   return [
     { url: SITE_URL, changeFrequency: 'daily' as const, priority: 1.0 },
     ...categoryUrls,
     ...subcategoryUrls,
     ...articleUrls,
     ...pageUrls,
+    ...authorUrls,
   ]
 }
