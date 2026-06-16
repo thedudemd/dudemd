@@ -1,13 +1,11 @@
 'use client'
-import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
 
 export default function GoldBarAuthSwap() {
-  const [session, setSession] = useState<any>(undefined)
-  const [profile, setProfile] = useState<{full_name?: string} | null>(null)
+  const [name, setName] = useState<string | null>(null)
 
   useEffect(() => {
     function getTokenAndUser() {
@@ -42,41 +40,20 @@ export default function GoldBarAuthSwap() {
       return null
     }
     const result = getTokenAndUser()
-    if (result) {
-      setSession({ user: { id: result.uid } })
-      fetch(`${SUPABASE_URL}/rest/v1/profiles?select=full_name&id=eq.${result.uid}&limit=1`, {
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${result.token}` }
-      }).then(r => r.json()).then(p => { if (p?.[0]) setProfile(p[0]) }).catch(() => {})
-    } else {
-      setSession(null)
-    }
+    if (!result) return // logged out — static bar is already correct, do nothing
+    fetch(`${SUPABASE_URL}/rest/v1/profiles?select=full_name&id=eq.${result.uid}&limit=1`, {
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${result.token}` }
+    }).then(r => r.json()).then(p => {
+      if (p?.[0]?.full_name) setName(p[0].full_name.split(' ')[0])
+    }).catch(() => {})
   }, [])
 
-  // Until session resolves, render nothing — static server gold bar shows through
-  if (session === undefined) return null
-
-  const firstName = profile?.full_name?.split(' ')[0] || ''
-  const circlesHref = session
-    ? `/circles?from=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '/')}`
-    : `/signin?redirect=/circles`
+  // Only render when logged in and name is loaded — just the Welcome text on the left
+  if (!name) return null
 
   return (
-    <div style={{ position: 'absolute', inset: 0, backgroundColor: 'var(--color-gold)', padding: '0.4rem 0' }}>
-      <div className="container-content">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
-          {session && profile ? (
-            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--color-navy)' }}>Welcome, <strong>{firstName}</strong></span>
-          ) : <span />}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <a href={circlesHref} style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Circles</a>
-            <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>
-            {!session && <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Sign In</Link>}
-            {!session && <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>}
-            {!session && <Link href="/join" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Subscribe</Link>}
-            {session && <Link href="/account" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>My Account</Link>}
-          </div>
-        </div>
-      </div>
-    </div>
+    <span style={{ position: 'absolute', left: '1.5rem', top: '50%', transform: 'translateY(-50%)', fontSize: '11px', fontWeight: 700, color: 'var(--color-navy)' }}>
+      Welcome, <strong>{name}</strong>
+    </span>
   )
 }
