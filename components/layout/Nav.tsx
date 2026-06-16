@@ -19,7 +19,28 @@ export default function Nav() {
   const [aboutOpen, setAboutOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
   const [profile, setProfile] = useState<{full_name?: string, avatar_url?: string} | null>(null)
-  const [session, setSession] = useState<any>(undefined)
+  const [session, setSession] = useState<any>(() => {
+    if (typeof document === 'undefined') return undefined
+    try {
+      const jar: Record<string, string> = {}
+      document.cookie.split(';').forEach(ck => {
+        const eq = ck.indexOf('=')
+        jar[ck.substring(0, eq).trim()] = ck.substring(eq + 1).trim()
+      })
+      let raw = ''
+      if (jar['sb-bicljoujevywrkzjeaoy-auth-token']) {
+        raw = jar['sb-bicljoujevywrkzjeaoy-auth-token'].replace('base64-', '')
+      } else {
+        const p0 = jar['sb-bicljoujevywrkzjeaoy-auth-token.0'] || ''
+        const p1 = jar['sb-bicljoujevywrkzjeaoy-auth-token.1'] || ''
+        raw = p0.replace('base64-', '') + decodeURIComponent(p1)
+      }
+      if (!raw) return null
+      const parsed = JSON.parse(atob(raw))
+      if (parsed?.access_token && parsed?.user?.id) return { user: { id: parsed.user.id } }
+    } catch {}
+    return null
+  })
   const [darkMode, setDarkMode] = useState(false)
   const userRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
