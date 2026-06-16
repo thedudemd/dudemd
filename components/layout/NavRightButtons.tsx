@@ -92,8 +92,10 @@ export default function NavRightButtons({ navItems }: { navItems: any[] }) {
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        {/* Auth slot — renders nothing while loading, no flicker, no shift */}
-        {session !== 'loading' && (
+        {/* Auth slot — fixed width reserved always */}
+        {session === 'loading' ? (
+          <div style={{ width: 32, height: 32, opacity: 0 }} />
+        ) : session !== 'loading' && (
           session === null ? (
             <Link href="/signin" className="icon-btn" title="Sign In">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
