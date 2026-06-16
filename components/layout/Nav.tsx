@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import NavClient from './NavClient'
-
-const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpY2xqb3VqZXZ5d3JremplYW95Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4MDc1ODIsImV4cCI6MjA5NDM4MzU4Mn0.UIKVUyX6QClJmAYdQKg91t_kAT4itpuSk_fIemcPJ0g'
+import NavDrawer from './NavDrawer'
+import NavAuthSlot from './NavAuthSlot'
+import GoldBarUser from './GoldBarUser'
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/auth-cookie'
 
 export default async function Nav() {
-  let navItems: any[] = []
+  let navItems: { label: string; href: string; subs: string[] }[] = []
   try {
     const catsRes = await fetch(
       `${SUPABASE_URL}/rest/v1/categories?select=id,name,slug&parent_id=is.null&enabled=eq.true&show_in_nav=eq.true&order=sort_order.asc,name.asc`,
@@ -33,15 +33,22 @@ export default async function Nav() {
       <style>{`
         .container-content { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
         .icon-btn { background: none; border: none; cursor: pointer; color: var(--color-cream); padding: 0.25rem; display: flex; align-items: center; }
-        .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
-        .drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 100%; max-width: 22rem; background: var(--color-navy); z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
-        .drawer.open { transform: translateX(0); }
-        .drawer-item { border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .drawer-cat-header { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.5rem; cursor: pointer; }
-        .drawer-sub-link { display: block; padding: 0.5rem 1.5rem 0.5rem 2.5rem; font-size: 12px; color: rgba(247,244,238,0.7); text-decoration: none; letter-spacing: 0.04em; }
         .desktop-nav { display: none !important; }
         @media (min-width: 900px) { .desktop-nav { display: flex !important; } }
-        .nav-auth-slot { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+        .nav-fade-in {
+          animation: navFadeIn 180ms ease-out;
+        }
+        @keyframes navFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .gold-bar-overlay {
+          position: absolute;
+          inset: 0;
+          background-color: var(--color-gold);
+          padding: 0.4rem 0;
+        }
       `}</style>
 
       <header style={{ backgroundColor: 'var(--color-navy)', position: 'sticky', top: 0, zIndex: 20 }}>
@@ -54,7 +61,7 @@ export default async function Nav() {
             </Link>
 
             {/* Desktop categories — server HTML, in first paint */}
-            <nav style={{ display: 'flex', gap: '2rem' }} className="desktop-nav">
+            <nav style={{ display: 'flex', gap: '2rem' }} className="desktop-nav" aria-label="Primary">
               {navItems.map((item) => (
                 <Link key={item.label} href={item.href} style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-cream)', textDecoration: 'none' }}>
                   {item.label}
@@ -62,13 +69,25 @@ export default async function Nav() {
               ))}
             </nav>
 
-            {/* Right buttons — client */}
-            <NavClient navItems={navItems} />
+            {/* Right side — auth slot is the only client piece; search + drawer trigger are server HTML */}
+            <div className="nav-right">
+              <NavAuthSlot />
+
+              {/* Search — links to search page; opens a real route, no client-side toggling needed */}
+              <Link href="/search" className="icon-btn" aria-label="Search" title="Search">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+              </Link>
+
+              {/* Drawer trigger is a client component, but tiny — just a button + drawer */}
+              <NavDrawer navItems={navItems} />
+            </div>
           </div>
         </div>
 
         {/* Gold bar — server HTML, default logged-out state */}
-        <div style={{ backgroundColor: 'var(--color-gold)', padding: '0.4rem 0' }}>
+        <div style={{ position: 'relative', backgroundColor: 'var(--color-gold)', padding: '0.4rem 0' }}>
           <div className="container-content">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
               <span />
@@ -81,6 +100,8 @@ export default async function Nav() {
               </div>
             </div>
           </div>
+          {/* Overlays with logged-in state once auth resolves; renders nothing for logged-out users */}
+          <GoldBarUser />
         </div>
       </header>
     </>
