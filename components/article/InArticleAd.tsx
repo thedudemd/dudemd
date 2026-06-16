@@ -13,6 +13,7 @@ export default function InArticleAd() {
   }, [])
 
   return (
+    <div style={{ maxWidth: '100%', overflow: 'hidden', width: '100%' }}>
     <ins
       className="adsbygoogle"
       style={{ display: 'block', textAlign: 'center', margin: '2rem 0' }}
@@ -21,5 +22,6 @@ export default function InArticleAd() {
       data-ad-client="ca-pub-9224150605844856"
       data-ad-slot="5366710034"
     />
+    </div>
   )
 }
