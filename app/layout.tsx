@@ -5,7 +5,6 @@ import './globals.css'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Analytics } from '@vercel/analytics/next'
 import Nav from '@/components/layout/Nav'
-import { supabaseServer } from '@/lib/supabase/server'
 import SessionTracker from '@/components/SessionTracker'
 import GoogleOneTap from '@/components/auth/GoogleOneTap'
 import Footer from '@/components/layout/Footer'
@@ -79,32 +78,7 @@ const websiteSchema = {
   }
 }
 
-async function getNavItems() {
-  try {
-    const { data: cats } = await supabaseServer
-      .from('categories')
-      .select('id, name, slug')
-      .is('parent_id', null)
-      .eq('enabled', true)
-      .eq('show_in_nav', true)
-      .order('sort_order', { ascending: true })
-      .order('name', { ascending: true })
-    if (!cats || !Array.isArray(cats)) return []
-    const items = await Promise.all(cats.map(async (cat) => {
-      const { data: subs } = await supabaseServer.from('categories').select('name, slug').eq('parent_id', cat.id).eq('enabled', true).order('sort_order', { ascending: true })
-      const { data: arts } = await supabaseServer.from('articles').select('slug, title, cover_image_url').eq('category_id', cat.id).eq('published', true).order('published_at', { ascending: false }).limit(2)
-      return {
-        label: cat.name,
-        href: '/category/' + cat.slug,
-        subs: Array.isArray(subs) ? subs.map((s) => s.name) : [],
-        articles: Array.isArray(arts) ? arts.map((a) => ({ slug: a.slug, title: a.title, image: a.cover_image_url || '' })) : []
-      }
-    }))
-    return items
-  } catch(e) { return [] }
-}
-
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
@@ -147,7 +121,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]) }}
         />
-        <Nav initialNavItems={await getNavItems()} />
+        <Nav />
         <SessionTracker />
         <GoogleOneTap />
         <main className="min-h-screen">{children}</main>
