@@ -9,8 +9,8 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 // Categories loaded dynamically from Supabase
 
-export default function Nav() {
-  const [navItems, setNavItems] = useState<any[]>([])
+export default function Nav({ initialNavItems = [] }: { initialNavItems?: any[] }) {
+  const [navItems, setNavItems] = useState<any[]>(initialNavItems)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const [drawerExpanded, setDrawerExpanded] = useState<string | null>(null)
@@ -39,42 +39,7 @@ export default function Nav() {
     localStorage.setItem('dudemd-theme', next ? 'dark' : 'light')
   }
 
-  useEffect(() => {
-    async function loadNav() {
-      try {
-        const catsRes = await fetch(`${SUPABASE_URL}/rest/v1/categories?select=*&parent_id=is.null&enabled=eq.true&show_in_nav=eq.true&order=sort_order.asc,name.asc`, {
-          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
-        })
-        const cats = await catsRes.json()
-        if (!Array.isArray(cats)) return
 
-        const items = await Promise.all(cats.map(async (cat: any) => {
-          const subsRes = await fetch(`${SUPABASE_URL}/rest/v1/categories?select=name,slug&parent_id=eq.${cat.id}&enabled=eq.true&order=sort_order.asc,name.asc`, {
-            headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
-          })
-          const subs = await subsRes.json()
-
-          const artsRes = await fetch(`${SUPABASE_URL}/rest/v1/articles?select=slug,title,cover_image_url&category_id=eq.${cat.id}&published=eq.true&order=published_at.desc&limit=2`, {
-            headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
-          })
-          const arts = await artsRes.json()
-
-          return {
-            label: cat.name,
-            href: `/category/${cat.slug}`,
-            subs: Array.isArray(subs) ? subs.map((s: any) => s.name) : [],
-            articles: Array.isArray(arts) ? arts.map((a: any) => ({
-              slug: a.slug,
-              title: a.title,
-              image: a.cover_image_url || ''
-            })) : []
-          }
-        }))
-        setNavItems(items)
-      } catch(e) {}
-    }
-    loadNav()
-  }, [])
   const router = useRouter()
 
   useEffect(() => {
