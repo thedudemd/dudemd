@@ -99,7 +99,7 @@ ul li:empty, ul li p:empty { display: none; } ul li:has(p:empty):not(:has(p:not(
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2rem; }
 .hero-featured { min-width: 0; max-width: 100%; overflow: hidden; }
 @media (min-width: 900px) { .hero-grid { grid-template-columns: 2fr 1fr; gap: 3rem; } }
-.hero-picks { display: flex; flex-direction: column; min-width: 0; max-width: 100%; overflow: hidden; width: 100%; }
+.hero-picks { display: flex; flex-direction: column; }
 
 /* Prevent AdSense overflow on mobile */
 .adsbygoogle,
