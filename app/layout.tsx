@@ -130,7 +130,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <SpeedInsights />
         <Analytics />
-        <SpeedInsights />
+        
       {/* <GoogleAnalytics gaId="G-FRVXC9JBB4" /> */}
     </body>
     </html>
