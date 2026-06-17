@@ -16,7 +16,7 @@ export default function NavAuthSlot() {
       </Link>
 
       {/* Logged-in: bell + avatar — both server-rendered shells, populate data after */}
-      <div className="auth-in" style={{ alignItems: 'center', gap: '0.5rem' }}>
+      <div className="auth-in" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <NotificationBell />
         <AvatarButton />
       </div>
