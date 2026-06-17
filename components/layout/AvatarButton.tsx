@@ -41,8 +41,10 @@ export default function AvatarButton() {
     window.location.href = '/signin'
   }
 
-  // Try to read cached first name immediately so the initial letter is correct on first render
-  const cachedName = typeof window !== 'undefined' ? (localStorage.getItem('dudemd-first-name') || '') : ''
+  const [cachedName, setCachedName] = useState('')
+  useEffect(() => {
+    try { setCachedName(localStorage.getItem('dudemd-first-name') || '') } catch {}
+  }, [])
   const firstName = profile?.full_name?.split(' ')[0] || cachedName
   const initial = firstName.charAt(0) || '·'
 
