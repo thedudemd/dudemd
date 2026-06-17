@@ -8,6 +8,7 @@ import Nav from '@/components/layout/Nav'
 import SessionTracker from '@/components/SessionTracker'
 import GoogleOneTap from '@/components/auth/GoogleOneTap'
 import Footer from '@/components/layout/Footer'
+import { PRE_HYDRATION_SCRIPT } from '@/lib/pre-hydration-script'
 const inter = Inter({ subsets: ['latin'], variable: '--font-body', display: 'swap' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display', display: 'swap', style: ['normal', 'italic'] })
 export const metadata: Metadata = {
@@ -82,6 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
       <head>
+          <script dangerouslySetInnerHTML={{ __html: PRE_HYDRATION_SCRIPT }} />
           <script dangerouslySetInnerHTML={{ __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
