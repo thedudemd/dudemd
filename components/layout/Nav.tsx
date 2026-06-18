@@ -58,6 +58,7 @@ export default async function Nav() {
 
         /* Notification badge slot — keeps its space even before count loads */
         .nav-bell { position: relative; display: flex; align-items: center; padding: 0.25rem; color: var(--color-cream); background: none; border: none; cursor: pointer; }
+        header { position: -webkit-sticky; position: sticky; }
       `}</style>
 
       <header style={{ backgroundColor: 'var(--color-navy)', position: 'sticky', top: 0, zIndex: 20 }}>

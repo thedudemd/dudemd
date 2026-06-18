@@ -1,6 +1,7 @@
 @tailwind base;
 
 html, body { overflow-x: hidden; }
+body { -webkit-overflow-scrolling: touch; touch-action: pan-y; }
 @tailwind components;
 @tailwind utilities;
 
