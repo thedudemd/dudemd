@@ -133,7 +133,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Nav />
         <SessionTracker />
         <GoogleOneTap />
-        <main className="min-h-screen">{children}</main>
+        <div style={{ overflowX: "hidden" }}><main className="min-h-screen">{children}</main></div>
         <Footer />
         <SpeedInsights />
         <Analytics />
