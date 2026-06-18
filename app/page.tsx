@@ -110,18 +110,18 @@ const organizationSchema = {
 export default async function HomePage() {
   const articles = await getArticles()
   const categories = await getCategories()
-  const mindArticles = await getCategoryArticles('mind', 3)
-  const lifestyleArticles = await getCategoryArticles('lifestyle', 3)
-  const recoveryArticles = await getCategoryArticles('recovery', 3)
+  const mindArticles = await getCategoryArticles('mind', 6)
+  const lifestyleArticles = await getCategoryArticles('lifestyle', 6)
+  const recoveryArticles = await getCategoryArticles('recovery', 6)
   const featured = articles[0]
   const secondary = articles.slice(1, 3)
   const latest = articles.slice(3)
 
   // Deduplicate category sections against hero slots
   const usedSlugs = new Set([featured?.slug, ...secondary.map(a => a.slug)].filter(Boolean))
-  const filteredMind = mindArticles.filter(a => !usedSlugs.has(a.slug))
-  const filteredLifestyle = lifestyleArticles.filter(a => !usedSlugs.has(a.slug))
-  const filteredRecovery = recoveryArticles.filter(a => !usedSlugs.has(a.slug))
+  const filteredMind = mindArticles.filter(a => !usedSlugs.has(a.slug)).slice(0, 3)
+  const filteredLifestyle = lifestyleArticles.filter(a => !usedSlugs.has(a.slug)).slice(0, 3)
+  const filteredRecovery = recoveryArticles.filter(a => !usedSlugs.has(a.slug)).slice(0, 3)
 
   return (
     <>
