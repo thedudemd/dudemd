@@ -1,4 +1,5 @@
 'use client'
+import type React from 'react'
 import { useState, useEffect } from 'react'
 
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
@@ -136,6 +137,13 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
     </div>
   )
 
+  const containment: React.CSSProperties = {
+    maxWidth: '100vw',
+    width: '100%',
+    overflowX: 'hidden',
+    boxSizing: 'border-box',
+  }
+
   if (isPopup) {
     return (
       <div onClick={dismiss} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(14,26,43,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
@@ -144,5 +152,5 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
     )
   }
 
-  return content
+  return <div style={containment}>{content}</div>
 }
