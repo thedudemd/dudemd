@@ -124,7 +124,7 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="your@email.com"
-              style={{ flex: 1, minWidth: '180px', padding: '0.75rem', border: '1px solid var(--color-border)', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+              style={{ flex: 1, minWidth: 0, padding: '0.75rem', border: '1px solid var(--color-border)', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
             />
             <button onClick={handleSubmit} disabled={status === 'submitting'} style={{ padding: '0.75rem 1.5rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: status === 'submitting' ? 'not-allowed' : 'pointer', opacity: status === 'submitting' ? 0.6 : 1 }}>
               {status === 'submitting' ? '...' : 'Subscribe'}
