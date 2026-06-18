@@ -1,5 +1,4 @@
 'use client'
-import type React from 'react'
 import { useState, useEffect } from 'react'
 
 const SUPABASE_URL = 'https://bicljoujevywrkzjeaoy.supabase.co'
@@ -7,7 +6,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: string; isHomepage?: boolean }) {
   const [enabled, setEnabled] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
   const [design, setDesign] = useState<any>(null)
   const [dismissed, setDismissed] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
@@ -15,9 +13,6 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768)
-  }, [])
 
   // Check feature flag
   useEffect(() => {
@@ -105,14 +100,11 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
   const isPopup = design.display_type === 'popup'
 
   const content = (
-    <div style={{ backgroundColor: 'var(--color-cream)', maxWidth: isPopup ? '420px' : '100%', width: '100%', position: 'relative', boxShadow: isPopup ? '0 8px 30px rgba(0,0,0,0.2)' : 'none', overflow: 'hidden', boxSizing: 'border-box' }}>
+    <div style={{ backgroundColor: 'var(--color-cream)', maxWidth: isPopup ? '420px' : '100%', width: '100%', position: 'relative', boxShadow: isPopup ? '0 8px 30px rgba(0,0,0,0.2)' : 'none' }}>
       {isPopup && (
         <button onClick={dismiss} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'rgba(255,255,255,0.8)', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1, color: 'var(--color-navy)', zIndex: 2, width: '28px', height: '28px', borderRadius: '50%' }}>×</button>
       )}
 
-      {design.html && (
-        <iframe srcDoc={design.html.includes('<meta name="viewport"') ? design.html : '<meta name="viewport" content="width=device-width, initial-scale=1">' + design.html} style={{ width: '100%', maxWidth: '100%', border: 'none', minHeight: '220px', display: 'block' }} title="Newsletter signup" />
-      )}
 
       {status === 'success' ? (
         <div style={{ padding: '1.5rem', textAlign: 'center' }}>
@@ -142,13 +134,6 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
     </div>
   )
 
-  const containment: React.CSSProperties = {
-    maxWidth: '100vw',
-    width: '100%',
-    overflowX: 'hidden',
-    boxSizing: 'border-box',
-  }
-
   if (isPopup) {
     return (
       <div onClick={dismiss} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(14,26,43,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
@@ -157,5 +142,5 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
     )
   }
 
-  return <div style={containment}>{content}</div>
+  return content
 }
