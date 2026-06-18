@@ -20,7 +20,7 @@ export default function AvatarButton() {
           setProfile(rows[0])
           // Cache first name for next page load — used by pre-hydration script
           if (rows[0].full_name) {
-            try { localStorage.setItem('dudemd-first-name', rows[0].full_name.split(' ')[0]) } catch {}
+            try { const n = rows[0].full_name.split(' ')[0]; localStorage.setItem('dudemd-first-name', n); window.dispatchEvent(new CustomEvent('dudemd-name-ready', { detail: n })) } catch {}
           }
         }
       })
