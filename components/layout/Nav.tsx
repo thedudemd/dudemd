@@ -55,7 +55,7 @@ export default async function Nav() {
         html:not([data-auth-state]) .auth-in { display: none; }
 
         /* Welcome name from data-auth-name attribute */
-        .gold-welcome-name::before { content: attr(data-name); }
+        .gold-welcome-name::before { content: 'Welcome, ' attr(data-name); } .gold-welcome-name:not([data-name])::before { content: none; } .gold-welcome-name[data-name='']::before { content: none; }
 
         /* Notification badge slot — keeps its space even before count loads */
         .nav-bell { position: relative; display: flex; align-items: center; padding: 0.25rem; color: var(--color-cream); background: none; border: none; cursor: pointer; }
@@ -120,7 +120,7 @@ export default async function Nav() {
             {/* Logged-in version */}
             <div className="auth-in" style={{ alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
               <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--color-navy)' }}>
-                Welcome, <span className="gold-welcome-name" suppressHydrationWarning />
+                <span className="gold-welcome-name" suppressHydrationWarning />
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                 <Link href="/circles" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Circles</Link>
