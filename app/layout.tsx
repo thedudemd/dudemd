@@ -113,7 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </head>
       <body style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
         <Script id="auth-prehydration" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: PRE_HYDRATION_SCRIPT }} />
-        <script dangerouslySetInnerHTML={{ __html: `
+        <Script id="facebook-pixel" strategy="lazyOnload" dangerouslySetInnerHTML={{ __html: `
           !function(f,b,e,v,n,t,s)
           {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};
