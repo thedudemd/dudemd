@@ -117,13 +117,18 @@ export default async function HomePage() {
   const secondary = articles.slice(1, 3)
   const latest = articles.slice(3)
 
+  // Deduplicate category sections against hero slots
+  const usedSlugs = new Set([featured?.slug, ...secondary.map(a => a.slug)].filter(Boolean))
+  const filteredMind = mindArticles.filter(a => !usedSlugs.has(a.slug))
+  const filteredLifestyle = lifestyleArticles.filter(a => !usedSlugs.has(a.slug))
+  const filteredRecovery = recoveryArticles.filter(a => !usedSlugs.has(a.slug))
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
       <h1 className="sr-only">DudeMD — Modern Men's Wellness for Real Life</h1>
       <GoogleOneTap />
-      <OptinDisplay isHomepage />
       <OptinDisplay isHomepage />
 
 
@@ -198,7 +203,7 @@ export default async function HomePage() {
 
       <PersonalizedSection />
 
-      {mindArticles.length > 0 && (
+      {filteredMind.length > 0 && (
       <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container-content">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2rem', borderBottom: '2px solid var(--color-navy)', paddingBottom: '0.75rem' }}>
@@ -206,7 +211,7 @@ export default async function HomePage() {
             <Link href="/category/mind" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>View All →</Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2.5rem' }}>
-            {mindArticles.map((a) => (
+            {filteredMind.map((a) => (
               <article key={a.slug}>
                 <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
@@ -234,7 +239,7 @@ export default async function HomePage() {
         </div>
       </section>
       )}
-      {lifestyleArticles.length > 0 && (
+      {filteredLifestyle.length > 0 && (
       <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container-content">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2rem', borderBottom: '2px solid var(--color-navy)', paddingBottom: '0.75rem' }}>
@@ -242,7 +247,7 @@ export default async function HomePage() {
             <Link href="/category/lifestyle" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>View All →</Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2.5rem' }}>
-            {lifestyleArticles.map((a) => (
+            {filteredLifestyle.map((a) => (
               <article key={a.slug}>
                 <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
@@ -270,7 +275,7 @@ export default async function HomePage() {
         </div>
       </section>
       )}
-      {recoveryArticles.length > 0 && (
+      {filteredRecovery.length > 0 && (
       <section style={{ padding: '3rem 0', borderBottom: '1px solid var(--color-border)' }}>
         <div className="container-content">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2rem', borderBottom: '2px solid var(--color-navy)', paddingBottom: '0.75rem' }}>
@@ -278,7 +283,7 @@ export default async function HomePage() {
             <Link href="/category/recovery" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-gold)', textDecoration: 'none' }}>View All →</Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2.5rem' }}>
-            {recoveryArticles.map((a) => (
+            {filteredRecovery.map((a) => (
               <article key={a.slug}>
                 <Link href={a.external_url || `/articles/${a.categories?.slug}/${a.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '3/2', overflow: 'hidden', marginBottom: '1rem' }}>
