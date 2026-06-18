@@ -49,8 +49,8 @@ export default function NavDrawer({ navItems }: { navItems: NavItem[] }) {
     <>
       <style>{`
         .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40; }
-        .drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 100%; max-width: 22rem; background: var(--color-navy); z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; }
-        .drawer.open { transform: translateX(0); }
+        .drawer { position: fixed; top: 0; left: 0; bottom: 0; width: 100%; max-width: 22rem; background: var(--color-navy); z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease; overflow-y: auto; visibility: hidden; }
+        .drawer.open { transform: translateX(0); visibility: visible; }
         .drawer-item { border-bottom: 1px solid rgba(255,255,255,0.1); }
         .drawer-cat-header { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.5rem; cursor: pointer; }
         .drawer-sub-link { display: block; padding: 0.5rem 1.5rem 0.5rem 2.5rem; font-size: 12px; color: rgba(247,244,238,0.7); text-decoration: none; letter-spacing: 0.04em; }
