@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import NavDrawer from './NavDrawer'
+import GoldBarWelcome from './GoldBarWelcome'
 import NavAuthSlot from './NavAuthSlot'
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/auth-cookie'
 
@@ -54,8 +55,6 @@ export default async function Nav() {
         html:not([data-auth-state]) .auth-out { display: flex; }
         html:not([data-auth-state]) .auth-in { display: none; }
 
-        /* Welcome name from data-auth-name attribute */
-        .gold-welcome-name::before { content: 'Welcome, ' attr(data-name); } .gold-welcome-name:not([data-name])::before { content: none; } .gold-welcome-name[data-name='']::before { content: none; }
 
         /* Notification badge slot — keeps its space even before count loads */
         .nav-bell { position: relative; display: flex; align-items: center; padding: 0.25rem; color: var(--color-cream); background: none; border: none; cursor: pointer; }
@@ -120,7 +119,7 @@ export default async function Nav() {
             {/* Logged-in version */}
             <div className="auth-in" style={{ alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
               <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--color-navy)' }}>
-                <span className="gold-welcome-name" suppressHydrationWarning />
+                <GoldBarWelcome />
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                 <Link href="/circles" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Circles</Link>
@@ -132,12 +131,6 @@ export default async function Nav() {
         </div>
       </header>
 
-      {/* Sync the welcome name from the html[data-auth-name] attribute into the span */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `(function(){try{var n=document.documentElement.getAttribute('data-auth-name');if(n){var els=document.querySelectorAll('.gold-welcome-name');els.forEach(function(e){e.setAttribute('data-name',n)})}}catch(e){}})();`
-        }}
-      />
     </>
   )
 }
