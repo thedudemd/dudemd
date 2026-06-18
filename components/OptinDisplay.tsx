@@ -110,8 +110,8 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
         <button onClick={dismiss} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'rgba(255,255,255,0.8)', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1, color: 'var(--color-navy)', zIndex: 2, width: '28px', height: '28px', borderRadius: '50%' }}>×</button>
       )}
 
-      {design.html && !isMobile && (
-        <iframe srcDoc={design.html} style={{ width: '100%', maxWidth: '100%', border: 'none', minHeight: '220px', display: 'block' }} title="Newsletter signup" />
+      {design.html && (
+        <iframe srcDoc={design.html.includes('<meta name="viewport"') ? design.html : '<meta name="viewport" content="width=device-width, initial-scale=1">' + design.html} style={{ width: '100%', maxWidth: '100%', border: 'none', minHeight: '220px', display: 'block' }} title="Newsletter signup" />
       )}
 
       {status === 'success' ? (
