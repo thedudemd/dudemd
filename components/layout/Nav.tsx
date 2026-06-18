@@ -109,7 +109,7 @@ export default async function Nav() {
             <div className="auth-out" style={{ alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
               <span />
               <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                <a href="/signin?redirect=/circles" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Circles</a>
+                <Link href="/circles" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Circles</Link>
                 <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>
                 <Link href="/signin" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-navy)', textDecoration: 'none' }}>Sign In</Link>
                 <span style={{ color: 'rgba(14,26,43,0.3)', fontSize: '10px' }}>|</span>
