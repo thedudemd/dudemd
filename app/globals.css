@@ -100,4 +100,4 @@ ul li:empty, ul li p:empty { display: none; } ul li:has(p:empty):not(:has(p:not(
 .hero-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
 @media (min-width: 900px) { .hero-grid { grid-template-columns: 2fr 1fr; gap: 3rem; } }
 
-@media (max-width: 899px) { .article-breadcrumb { display: none; } }
+@media (max-width: 899px) { .article-breadcrumb { display: none !important; } }
