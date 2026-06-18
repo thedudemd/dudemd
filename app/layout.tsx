@@ -12,6 +12,12 @@ import { PRE_HYDRATION_SCRIPT } from '@/lib/pre-hydration-script'
 import Script from 'next/script'
 const inter = Inter({ subsets: ['latin'], variable: '--font-body', display: 'swap' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display', display: 'swap', style: ['normal', 'italic'] })
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  interactiveWidget: "resizes-content",
+}
+
 export const metadata: Metadata = {
   title: {
     default: "DudeMD — Modern Men's Wellness for Real Life",
