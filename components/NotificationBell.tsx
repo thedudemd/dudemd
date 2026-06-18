@@ -73,7 +73,7 @@ export default function NotificationBell() {
           <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
         </svg>
         {unread > 0 && (
-          <span style={{ position: 'absolute', top: -2, right: -2, backgroundColor: '#c9b28f', color: '#0e1a2b', fontSize: '10px', fontWeight: 700, borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }} aria-label={`${unread} unread`}>
+          <span style={{ position: 'absolute', top: -2, right: -2, backgroundColor: '#c0392b', color: '#fff', fontSize: '10px', fontWeight: 700, borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }} aria-label={`${unread} unread`}>
             {unread > 9 ? '9+' : unread}
           </span>
         )}
