@@ -43,7 +43,7 @@ export default function CirclesPage() {
         <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '1.25rem', marginBottom: '2rem' }}>
           <p style={{ fontSize: '13px', color: '#9a9085', margin: 0 }}>Taking you back in <strong style={{ color: 'var(--color-navy)', fontSize: '18px' }}>{countdown}</strong> seconds...</p>
         </div>
-        <button onClick={() => { window.location.href = from }} style={{ padding: '0.75rem 2rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', marginRight: '0.75rem' }}>
+        <button onClick={() => { window.location.href = from || "/" }} style={{ padding: '0.75rem 2rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', marginRight: '0.75rem' }}>
           Go Back Now
         </button>
         <Link href="/" style={{ fontSize: '13px', color: 'var(--color-gold)', fontWeight: 600, textDecoration: 'none' }}>Home</Link>
