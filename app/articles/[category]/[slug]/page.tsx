@@ -165,7 +165,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       <div className="container-content" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
         <div className="article-grid" style={{ alignItems: 'start' }}>
           <article>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <div className="article-breadcrumb" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '1.5rem' }}>
               <Link href="/" style={{ fontSize: '12px', color: '#9a9085', textDecoration: 'none' }}>Home</Link>
               <span style={{ fontSize: '12px', color: '#9a9085' }}>›</span>
               <Link href={`/category/${article.categories?.slug}`} style={{ fontSize: '12px', color: '#9a9085', textDecoration: 'none' }}>{article.categories?.name}</Link>
