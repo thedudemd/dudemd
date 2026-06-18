@@ -12,7 +12,7 @@ export default async function Footer() {
         <div className="container-content">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', marginBottom: '3rem' }}>
             <div style={{ gridColumn: 'span 2' }}>
-              <img src="/md-transparent.svg" alt="DudeMD" style={{ height: '120px', width: 'auto', marginBottom: '1rem', filter: 'brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(500%) hue-rotate(5deg) brightness(95%) contrast(90%)' }} />
+              <img src="/md-transparent.svg" alt="DudeMD" style={{ height: '120px', width: 'auto', marginBottom: '1rem', filter: 'brightness(0) saturate(100%) invert(76%) sepia(20%) saturate(600%) hue-rotate(350deg) brightness(95%) contrast(88%)' }} />
               <p style={{ fontSize: '13px', color: 'rgba(247,244,238,0.5)', marginBottom: '1.5rem', maxWidth: '22rem', lineHeight: 1.6 }}> Modern Men's Wellness for Real Life.</p>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 {[
