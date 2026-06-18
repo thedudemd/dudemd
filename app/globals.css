@@ -103,3 +103,5 @@ ul li:empty, ul li p:empty { display: none; } ul li:has(p:empty):not(:has(p:not(
 @media (max-width: 899px) { .article-breadcrumb { display: none !important; } }
 
 @media (max-width: 899px) { .article-byline { margin-bottom: 1rem !important; } }
+
+@media (max-width: 899px) { .article-share-bar { margin: 0.5rem 0 !important; } }

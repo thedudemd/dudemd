@@ -249,7 +249,7 @@ export default function ArticleContent({ article, slug, category, relatedArticle
     }
 
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.875rem 0', borderTop: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)', margin: '1.5rem 0' }}>
+      <div className="article-share-bar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.875rem 0', borderTop: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)', margin: '1.5rem 0' }}>
         <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--color-slate)' }}>Share</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
           <span className="share-tip" data-tip="Share on Facebook"><a href="#" onClick={handleFacebookShare} title="Share on Facebook" style={{ color: '#9a9085', display: 'flex', textDecoration: 'none' }}>
