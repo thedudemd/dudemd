@@ -9,6 +9,7 @@ import SessionTracker from '@/components/SessionTracker'
 import GoogleOneTap from '@/components/auth/GoogleOneTap'
 import Footer from '@/components/layout/Footer'
 import { PRE_HYDRATION_SCRIPT } from '@/lib/pre-hydration-script'
+import Script from 'next/script'
 const inter = Inter({ subsets: ['latin'], variable: '--font-body', display: 'swap' })
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display', display: 'swap', style: ['normal', 'italic'] })
 export const metadata: Metadata = {
@@ -81,9 +82,8 @@ const websiteSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${playfair.variable}`}>
       <head>
-          <script dangerouslySetInnerHTML={{ __html: PRE_HYDRATION_SCRIPT }} />
           <script dangerouslySetInnerHTML={{ __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -106,6 +106,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <meta property='fb:app_id' content='2107832130079548' />
         </head>
       <body style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+        <Script id="auth-prehydration" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: PRE_HYDRATION_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: `
           !function(f,b,e,v,n,t,s)
           {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
