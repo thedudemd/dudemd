@@ -509,7 +509,7 @@ export default function AccountPage() {
         .snav-btn.active .snav-dot { background: #c9b28f; opacity: 1; }
 
         /* Mobile subnav — sits below site header, sticky */
-        .mnav { display: none; background: #fff; border-bottom: 1px solid var(--color-border); overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .mnav { display: none; background: #fff; border-bottom: 1px solid var(--color-border); overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; position: sticky; top: 97px; z-index: 10; }
         .mnav::-webkit-scrollbar { display: none; }
         .mnav-inner { display: flex; padding: 0 0.75rem; }
         .mnav-btn { padding: 0.8rem 0.875rem; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-size: 13px; font-weight: 600; color: #9a9085; white-space: nowrap; transition: color 0.15s, border-color 0.15s; }
@@ -605,7 +605,7 @@ export default function AccountPage() {
       <div className="hub-mobile" style={{ display: 'none' }}>
 
         {/* Sticky subnav — sits directly below the site header, no profile header */}
-        <nav className="mnav" style={{ position: 'fixed', top: 117, zIndex: 30, left: 0, right: 0 }}>
+        <nav className="mnav">
           <div className="mnav-inner">
             {NAV.slice(0, 4).map(item => (
               <button key={item.id} className={`mnav-btn${activeTab === item.id ? ' active' : ''}`} onClick={() => setActiveTab(item.id)}>
