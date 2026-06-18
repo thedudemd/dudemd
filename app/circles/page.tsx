@@ -1,19 +1,13 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 export default function CirclesPage() {
   const [countdown, setCountdown] = useState(6)
-  const fromRef = useRef<string>('/')
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    fromRef.current = params.get('from') || document.referrer || '/'
-  }, [])
 
   useEffect(() => {
     if (countdown <= 0) {
-      window.location.href = fromRef.current
+      window.history.back()
       return
     }
     const t = setTimeout(() => setCountdown(c => c - 1), 1000)
@@ -39,7 +33,7 @@ export default function CirclesPage() {
         <div style={{ backgroundColor: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '1.25rem', marginBottom: '2rem' }}>
           <p style={{ fontSize: '13px', color: '#9a9085', margin: 0 }}>Taking you back in <strong style={{ color: 'var(--color-navy)', fontSize: '18px' }}>{countdown}</strong> seconds...</p>
         </div>
-        <button onClick={() => { window.location.href = fromRef.current }} style={{ padding: '0.75rem 2rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', marginRight: '0.75rem' }}>
+        <button onClick={() => { window.history.back() }} style={{ padding: '0.75rem 2rem', backgroundColor: 'var(--color-navy)', color: 'var(--color-cream)', fontWeight: 700, fontSize: '13px', letterSpacing: '0.08em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', marginRight: '0.75rem' }}>
           Go Back Now
         </button>
         <Link href="/" style={{ fontSize: '13px', color: 'var(--color-gold)', fontWeight: 600, textDecoration: 'none' }}>Home</Link>
