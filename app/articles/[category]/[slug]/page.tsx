@@ -190,7 +190,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </p>
             )}
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--color-border)', marginBottom: '2rem' }}>
+            <div className="article-byline" style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--color-border)', marginBottom: '2rem' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {article.authors?.avatar_url ? (
                     <img src={article.authors.avatar_url} alt={article.authors.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
