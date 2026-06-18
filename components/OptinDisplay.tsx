@@ -7,12 +7,17 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: string; isHomepage?: boolean }) {
   const [enabled, setEnabled] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [design, setDesign] = useState<any>(null)
   const [dismissed, setDismissed] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768)
+  }, [])
 
   // Check feature flag
   useEffect(() => {
@@ -105,7 +110,7 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
         <button onClick={dismiss} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'rgba(255,255,255,0.8)', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1, color: 'var(--color-navy)', zIndex: 2, width: '28px', height: '28px', borderRadius: '50%' }}>×</button>
       )}
 
-      {design.html && (
+      {design.html && !isMobile && (
         <iframe srcDoc={design.html} style={{ width: '100%', maxWidth: '100%', border: 'none', minHeight: '220px', display: 'block' }} title="Newsletter signup" />
       )}
 
