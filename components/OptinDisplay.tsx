@@ -99,13 +99,13 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
   const isPopup = design.display_type === 'popup'
 
   const content = (
-    <div style={{ backgroundColor: 'var(--color-cream)', maxWidth: isPopup ? '420px' : '100%', width: '100%', position: 'relative', boxShadow: isPopup ? '0 8px 30px rgba(0,0,0,0.2)' : 'none' }}>
+    <div style={{ backgroundColor: 'var(--color-cream)', maxWidth: isPopup ? '420px' : '100%', width: '100%', position: 'relative', boxShadow: isPopup ? '0 8px 30px rgba(0,0,0,0.2)' : 'none', overflow: 'hidden', boxSizing: 'border-box' }}>
       {isPopup && (
         <button onClick={dismiss} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'rgba(255,255,255,0.8)', border: 'none', cursor: 'pointer', fontSize: '20px', lineHeight: 1, color: 'var(--color-navy)', zIndex: 2, width: '28px', height: '28px', borderRadius: '50%' }}>×</button>
       )}
 
       {design.html && (
-        <iframe srcDoc={design.html} style={{ width: '100%', border: 'none', minHeight: '220px', display: 'block' }} title="Newsletter signup" />
+        <iframe srcDoc={design.html} style={{ width: '100%', maxWidth: '100%', border: 'none', minHeight: '220px', display: 'block' }} title="Newsletter signup" />
       )}
 
       {status === 'success' ? (
