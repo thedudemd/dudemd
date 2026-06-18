@@ -116,7 +116,7 @@ export default function OptinDisplay({ categoryId, isHomepage }: { categoryId?: 
         </div>
       ) : (
         <div style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', width: '100%', boxSizing: 'border-box' }}>
             <input
               type="email"
               value={email}
