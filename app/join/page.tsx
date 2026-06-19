@@ -101,7 +101,7 @@ function NewsletterInner() {
               </form>
               <p style={{ fontSize: '11px', color: '#9a9085', marginTop: '1.25rem', textAlign: 'center', lineHeight: 1.6 }}>
                 🔒 Your information is secured. We never sell your data or spam you.<br/>
-                <a href="/privacy-policy" style={{ color: 'var(--color-navy)', textDecoration: 'underline' }}>Privacy Policy</a> &amp; <a href="/terms-of-use" style={{ color: 'var(--color-navy)', textDecoration: 'underline' }}>Terms of Service</a>
+                <a href="/privacy-policy" style={{ color: 'var(--color-navy)', textDecoration: 'underline' }}>Privacy Policy</a> &amp; <a href="/terms-of-service" style={{ color: 'var(--color-navy)', textDecoration: 'underline' }}>Terms of Service</a>
               </p>
             </div>
           </div>
