@@ -10,11 +10,11 @@ export async function POST(req: NextRequest) {
   if (!email) return NextResponse.json({ error: 'Email required' }, { status: 400 })
 
   // Check if already subscribed in newsletter_subscribers
-  const { data: existing } = await supabase.from('newsletter_subscribers').select('email').eq('email', email).single()
+  const { data: existing } = await supabase.from('newsletter_subscribers').select('email').eq('email', email).maybeSingle()
   if (existing) return NextResponse.json({ exists: true }, { status: 200 })
 
   // Check if already registered as a user in profiles
-  const { data: existingProfile } = await supabase.from('profiles').select('email').eq('email', email).single()
+  const { data: existingProfile } = await supabase.from('profiles').select('email').eq('email', email).maybeSingle()
   if (existingProfile) return NextResponse.json({ exists: true }, { status: 200 })
 
   const { error } = await supabase.from('newsletter_subscribers').insert({ email, source: 'newsletter_page', subscribed_categories: [] })
