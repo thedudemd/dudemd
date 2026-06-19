@@ -43,12 +43,16 @@ export async function POST(req: NextRequest) {
   const unsubscribeLink = 'https://www.dudemd.com/unsubscribe?email=' + encodeURIComponent(email)
   welcomeHtml = welcomeHtml.split('{{unsubscribe_link}}').join(unsubscribeLink).split('{{email}}').join(email)
 
-  await resend.emails.send({
-    from: 'DudeMD <hello@dudemd.com>',
-    to: email,
-    subject: welcomeSubject,
-    html: welcomeHtml
-  })
+  try {
+    await resend.emails.send({
+      from: 'DudeMD <hello@dudemd.com>',
+      to: email,
+      subject: welcomeSubject,
+      html: welcomeHtml
+    })
+  } catch(e) {
+    console.error('Welcome email failed:', e)
+  }
 
   // Fire Meta pixel server-side conversion event
   try {
